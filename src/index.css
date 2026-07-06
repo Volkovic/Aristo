@@ -1,0 +1,15 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --color-primary: #d1fe17;
+  --color-background-dark: #0a0a0a;
+  --color-background-card: #121212;
+  --color-text-main: #ffffff;
+  --color-text-muted: #9ca3af;
+}
+
+body {
+  background-color: var(--color-background-dark);
+  color: var(--color-text-main);
+}

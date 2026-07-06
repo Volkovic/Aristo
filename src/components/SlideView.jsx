@@ -1,0 +1,107 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+import Quiz from './Quiz';
+
+export default function SlideView({ content, dayQuiz, dayId, courseId }) {
+  // Split markdown by horizontal rule (---)
+  // We use regex to match lines that are exactly '---'
+  const slides = content.split(/^---\s*$/m).filter(s => s.trim().length > 0);
+  
+  // Add a final slide for the Quiz
+  const totalSlides = dayQuiz ? slides.length + 1 : slides.length;
+
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const handleNext = () => {
+    if (currentSlide < totalSlides - 1) {
+      setCurrentSlide(prev => prev + 1);
+    }
+  };
+
+  const handlePrev = () => {
+    if (currentSlide > 0) {
+      setCurrentSlide(prev => prev - 1);
+    }
+  };
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowRight') handleNext();
+      if (e.key === 'ArrowLeft') handlePrev();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [currentSlide, totalSlides]);
+
+  const isQuizSlide = dayQuiz && currentSlide === totalSlides - 1;
+
+  return (
+    <div className="w-full max-w-5xl mx-auto flex flex-col bg-gray-900 border border-gray-800 shadow-2xl rounded-2xl overflow-hidden" style={{ minHeight: '65vh' }}>
+      
+      {/* Header with Progress Bar */}
+      <div className="flex flex-col bg-gray-800/50 px-6 py-4 border-b border-gray-800 flex-shrink-0">
+        <div className="flex justify-between items-center mb-2">
+          <Link to={`/${courseId || 'python'}`} className="text-gray-400 hover:text-primary transition-colors flex items-center gap-2">
+            <ArrowLeft size={16} /> <span className="hidden sm:inline">Volver</span>
+          </Link>
+          <span className="text-sm font-bold text-gray-300">
+            {isQuizSlide ? 'Evaluación' : `Diapositiva ${currentSlide + 1} de ${totalSlides}`}
+          </span>
+          <div className="w-16"></div>
+        </div>
+        <div className="w-full bg-gray-700 rounded-full h-1.5">
+          <div 
+            className="bg-primary h-1.5 rounded-full transition-all duration-300" 
+            style={{ width: `${((currentSlide + 1) / totalSlides) * 100}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {/* Slide Content Area */}
+      <div className="flex-1 flex flex-col justify-center p-8 lg:p-12 relative overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent bg-background-dark/30">
+        {isQuizSlide ? (
+          <div id="quiz-container" className="h-full flex items-center justify-center">
+            <Quiz questions={dayQuiz} dayId={dayId} courseId={courseId} />
+          </div>
+        ) : (
+          <article className="prose prose-invert prose-p:text-gray-300 prose-p:text-lg prose-headings:text-white prose-a:text-primary hover:prose-a:text-primary/80 prose-pre:bg-gray-950 prose-pre:border prose-pre:border-gray-800 prose-pre:whitespace-pre-wrap prose-pre:break-words max-w-none w-full mx-auto flex flex-col justify-center min-h-full">
+            <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+              {slides[currentSlide]}
+            </ReactMarkdown>
+          </article>
+        )}
+      </div>
+
+      {/* Footer Controls */}
+      <div className="flex justify-between items-center bg-gray-800/50 px-6 py-4 border-t border-gray-800 flex-shrink-0">
+        <button
+          onClick={handlePrev}
+          disabled={currentSlide === 0}
+          className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold transition-colors ${
+            currentSlide === 0 
+              ? 'opacity-50 cursor-not-allowed text-gray-500 bg-gray-800' 
+              : 'text-white bg-gray-800 hover:bg-gray-700'
+          }`}
+        >
+          <ArrowLeft size={18} /> Anterior
+        </button>
+        
+        <button
+          onClick={handleNext}
+          disabled={currentSlide === totalSlides - 1}
+          className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold transition-colors ${
+            currentSlide === totalSlides - 1
+              ? 'opacity-50 cursor-not-allowed text-gray-500 bg-gray-800'
+              : 'text-background-dark bg-primary hover:bg-primary/90'
+          }`}
+        >
+          {isQuizSlide ? 'Finalizar' : 'Siguiente'} <ArrowRight size={18} />
+        </button>
+      </div>
+    </div>
+  );
+}
