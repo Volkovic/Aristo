@@ -1,7 +1,56 @@
+import { useState, useEffect } from 'react';
 import CourseCard from '../components/CourseCard';
 import { Terminal, Code2, Database } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { supabase } from '../lib/supabase';
 
 export default function Dashboard() {
+  const { user } = useAuth();
+  const [progress, setProgress] = useState({
+    python: 0,
+    javascript: 0,
+    sql: 0
+  });
+
+  const TOTAL_DAYS = {
+    python: 30,
+    javascript: 23,
+    sql: 15
+  };
+
+  useEffect(() => {
+    if (!user) return;
+
+    async function loadProgress() {
+      const { data, error } = await supabase
+        .from('user_progress')
+        .select('course_id, day_id')
+        .eq('user_id', user.id);
+
+      if (!error && data) {
+        const maxDays = {
+          python: 0,
+          javascript: 0,
+          sql: 0
+        };
+        
+        data.forEach(row => {
+          if (row.course_id && row.day_id > maxDays[row.course_id]) {
+            maxDays[row.course_id] = row.day_id;
+          }
+        });
+
+        setProgress({
+          python: Math.round((maxDays.python / TOTAL_DAYS.python) * 100),
+          javascript: Math.round((maxDays.javascript / TOTAL_DAYS.javascript) * 100),
+          sql: Math.round((maxDays.sql / TOTAL_DAYS.sql) * 100)
+        });
+      }
+    }
+
+    loadProgress();
+  }, [user]);
+
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <section className="space-y-4 max-w-3xl">
@@ -20,7 +69,7 @@ export default function Dashboard() {
           description="Aprende los fundamentos de Python, estructuras de datos y lógica de programación desde cero." 
           icon={Terminal} 
           to="/python" 
-          progress={0}
+          progress={progress.python}
         />
         <CourseCard 
           title="JavaScript"
@@ -28,7 +77,7 @@ export default function Dashboard() {
           description="Domina el lenguaje de la web, asincronía y el ecosistema de JS." 
           icon={Code2} 
           to="/javascript"
-          progress={0}
+          progress={progress.javascript}
         />
         <CourseCard 
           title="SQL" 
@@ -36,7 +85,7 @@ export default function Dashboard() {
           description="Bases de datos relacionales, consultas complejas y modelado de datos." 
           icon={Database} 
           to="/sql"
-          progress={0}
+          progress={progress.sql}
         />
       </section>
     </div>
