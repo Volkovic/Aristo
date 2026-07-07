@@ -64,7 +64,7 @@ export default function Quiz({ questions, dayId, courseId }) {
 
   useEffect(() => {
     let timer;
-    if (isStarted && !isFinished && timeLeft > 0) {
+    if (isStarted && !isFinished && !isAnswered && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft((prev) => {
           if (prev <= 1) {
@@ -77,7 +77,7 @@ export default function Quiz({ questions, dayId, courseId }) {
       }, 1000);
     }
     return () => clearInterval(timer);
-  }, [isStarted, isFinished, timeLeft, finishQuiz]);
+  }, [isStarted, isFinished, isAnswered, timeLeft, finishQuiz]);
 
   const currentQuestion = shuffledQuestions[currentQuestionIndex];
 
@@ -231,16 +231,16 @@ export default function Quiz({ questions, dayId, courseId }) {
                 <div className="bg-primary h-1.5 rounded-full transition-all duration-300" style={{ width: `${((currentQuestionIndex) / shuffledQuestions.length) * 100}%` }}></div>
               </div>
             </div>
-            <div className={`flex items-center gap-2 font-mono text-lg font-bold px-4 py-1.5 rounded-lg border ${timeLeft < 60 ? 'bg-red-500/10 text-red-500 border-red-500/50 animate-pulse' : 'bg-gray-800 text-primary border-gray-700'}`}>
-              <Clock size={18} /> {formatTime(timeLeft)}
+            <div className={`flex items-center gap-2 font-mono text-lg font-bold px-4 py-1.5 rounded-lg border ${isAnswered ? 'bg-gray-800 text-gray-500 border-gray-700' : timeLeft < 60 ? 'bg-red-500/10 text-red-500 border-red-500/50 animate-pulse' : 'bg-gray-800 text-primary border-gray-700'}`}>
+              <Clock size={18} /> {formatTime(timeLeft)} {isAnswered && <span className="text-xs text-gray-500 ml-1">⏸</span>}
             </div>
           </div>
 
-          {/* Body */}
-          <div className="p-6 flex flex-col gap-6 overflow-hidden flex-1">
+          {/* Scrollable Body */}
+          <div className="p-6 flex flex-col gap-6 overflow-y-auto flex-1">
             <h3 className="text-xl sm:text-2xl font-bold text-white leading-tight">{currentQuestion.question}</h3>
             
-            {/* Grid 2x2 para las opciones (evita el scroll vertical al aprovechar el ancho) */}
+            {/* Grid 2x2 para las opciones */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {currentQuestion.options.map((option, index) => {
                 let buttonStateClass = "border-gray-700 hover:border-gray-500 hover:bg-gray-800";
@@ -275,28 +275,32 @@ export default function Quiz({ questions, dayId, courseId }) {
               })}
             </div>
 
-            {/* Justificación y Botón Siguiente (Diseño horizontal compacto para ahorrar espacio) */}
+            {/* Justificación (scrollable dentro del body) */}
             {isAnswered && (
-              <div className="flex flex-col sm:flex-row gap-4 items-stretch mt-auto animate-in fade-in slide-in-from-bottom-4 flex-shrink-0">
-                <div className="flex-1 p-4 rounded-xl bg-background-card border border-gray-800 overflow-y-auto">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    {selectedOption === currentQuestion.correctAnswer ? (
-                      <span className="text-green-400 font-bold flex items-center gap-1.5"><CheckCircle size={16}/> ¡Correcto!</span>
-                    ) : (
-                      <span className="text-red-400 font-bold flex items-center gap-1.5"><XCircle size={16}/> Incorrecto</span>
-                    )}
-                  </div>
-                  <p className="text-gray-300 text-sm sm:text-base"><strong className="text-white">Justificación:</strong> {currentQuestion.justification}</p>
+              <div className="p-4 rounded-xl bg-background-card border border-gray-800 animate-in fade-in slide-in-from-bottom-4">
+                <div className="flex items-center gap-2 mb-1.5">
+                  {selectedOption === currentQuestion.correctAnswer ? (
+                    <span className="text-green-400 font-bold flex items-center gap-1.5"><CheckCircle size={16}/> ¡Correcto!</span>
+                  ) : (
+                    <span className="text-red-400 font-bold flex items-center gap-1.5"><XCircle size={16}/> Incorrecto</span>
+                  )}
                 </div>
-                <button 
-                  onClick={handleNext}
-                  className="sm:w-48 flex-shrink-0 py-4 sm:py-0 px-6 bg-primary text-background-dark font-bold text-lg rounded-xl hover:bg-primary/90 transition-transform hover:scale-[1.02]"
-                >
-                  {currentQuestionIndex < shuffledQuestions.length - 1 ? 'Siguiente >>' : 'Finalizar'}
-                </button>
+                <p className="text-gray-300 text-sm sm:text-base"><strong className="text-white">Justificación:</strong> {currentQuestion.justification}</p>
               </div>
             )}
           </div>
+
+          {/* Botón Siguiente - Siempre visible al fondo */}
+          {isAnswered && (
+            <div className="flex-shrink-0 border-t border-gray-800 bg-gray-900 px-6 py-4 animate-in fade-in slide-in-from-bottom-2">
+              <button 
+                onClick={handleNext}
+                className="w-full py-3.5 px-6 bg-primary text-background-dark font-bold text-lg rounded-xl hover:bg-primary/90 transition-transform hover:scale-[1.01]"
+              >
+                {currentQuestionIndex < shuffledQuestions.length - 1 ? 'Siguiente >>' : 'Finalizar'}
+              </button>
+            </div>
+          )}
 
         </div>
       )}

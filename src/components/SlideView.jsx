@@ -2,8 +2,32 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronRight } from 'lucide-react';
 import Quiz from './Quiz';
+
+// Converts **[Solución]** followed by a ```code block``` into a collapsible <details> toggle
+function preprocessSolutions(markdown) {
+  // Match **[Solución]** followed by a fenced code block (```...```)
+  return markdown.replace(
+    /\*\*\[Solución\]\*\*\s*\n(```[\s\S]*?```)/g,
+    (_, codeBlock) => {
+      // Escape the code content for safe HTML embedding
+      const lines = codeBlock.split('\n');
+      // First line is ```lang, last line is ```
+      const langMatch = lines[0].match(/^```(\w*)/);
+      const lang = langMatch ? langMatch[1] : '';
+      const codeContent = lines.slice(1, -1).join('\n')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      
+      return `<details class="solution-toggle">
+<summary>💡 Ver Solución</summary>
+<pre class="solution-code"><code class="language-${lang}">${codeContent}</code></pre>
+</details>`;
+    }
+  );
+}
 
 export default function SlideView({ content, dayQuiz, dayId, courseId }) {
   // Split markdown by horizontal rule (---)
@@ -70,7 +94,7 @@ export default function SlideView({ content, dayQuiz, dayId, courseId }) {
         ) : (
           <article className="prose prose-invert prose-p:text-gray-300 prose-p:text-lg prose-headings:text-white prose-a:text-primary hover:prose-a:text-primary/80 prose-pre:bg-gray-950 prose-pre:border prose-pre:border-gray-800 prose-pre:whitespace-pre-wrap prose-pre:break-words max-w-none w-full mx-auto flex flex-col justify-center min-h-full">
             <ReactMarkdown rehypePlugins={[rehypeRaw]}>
-              {slides[currentSlide]}
+              {preprocessSolutions(slides[currentSlide])}
             </ReactMarkdown>
           </article>
         )}
