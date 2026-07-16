@@ -56,8 +56,7 @@ WHERE id = 5;
 UPDATE empleados SET salario = 5000;
 ```
 
-<details>
-<summary>Ver Respuesta</summary>
-
-Al omitir el `WHERE` (la condición de freno), la base de datos obedecerá ciegamente la instrucción global. Irá fila por fila mutando a TODA LA EMPRESA (desde el conserje hasta el CEO) asignándoles a todos el salario de 5000 en el acto, arruinando la contabilidad completa irreversiblemente. ¡Siempre usa WHERE en Updates/Deletes!
-</details>
+**[Solución]**
+```sql
+-- Al omitir el `WHERE` (la condición de freno), la base de datos obedecerá ciegamente la instrucción global. Irá fila por fila mutando a TODA LA EMPRESA (desde el conserje hasta el CEO) asignándoles a todos el salario de 5000 en el acto, arruinando la contabilidad completa irreversiblemente. ¡Siempre usa WHERE en Updates/Deletes!
+```

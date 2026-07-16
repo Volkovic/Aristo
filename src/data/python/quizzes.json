@@ -3656,12 +3656,12 @@
     },
     {
       "id": 1603,
-      "question": "¿Cómo extraes únicamente el año (Year) de un objeto datetime llamado `ahora`?",
+      "question": "¿Cómo extraes únicamente el año (Year) de un objeto datetime llamado `now`?",
       "options": [
-        "ahora.get_year()",
-        "ahora.year",
-        "ahora['year']",
-        "ahora.y"
+        "now.get_year()",
+        "now.year",
+        "now['year']",
+        "now.y"
       ],
       "correctAnswer": 1,
       "justification": "Los objetos devueltos por `.now()` exponen atributos accesibles directamente como `.year`, `.month`, `.day`, `.hour`, etc."

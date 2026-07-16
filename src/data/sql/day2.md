@@ -107,34 +107,30 @@ WHERE nombre LIKE 'L___'
 
 ---
 
-### Ejercicio Práctico 1
+## 💻 Ejercicios Prácticos
 
-**¿Qué salida produce este código?**
+**Consigna 1: ¿Qué salida produce este código?**
 ```sql
 SELECT * FROM productos WHERE precio = 50 AND precio = 100;
 ```
 
-<details>
-<summary>Ver Respuesta</summary>
+**[Solución]**
+```sql
+-- Devolverá 0 filas (Tabla Vacía).
+-- Es lógicamente imposible que una única fila tenga un precio que sea 
+-- exactamente 50 y, al mismo tiempo exacto, sea 100. 
+-- Probablemente el programador quería usar el operador OR.
+```
 
-**Devolverá 0 filas (Tabla Vacía).**
-Es lógicamente imposible que una única fila tenga un precio que sea exactamente 50 y, al mismo tiempo exacto, sea 100. Probablemente el programador quería usar el operador `OR`.
-</details>
-
----
-
-### Ejercicio Práctico 2
-
-**Reescribe el siguiente código feo usando un solo operador moderno:**
+**Consigna 2: Reescribe el siguiente código feo usando un solo operador moderno:**
 ```sql
 SELECT id FROM facturas WHERE fecha >= '2023-01-01' AND fecha <= '2023-12-31';
 ```
 
-<details>
-<summary>Ver Respuesta</summary>
-
+**[Solución]**
 ```sql
 SELECT id FROM facturas WHERE fecha BETWEEN '2023-01-01' AND '2023-12-31';
+
+-- El operador BETWEEN hace exactamente lo mismo (mayor o igual, y menor o igual), 
+-- logrando que el código sea semánticamente hermoso y fácil de leer.
 ```
-El operador `BETWEEN` hace exactamente lo mismo (mayor o igual, y menor o igual), logrando que el código sea semánticamente hermoso y fácil de leer.
-</details>

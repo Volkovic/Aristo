@@ -51,8 +51,7 @@ CREATE TABLE post (
 );
 ```
 
-<details>
-<summary>Ver Respuesta</summary>
-
-Falta absolutamente todo. La tabla no tiene llave primaria (`id`) por lo que las filas serán irreconocibles, y VARCHAR(50) es extremadamente corto para un título de un post (explotará). Además, al no forzar un NOT NULL, se pueden insertar posts vacíos.
-</details>
+**[Solución]**
+```sql
+-- Falta absolutamente todo. La tabla no tiene llave primaria (`id`) por lo que las filas serán irreconocibles, y VARCHAR(50) es extremadamente corto para un título de un post (explotará). Además, al no forzar un NOT NULL, se pueden insertar posts vacíos.
+```

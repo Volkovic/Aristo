@@ -80,14 +80,11 @@ SELECT * FROM posts ORDER BY fecha DESC LIMIT 10 OFFSET 20;
 
 **Analiza el siguiente requerimiento:** Necesitamos obtener el "Segundo empleado con el salario más alto de la empresa". ¿Cómo armas la consulta?
 
-<details>
-<summary>Ver Respuesta</summary>
-
+**[Solución]**
 ```sql
 SELECT nombre, salario 
 FROM empleados 
 ORDER BY salario DESC 
 LIMIT 1 OFFSET 1;
+-- **Justificación:** Al ordenar `DESC`, ponemos a los más ricos arriba. `LIMIT 1` asegura que nos traiga solo 1 fila. Y la clave maestra es `OFFSET 1`, que le dice al motor: "sáltate e ignora a la primera fila absoluta (el más rico real), y entrégame solo el que quedó en el segundo puesto".
 ```
-**Justificación:** Al ordenar `DESC`, ponemos a los más ricos arriba. `LIMIT 1` asegura que nos traiga solo 1 fila. Y la clave maestra es `OFFSET 1`, que le dice al motor: "sáltate e ignora a la primera fila absoluta (el más rico real), y entrégame solo el que quedó en el segundo puesto".
-</details>

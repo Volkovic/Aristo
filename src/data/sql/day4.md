@@ -44,9 +44,8 @@ FROM productos;
 
 **¿Qué pasa si ejecutas `SELECT nombre, MAX(salario) FROM empleados;`?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
-**Genera un Error (o comportamiento impredecible).**
-No puedes mezclar en el mismo SELECT una columna 'plana' e individual (nombre) junto con una función de agregación agrupada (MAX), a menos que uses la cláusula GROUP BY. La base de datos no sabe qué nombre asociar a ese único salario máximo resumido.
-</details>
+**[Solución]**
+```sql
+-- **Genera un Error (o comportamiento impredecible).**
+-- No puedes mezclar en el mismo SELECT una columna 'plana' e individual (nombre) junto con una función de agregación agrupada (MAX), a menos que uses la cláusula GROUP BY. La base de datos no sabe qué nombre asociar a ese único salario máximo resumido.
+```

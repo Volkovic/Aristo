@@ -35,8 +35,7 @@ Si necesitas ver a todos los clientes, hayan comprado o no, INNER JOIN no te ser
 
 **En la consulta de arriba, ¿por qué escribimos `clientes.nombre` en vez de solo `nombre`?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
-**Por ambigüedad.** Si la tabla `clientes` tiene una columna `fecha_compra` y la tabla `pedidos` también la tiene, el motor SQL entrará en pánico (Error: Ambiguous column name). Al prefijar `nombreTabla.nombreColumna`, somos explícitos y seguros.
-</details>
+**[Solución]**
+```sql
+-- **Por ambigüedad.** Si la tabla `clientes` tiene una columna `fecha_compra` y la tabla `pedidos` también la tiene, el motor SQL entrará en pánico (Error: Ambiguous column name). Al prefijar `nombreTabla.nombreColumna`, somos explícitos y seguros.
+```

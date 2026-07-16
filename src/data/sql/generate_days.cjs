@@ -49,12 +49,11 @@ FROM productos;
 
 **¿Qué pasa si ejecutas \`SELECT nombre, MAX(salario) FROM empleados;\`?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
-**Genera un Error (o comportamiento impredecible).**
-No puedes mezclar en el mismo SELECT una columna 'plana' e individual (nombre) junto con una función de agregación agrupada (MAX), a menos que uses la cláusula GROUP BY. La base de datos no sabe qué nombre asociar a ese único salario máximo resumido.
-</details>`,
+**[Solución]**
+\`\`\`sql
+-- **Genera un Error (o comportamiento impredecible).**
+-- No puedes mezclar en el mismo SELECT una columna 'plana' e individual (nombre) junto con una función de agregación agrupada (MAX), a menos que uses la cláusula GROUP BY. La base de datos no sabe qué nombre asociar a ese único salario máximo resumido.
+\`\`\``,
   5: `## Agrupación de Datos (GROUP BY)
 
 Como vimos en el día anterior, no puedes mezclar agregaciones con columnas normales. Pero, ¿qué pasa si quieres saber "cuántos empleados hay EN CADA departamento"? 
@@ -92,16 +91,15 @@ HAVING SUM(salario) > 50000;
 **Ordena las cláusulas SQL según su estricto orden de ejecución lógica dentro del motor:** 
 GROUP BY, WHERE, ORDER BY, SELECT, FROM, HAVING.
 
-<details>
-<summary>Ver Respuesta</summary>
-
-1. **FROM** (Busca la tabla cruda)
-2. **WHERE** (Elimina filas que no sirven)
-3. **GROUP BY** (Agrupa lo que quedó)
-4. **HAVING** (Filtra a los grupos que no sirven)
-5. **SELECT** (Proyecta o saca las columnas finales)
-6. **ORDER BY** (Ordena visualmente el resultado final)
-</details>`,
+**[Solución]**
+\`\`\`sql
+-- 1. **FROM** (Busca la tabla cruda)
+-- 2. **WHERE** (Elimina filas que no sirven)
+-- 3. **GROUP BY** (Agrupa lo que quedó)
+-- 4. **HAVING** (Filtra a los grupos que no sirven)
+-- 5. **SELECT** (Proyecta o saca las columnas finales)
+-- 6. **ORDER BY** (Ordena visualmente el resultado final)
+\`\`\``,
   6: `## Funciones Nativas de Texto (Strings)
 
 SQL viene con múltiples herramientas incorporadas (Built-in Functions) para alterar los datos al vuelo justo antes de mostrarlos.
@@ -160,11 +158,10 @@ FROM empleados;
 SELECT nombre, COALESCE(telefono, 'Sin registrar') AS Tel FROM usuarios;
 \`\`\`
 
-<details>
-<summary>Ver Respuesta</summary>
-
-La fantástica función \`COALESCE()\` evalúa si el primer parámetro es NULL. Si lo es, escupe el segundo parámetro (un valor de respaldo/default). Por lo tanto, en la UI se mostrará el texto 'Sin registrar' en vez de un espantoso NULL vacío.
-</details>`,
+**[Solución]**
+\`\`\`sql
+-- La fantástica función \`COALESCE()\` evalúa si el primer parámetro es NULL. Si lo es, escupe el segundo parámetro (un valor de respaldo/default). Por lo tanto, en la UI se mostrará el texto 'Sin registrar' en vez de un espantoso NULL vacío.
+\`\`\``,
   7: `## Relaciones y JOINs
 
 Las bases de datos relacionales evitan la redundancia dividiendo los datos en muchas tablas pequeñas conectadas por claves (Llaves Primarias y Llaves Foráneas).
@@ -202,11 +199,10 @@ Si necesitas ver a todos los clientes, hayan comprado o no, INNER JOIN no te ser
 
 **En la consulta de arriba, ¿por qué escribimos \`clientes.nombre\` en vez de solo \`nombre\`?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
-**Por ambigüedad.** Si la tabla \`clientes\` tiene una columna \`fecha_compra\` y la tabla \`pedidos\` también la tiene, el motor SQL entrará en pánico (Error: Ambiguous column name). Al prefijar \`nombreTabla.nombreColumna\`, somos explícitos y seguros.
-</details>`,
+**[Solución]**
+\`\`\`sql
+-- **Por ambigüedad.** Si la tabla \`clientes\` tiene una columna \`fecha_compra\` y la tabla \`pedidos\` también la tiene, el motor SQL entrará en pánico (Error: Ambiguous column name). Al prefijar \`nombreTabla.nombreColumna\`, somos explícitos y seguros.
+\`\`\``,
   8: `## OUTER JOINS
 
 A diferencia del INNER JOIN estricto que requiere pareja exacta, los Outer Joins permiten que las filas de una tabla sobrevivan en el resultado, incluso si no encontraron coincidencias en la otra tabla.
@@ -254,17 +250,14 @@ FULL OUTER JOIN pedidos p
 
 **¿Cómo usarías un LEFT JOIN para encontrar a los clientes falsos (que se registraron pero que JAMÁS hicieron una compra)?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
+**[Solución]**
 \`\`\`sql
 SELECT c.nombre 
 FROM clientes c
 LEFT JOIN pedidos p ON c.id = p.cliente_id
 WHERE p.id IS NULL;
-\`\`\`
-Al hacer el LEFT JOIN sabemos que los que no compraron tendrán la columna de pedido rellena de NULLs por SQL. Filtrando explícitamente \`WHERE p.id IS NULL\` nos aislamos para ver únicamente a los rezagados. A esta técnica técnica se le llama "Anti-Join".
-</details>`,
+-- Al hacer el LEFT JOIN sabemos que los que no compraron tendrán la columna de pedido rellena de NULLs por SQL. Filtrando explícitamente \`WHERE p.id IS NULL\` nos aislamos para ver únicamente a los rezagados. A esta técnica técnica se le llama "Anti-Join".
+\`\`\``,
   9: `## Operaciones de Conjuntos (UNION)
 
 En lugar de unir tablas horizontalmente añadiendo columnas con un JOIN, las operaciones de conjunto como \`UNION\` unen los resultados **verticalmente**, apilando filas encima de otras filas.
@@ -308,11 +301,10 @@ Para poder apilar dos SELECTs, SQL te obliga a cumplir dos reglas de oro inquebr
 
 **¿Qué ocurre si el primer SELECT pide 2 columnas, y el segundo pide 3?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
-**Syntax Error.** El motor colapsará instantáneamente alegando: "Las consultas utilizadas en una instrucción UNION deben tener el mismo número de columnas".
-</details>`,
+**[Solución]**
+\`\`\`sql
+-- **Syntax Error.** El motor colapsará instantáneamente alegando: "Las consultas utilizadas en una instrucción UNION deben tener el mismo número de columnas".
+\`\`\``,
   10: `## Subconsultas (Subqueries)
 
 Una subconsulta es una consulta completa anidada o escondida adentro de otra consulta (Query dentro de un Query).
@@ -373,11 +365,10 @@ WHERE e1.salario > (
 
 **¿Por qué las Subconsultas Correlacionadas se consideran un Anti-patrón de rendimiento masivo frente a un JOIN?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
-Porque ejecutan su lógica en un bucle N veces (N siendo las filas exteriores). Si la tabla exterior tiene 1 millón de empleados, el servidor hará 1 millón de consultas independientes extra a la base de datos para promediar salarios, matando el CPU. Con JOINs, los datos se calculan en masa (Set-based) una sola vez.
-</details>`,
+**[Solución]**
+\`\`\`sql
+-- Porque ejecutan su lógica en un bucle N veces (N siendo las filas exteriores). Si la tabla exterior tiene 1 millón de empleados, el servidor hará 1 millón de consultas independientes extra a la base de datos para promediar salarios, matando el CPU. Con JOINs, los datos se calculan en masa (Set-based) una sola vez.
+\`\`\``,
   11: `## Common Table Expressions (CTEs)
 
 Las CTEs (Cláusula \`WITH\`) son una evolución moderna, elegante y revolucionaria para reemplazar subconsultas ilegibles y anidadas (Código Espagueti). 
@@ -421,11 +412,10 @@ SELECT * FROM T3;
 
 **¿Se guarda la tabla CTE físicamente en el disco duro de la base de datos (como una View)?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
-**NO.** Las CTEs son 100% efímeras. Solo existen viva en memoria durante la minúscula fracción de segundo que demora en ejecutarse esa única declaración SQL. Al finalizar el punto y coma \`;\`, la CTE y sus datos se evaporan sin dejar rastro.
-</details>`,
+**[Solución]**
+\`\`\`sql
+-- **NO.** Las CTEs son 100% efímeras. Solo existen viva en memoria durante la minúscula fracción de segundo que demora en ejecutarse esa única declaración SQL. Al finalizar el punto y coma \`;\`, la CTE y sus datos se evaporan sin dejar rastro.
+\`\`\``,
   12: `## Manipulando Estructuras (DDL)
 
 Hasta ahora aprendimos DQL (Data Query Language, para consultar). Ahora entraremos a **DDL (Data Definition Language)**: Comandos para crear y destruir las estructuras, las bases y las columnas (Arquitectura).
@@ -479,11 +469,10 @@ CREATE TABLE post (
 );
 \`\`\`
 
-<details>
-<summary>Ver Respuesta</summary>
-
-Falta absolutamente todo. La tabla no tiene llave primaria (\`id\`) por lo que las filas serán irreconocibles, y VARCHAR(50) es extremadamente corto para un título de un post (explotará). Además, al no forzar un NOT NULL, se pueden insertar posts vacíos.
-</details>`,
+**[Solución]**
+\`\`\`sql
+-- Falta absolutamente todo. La tabla no tiene llave primaria (\`id\`) por lo que las filas serán irreconocibles, y VARCHAR(50) es extremadamente corto para un título de un post (explotará). Además, al no forzar un NOT NULL, se pueden insertar posts vacíos.
+\`\`\``,
   13: `## Manipulando Datos (DML)
 
 Ahora entraremos a **DML (Data Manipulation Language)**: Los comandos operativos para Insertar, Actualizar y Eliminar registros (filas) dentro de nuestras estructuras previas.
@@ -542,11 +531,10 @@ WHERE id = 5;
 UPDATE empleados SET salario = 5000;
 \`\`\`
 
-<details>
-<summary>Ver Respuesta</summary>
-
-Al omitir el \`WHERE\` (la condición de freno), la base de datos obedecerá ciegamente la instrucción global. Irá fila por fila mutando a TODA LA EMPRESA (desde el conserje hasta el CEO) asignándoles a todos el salario de 5000 en el acto, arruinando la contabilidad completa irreversiblemente. ¡Siempre usa WHERE en Updates/Deletes!
-</details>`,
+**[Solución]**
+\`\`\`sql
+-- Al omitir el \`WHERE\` (la condición de freno), la base de datos obedecerá ciegamente la instrucción global. Irá fila por fila mutando a TODA LA EMPRESA (desde el conserje hasta el CEO) asignándoles a todos el salario de 5000 en el acto, arruinando la contabilidad completa irreversiblemente. ¡Siempre usa WHERE en Updates/Deletes!
+\`\`\``,
   14: `## Transacciones (ACID)
 
 Una **Transacción** asegura que una secuencia de operaciones complejas en la base de datos (Ej: 1. Restar dinero de mi cuenta, 2. Sumarlo a tu cuenta) se ejecuten como una **única unidad de trabajo invisible e indisoluble**.
@@ -590,11 +578,10 @@ CREATE INDEX idx_usuario_email ON usuarios(email);
 
 **Si los índices aceleran todas las lecturas de forma milagrosa a 1 milisegundo, ¿por qué no le ponemos un índice a absolutamente todas las columnas de todas las tablas y ya está?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
-Porque cada índice tiene un precio gravísimo: **Desaceleran salvajemente las Escrituras (INSERT, UPDATE, DELETE)**. Cada vez que inyectas una fila nueva, el motor debe pausar y reestructurar matemáticamente todos y cada uno de los árboles (índices) adjuntos. Si tienes 20 índices, cada registro que entra será lentísimo, colapsando tu capacidad de inserción masiva. Solo se indexan las llaves principales y las usadas masivamente en el WHERE.
-</details>`,
+**[Solución]**
+\`\`\`sql
+-- Porque cada índice tiene un precio gravísimo: **Desaceleran salvajemente las Escrituras (INSERT, UPDATE, DELETE)**. Cada vez que inyectas una fila nueva, el motor debe pausar y reestructurar matemáticamente todos y cada uno de los árboles (índices) adjuntos. Si tienes 20 índices, cada registro que entra será lentísimo, colapsando tu capacidad de inserción masiva. Solo se indexan las llaves principales y las usadas masivamente en el WHERE.
+\`\`\``,
   15: `## Window Functions (Funciones de Ventana)
 
 Las Window Functions son la magia de análisis moderno (PostgreSQL, SQL Server).
@@ -654,11 +641,10 @@ FROM empleados
 WHERE Top <= 3;
 \`\`\`
 
-<details>
-<summary>Ver Respuesta</summary>
-
-**Error de Orden Lógico.** Como aprendiste en el día 5, el \`WHERE\` ocurre primero (antes del SELECT). Por tanto, la base de datos dice: "No tengo la más remota idea de qué es la columna 'Top', porque las Window Functions se calculan justo al final (en la fase del Select)". Para filtrarlo debes envolverlo obligatoriamente en un CTE (\`WITH...\`) y filtrar la nueva variable limpia después. ¡Felicidades por finalizar tu currículo!
-</details>`
+**[Solución]**
+\`\`\`sql
+-- **Error de Orden Lógico.** Como aprendiste en el día 5, el \`WHERE\` ocurre primero (antes del SELECT). Por tanto, la base de datos dice: "No tengo la más remota idea de qué es la columna 'Top', porque las Window Functions se calculan justo al final (en la fase del Select)". Para filtrarlo debes envolverlo obligatoriamente en un CTE (\`WITH...\`) y filtrar la nueva variable limpia después. ¡Felicidades por finalizar tu currículo!
+\`\`\``
 };
 
 for (const [day, content] of Object.entries(contents)) {

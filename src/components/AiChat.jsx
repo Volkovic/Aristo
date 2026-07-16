@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
+import ReactMarkdown from 'react-markdown';
 import { MessageSquare, X, Send, Settings, Sparkles, Trash2, ChevronDown } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
@@ -340,12 +341,12 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
               
               {messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+                  <div className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed overflow-hidden break-words ${
                     msg.role === 'user'
-                      ? 'bg-primary/20 text-white rounded-br-md'
-                      : 'bg-gray-800 text-gray-200 rounded-bl-md border border-gray-700'
+                      ? 'bg-primary/20 text-white rounded-br-md whitespace-pre-wrap'
+                      : 'bg-gray-800 text-gray-200 rounded-bl-md border border-gray-700 prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:p-2 prose-pre:bg-black/50 prose-pre:border prose-pre:border-gray-700 prose-pre:whitespace-pre-wrap prose-pre:break-words'
                   }`}>
-                    {msg.content}
+                    {msg.role === 'user' ? msg.content : <ReactMarkdown>{msg.content}</ReactMarkdown>}
                   </div>
                 </div>
               ))}
@@ -353,9 +354,8 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
               {/* Streaming message */}
               {isLoading && streamingText && (
                 <div className="flex justify-start">
-                  <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-bl-md text-sm leading-relaxed bg-gray-800 text-gray-200 border border-gray-700 whitespace-pre-wrap">
-                    {streamingText}
-                    <span className="ai-chat-cursor">▊</span>
+                  <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-bl-md text-sm leading-relaxed overflow-hidden break-words bg-gray-800 text-gray-200 border border-gray-700 prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:p-2 prose-pre:bg-black/50 prose-pre:border prose-pre:border-gray-700 prose-pre:whitespace-pre-wrap prose-pre:break-words">
+                    <ReactMarkdown>{streamingText + ' ▊'}</ReactMarkdown>
                   </div>
                 </div>
               )}
@@ -464,21 +464,20 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
 
                 {messages.map((msg, i) => (
                   <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
+                    <div className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed overflow-hidden break-words ${
                       msg.role === 'user'
-                        ? 'bg-primary/20 text-white rounded-br-md'
-                        : 'bg-gray-800 text-gray-200 rounded-bl-md border border-gray-700'
+                        ? 'bg-primary/20 text-white rounded-br-md whitespace-pre-wrap'
+                        : 'bg-gray-800 text-gray-200 rounded-bl-md border border-gray-700 prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:p-2 prose-pre:bg-black/50 prose-pre:border prose-pre:border-gray-700 prose-pre:whitespace-pre-wrap prose-pre:break-words'
                     }`}>
-                      {msg.content}
+                      {msg.role === 'user' ? msg.content : <ReactMarkdown>{msg.content}</ReactMarkdown>}
                     </div>
                   </div>
                 ))}
 
                 {isLoading && streamingText && (
                   <div className="flex justify-start">
-                    <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-bl-md text-sm leading-relaxed bg-gray-800 text-gray-200 border border-gray-700 whitespace-pre-wrap">
-                      {streamingText}
-                      <span className="ai-chat-cursor">▊</span>
+                    <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-bl-md text-sm leading-relaxed overflow-hidden break-words bg-gray-800 text-gray-200 border border-gray-700 prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:p-2 prose-pre:bg-black/50 prose-pre:border prose-pre:border-gray-700 prose-pre:whitespace-pre-wrap prose-pre:break-words">
+                      <ReactMarkdown>{streamingText + ' ▊'}</ReactMarkdown>
                     </div>
                   </div>
                 )}

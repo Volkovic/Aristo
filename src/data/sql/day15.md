@@ -57,8 +57,7 @@ FROM empleados
 WHERE Top <= 3;
 ```
 
-<details>
-<summary>Ver Respuesta</summary>
-
-**Error de Orden Lógico.** Como aprendiste en el día 5, el `WHERE` ocurre primero (antes del SELECT). Por tanto, la base de datos dice: "No tengo la más remota idea de qué es la columna 'Top', porque las Window Functions se calculan justo al final (en la fase del Select)". Para filtrarlo debes envolverlo obligatoriamente en un CTE (`WITH...`) y filtrar la nueva variable limpia después. ¡Felicidades por finalizar tu currículo!
-</details>
+**[Solución]**
+```sql
+-- **Error de Orden Lógico.** Como aprendiste en el día 5, el `WHERE` ocurre primero (antes del SELECT). Por tanto, la base de datos dice: "No tengo la más remota idea de qué es la columna 'Top', porque las Window Functions se calculan justo al final (en la fase del Select)". Para filtrarlo debes envolverlo obligatoriamente en un CTE (`WITH...`) y filtrar la nueva variable limpia después. ¡Felicidades por finalizar tu currículo!
+```

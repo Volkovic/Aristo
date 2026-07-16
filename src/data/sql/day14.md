@@ -41,8 +41,7 @@ CREATE INDEX idx_usuario_email ON usuarios(email);
 
 **Si los índices aceleran todas las lecturas de forma milagrosa a 1 milisegundo, ¿por qué no le ponemos un índice a absolutamente todas las columnas de todas las tablas y ya está?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
-Porque cada índice tiene un precio gravísimo: **Desaceleran salvajemente las Escrituras (INSERT, UPDATE, DELETE)**. Cada vez que inyectas una fila nueva, el motor debe pausar y reestructurar matemáticamente todos y cada uno de los árboles (índices) adjuntos. Si tienes 20 índices, cada registro que entra será lentísimo, colapsando tu capacidad de inserción masiva. Solo se indexan las llaves principales y las usadas masivamente en el WHERE.
-</details>
+**[Solución]**
+```sql
+-- Porque cada índice tiene un precio gravísimo: **Desaceleran salvajemente las Escrituras (INSERT, UPDATE, DELETE)**. Cada vez que inyectas una fila nueva, el motor debe pausar y reestructurar matemáticamente todos y cada uno de los árboles (índices) adjuntos. Si tienes 20 índices, cada registro que entra será lentísimo, colapsando tu capacidad de inserción masiva. Solo se indexan las llaves principales y las usadas masivamente en el WHERE.
+```

@@ -41,8 +41,7 @@ Para poder apilar dos SELECTs, SQL te obliga a cumplir dos reglas de oro inquebr
 
 **¿Qué ocurre si el primer SELECT pide 2 columnas, y el segundo pide 3?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
-**Syntax Error.** El motor colapsará instantáneamente alegando: "Las consultas utilizadas en una instrucción UNION deben tener el mismo número de columnas".
-</details>
+**[Solución]**
+```sql
+-- **Syntax Error.** El motor colapsará instantáneamente alegando: "Las consultas utilizadas en una instrucción UNION deben tener el mismo número de columnas".
+```

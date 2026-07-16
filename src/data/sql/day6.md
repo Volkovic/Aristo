@@ -56,8 +56,7 @@ FROM empleados;
 SELECT nombre, COALESCE(telefono, 'Sin registrar') AS Tel FROM usuarios;
 ```
 
-<details>
-<summary>Ver Respuesta</summary>
-
-La fantástica función `COALESCE()` evalúa si el primer parámetro es NULL. Si lo es, escupe el segundo parámetro (un valor de respaldo/default). Por lo tanto, en la UI se mostrará el texto 'Sin registrar' en vez de un espantoso NULL vacío.
-</details>
+**[Solución]**
+```sql
+-- La fantástica función `COALESCE()` evalúa si el primer parámetro es NULL. Si lo es, escupe el segundo parámetro (un valor de respaldo/default). Por lo tanto, en la UI se mostrará el texto 'Sin registrar' en vez de un espantoso NULL vacío.
+```

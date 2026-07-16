@@ -58,8 +58,7 @@ WHERE e1.salario > (
 
 **¿Por qué las Subconsultas Correlacionadas se consideran un Anti-patrón de rendimiento masivo frente a un JOIN?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
-Porque ejecutan su lógica en un bucle N veces (N siendo las filas exteriores). Si la tabla exterior tiene 1 millón de empleados, el servidor hará 1 millón de consultas independientes extra a la base de datos para promediar salarios, matando el CPU. Con JOINs, los datos se calculan en masa (Set-based) una sola vez.
-</details>
+**[Solución]**
+```sql
+-- Porque ejecutan su lógica en un bucle N veces (N siendo las filas exteriores). Si la tabla exterior tiene 1 millón de empleados, el servidor hará 1 millón de consultas independientes extra a la base de datos para promediar salarios, matando el CPU. Con JOINs, los datos se calculan en masa (Set-based) una sola vez.
+```

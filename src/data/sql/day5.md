@@ -35,13 +35,12 @@ HAVING SUM(salario) > 50000;
 **Ordena las cláusulas SQL según su estricto orden de ejecución lógica dentro del motor:** 
 GROUP BY, WHERE, ORDER BY, SELECT, FROM, HAVING.
 
-<details>
-<summary>Ver Respuesta</summary>
-
-1. **FROM** (Busca la tabla cruda)
-2. **WHERE** (Elimina filas que no sirven)
-3. **GROUP BY** (Agrupa lo que quedó)
-4. **HAVING** (Filtra a los grupos que no sirven)
-5. **SELECT** (Proyecta o saca las columnas finales)
-6. **ORDER BY** (Ordena visualmente el resultado final)
-</details>
+**[Solución]**
+```sql
+-- 1. **FROM** (Busca la tabla cruda)
+-- 2. **WHERE** (Elimina filas que no sirven)
+-- 3. **GROUP BY** (Agrupa lo que quedó)
+-- 4. **HAVING** (Filtra a los grupos que no sirven)
+-- 5. **SELECT** (Proyecta o saca las columnas finales)
+-- 6. **ORDER BY** (Ordena visualmente el resultado final)
+```

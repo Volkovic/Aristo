@@ -41,8 +41,7 @@ SELECT * FROM T3;
 
 **¿Se guarda la tabla CTE físicamente en el disco duro de la base de datos (como una View)?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
-**NO.** Las CTEs son 100% efímeras. Solo existen viva en memoria durante la minúscula fracción de segundo que demora en ejecutarse esa única declaración SQL. Al finalizar el punto y coma `;`, la CTE y sus datos se evaporan sin dejar rastro.
-</details>
+**[Solución]**
+```sql
+-- **NO.** Las CTEs son 100% efímeras. Solo existen viva en memoria durante la minúscula fracción de segundo que demora en ejecutarse esa única declaración SQL. Al finalizar el punto y coma `;`, la CTE y sus datos se evaporan sin dejar rastro.
+```

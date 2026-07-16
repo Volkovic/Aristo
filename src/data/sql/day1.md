@@ -68,12 +68,11 @@ Esto devolverá una lista limpia y sin repeticiones de los países registrados.
 SELECT nombre, apellido, DISTINCT edad FROM clientes;
 ```
 
-<details>
-<summary>Ver Respuesta</summary>
-
-**Error:** La palabra clave `DISTINCT` aplica a la consulta entera y siempre debe ir inmediatamente después de la palabra `SELECT`, no en medio de las columnas.
-**Correcto:** `SELECT DISTINCT edad, nombre, apellido FROM clientes;` (aunque evaluar la distinción de múltiples columnas a la vez tiene un comportamiento diferente).
-</details>
+**[Solución]**
+```sql
+-- **Error:** La palabra clave `DISTINCT` aplica a la consulta entera y siempre debe ir inmediatamente después de la palabra `SELECT`, no en medio de las columnas.
+-- **Correcto:** `SELECT DISTINCT edad, nombre, apellido FROM clientes;` (aunque evaluar la distinción de múltiples columnas a la vez tiene un comportamiento diferente).
+```
 
 ---
 
@@ -84,9 +83,8 @@ SELECT nombre, apellido, DISTINCT edad FROM clientes;
 SELECT * AS TodosLosDatos FROM productos;
 ```
 
-<details>
-<summary>Ver Respuesta</summary>
-
-**Error de Sintaxis:** No puedes asignarle un Alias (`AS`) al comodín asterisco `*`. El comodín es un expansor de todas las columnas, no una columna per se. 
-Debes hacer `SELECT * FROM productos;` o darle alias a columnas individuales.
-</details>
+**[Solución]**
+```sql
+-- **Error de Sintaxis:** No puedes asignarle un Alias (`AS`) al comodín asterisco `*`. El comodín es un expansor de todas las columnas, no una columna per se. 
+-- Debes hacer `SELECT * FROM productos;` o darle alias a columnas individuales.
+```

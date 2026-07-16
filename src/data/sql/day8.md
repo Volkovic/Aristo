@@ -45,14 +45,11 @@ FULL OUTER JOIN pedidos p
 
 **¿Cómo usarías un LEFT JOIN para encontrar a los clientes falsos (que se registraron pero que JAMÁS hicieron una compra)?**
 
-<details>
-<summary>Ver Respuesta</summary>
-
+**[Solución]**
 ```sql
 SELECT c.nombre 
 FROM clientes c
 LEFT JOIN pedidos p ON c.id = p.cliente_id
 WHERE p.id IS NULL;
+-- Al hacer el LEFT JOIN sabemos que los que no compraron tendrán la columna de pedido rellena de NULLs por SQL. Filtrando explícitamente `WHERE p.id IS NULL` nos aislamos para ver únicamente a los rezagados. A esta técnica técnica se le llama "Anti-Join".
 ```
-Al hacer el LEFT JOIN sabemos que los que no compraron tendrán la columna de pedido rellena de NULLs por SQL. Filtrando explícitamente `WHERE p.id IS NULL` nos aislamos para ver únicamente a los rezagados. A esta técnica técnica se le llama "Anti-Join".
-</details>
