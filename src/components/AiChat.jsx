@@ -37,8 +37,20 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
   const [hasConfig, setHasConfig] = useState(false);
   const [streamingText, setStreamingText] = useState('');
   const messagesEndRef = useRef(null);
-  const inputRef = useRef(null);
+  const desktopInputRef = useRef(null);
+  const mobileInputRef = useRef(null);
   const abortRef = useRef(null);
+
+  // Auto-resize textareas based on content
+  useEffect(() => {
+    const adjustHeight = (el) => {
+      if (!el) return;
+      el.style.height = 'auto';
+      el.style.height = `${el.scrollHeight}px`;
+    };
+    adjustHeight(desktopInputRef.current);
+    adjustHeight(mobileInputRef.current);
+  }, [input]);
 
   // Load config from localStorage
   useEffect(() => {
@@ -164,7 +176,9 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
       let fullText = '';
       let buffer = '';
 
-      while (reader) {
+      let isDone = false;
+
+      while (reader && !isDone) {
         const { done, value } = await reader.read();
         if (done) break;
 
@@ -173,7 +187,10 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
         buffer = lines.pop() || '';
 
         for (const line of lines) {
-          if (line === 'data: [DONE]') continue;
+          if (line === 'data: [DONE]') {
+            isDone = true;
+            break;
+          }
           if (!line.startsWith('data: ')) continue;
 
           try {
@@ -204,8 +221,17 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
   }, [messages, isLoading, hasConfig, slideContent, provider, apiKey, user, courseId, dayId]);
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     sendMessage(input);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (input.trim() && !isLoading) {
+        handleSubmit();
+      }
+    }
   };
 
   const handleSuggestion = (text) => {
@@ -379,14 +405,15 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
             {/* Input */}
             <form onSubmit={handleSubmit} className="flex-shrink-0 p-3 border-t border-gray-800 bg-gray-900/50">
               <div className="flex items-center gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
+                <textarea
+                  ref={desktopInputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
                   placeholder="Preguntá algo..."
                   disabled={isLoading}
-                  className="flex-1 px-3.5 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition-colors disabled:opacity-50"
+                  rows={1}
+                  className="flex-1 px-3.5 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition-colors disabled:opacity-50 resize-none overflow-hidden"
                 />
                 <button
                   type="submit"
@@ -500,14 +527,15 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
               {/* Input */}
               <form onSubmit={handleSubmit} className="flex-shrink-0 p-3 border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm">
                 <div className="flex items-center gap-2">
-                  <input
-                    ref={inputRef}
-                    type="text"
+                  <textarea
+                    ref={mobileInputRef}
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     placeholder="Preguntá algo..."
                     disabled={isLoading}
-                    className="flex-1 px-3.5 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition-colors disabled:opacity-50"
+                    rows={1}
+                    className="flex-1 px-3.5 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition-colors disabled:opacity-50 resize-none overflow-hidden"
                   />
                   <button
                     type="submit"
