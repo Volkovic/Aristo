@@ -181,16 +181,43 @@ print(preparar_orden("Ravioles", mesa=4, extra="Queso extra"))
 
 Al usar `*args` y `**kwargs`, nos aseguramos de que el decorador funcione con **cualquier** función, sin importar cuántos parámetros tenga.
 
+### Apilar Decoradores (Múltiples Envoltorios)
+Puedes aplicar más de un decorador a una función simplemente poniéndolos uno debajo del otro. Se ejecutan "de abajo hacia arriba" (Bottom-up). El decorador más cercano a la función original la envuelve primero.
+
+```python
+@verificar_pago
+@empaquetado_regalo
+def preparar_postre():
+    return "Torta de chocolate"
+# 1° se empaqueta, 2° se verifica el pago.
+```
+
+### El problema de la identidad: @functools.wraps
+Cuando envuelves una función, la función original "pierde" su nombre interno (pasa a llamarse genéricamente `wrapper`), lo cual dificulta encontrar errores (debugging). Para evitar esto, usamos un decorador especial de Python llamado `@wraps`.
+
+```python
+from functools import wraps
+
+def mi_decorador(funcion_original):
+    @wraps(funcion_original)  # <-- Esto copia la identidad original al wrapper
+    def wrapper(*args, **kwargs):
+        return funcion_original(*args, **kwargs)
+    return wrapper
+```
+
 ---
 
 ## 6. Funciones integradas (Procesando el inventario)
 
 Python ya trae de fábrica algunas funciones de orden superior muy útiles que operan sobre listas. Son las famosas `map`, `filter` y `reduce`.
 
-Imagina que estamos revisando el inventario y los pedidos de nuestro restaurante.
+Imagina que estamos revisando el inventario y los pedidos de nuestro restaurante. Las funciones `map` y `filter` se usan casi siempre junto a **lambdas** (funciones anónimas). 
+*Nota: Por diseño en Python, una función lambda está rígidamente limitada a **una ÚNICA expresión** (no puedes usar múltiples líneas, ifs complejos o asignaciones dentro de ella).*
 
 ### MAP (Transformar todo)
-Aplica una función a **cada elemento** de una lista y devuelve una lista nueva.
+Aplica una función a **cada elemento** de una lista y devuelve un nuevo objeto transformado.
+*Dato clave:* En Python 3, `map` (y `filter`) devuelven un "Iterador perezoso" (Lazy Object) para ahorrar memoria, no una lista. Si lo imprimes directo verás `<map object>`. Debes forzar su conversión usando `list()`.
+
 *Ejemplo: Convertir precios en dólares a moneda local.*
 
 ```python
