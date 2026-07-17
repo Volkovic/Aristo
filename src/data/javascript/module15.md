@@ -8,6 +8,10 @@ En la sección de objetos, vimos cómo crear un objeto literal. El objeto litera
 
 ### Definir una clase
 
+Las clases fueron introducidas en **ES6 (ECMAScript 2015)**. En realidad, son una capa de **"azúcar sintáctico"** sobre el ya existente modelo de herencia basada en prototipos de JavaScript. Antes de ES6 (en ES5), los desarrolladores lograban la herencia utilizando **Funciones Constructoras regulares y mutando explícitamente su propiedad `.prototype`** (Herencia Prototípica manual). El **Prototipo (Prototype)** es un objeto oculto interno que cada función constructora y objeto posee, utilizado como "molde" para delegar y heredar propiedades o métodos a través de la Cadena de Prototipos (Prototype Chain).
+
+A diferencia de las funciones regulares, las clases en JavaScript **no sufren "hoisting" (elevación)** de la misma manera. Intentar instanciar una clase antes de su línea de declaración arrojará un `ReferenceError` (Temporal Dead Zone). Además de la declaración de clase estándar, también puedes usar una **Expresión de Clase (Class Expression)**, asignando la clase a una variable constante, por ejemplo: `const Rectangulo = class { };`.
+
 Para definir una clase en JavaScript necesitamos la palabra clave _class_ , el nombre de una clase en **CamelCase** y bloque de código (dentro de dos corchetes). Vamos a crear una clase llamada Persona.
 
 ```sh
@@ -59,6 +63,8 @@ Usemos el constructor de la clase para pasar diferentes propiedades a la clase.
 ### Constructor
 
 El constructor es una función incorporada que permite crear un blueprint para nuestro objeto. La función constructora comienza con la palabra clave _constructor_ seguida de un paréntesis. Dentro del paréntesis pasamos las propiedades del objeto como parámetro. Utilizamos la palabra clave _this_ para adjuntar los parámetros del constructor con la clase.
+
+¿Qué ocurre si no incluyes explícitamente un método `constructor(){}` en una clase vacía o base? El motor de JavaScript es tolerante e **inserta automáticamente un constructor vacío e invisible** por detrás: `constructor() {}`. Por otro lado, si la clase que carece de constructor no es una clase base, sino una clase Hija (que usa `extends`), JavaScript inyecta un constructor que pasa todos los argumentos al padre automáticamente: `constructor(...args) { super(...args); }`.
 
 El siguiente constructor de la clase Persona tiene las propiedades firstName y lastName. Estas propiedades se adjuntan a la clase Persona utilizando la palabra clave _this_. _this_ se refiere a la propia clase.
 
@@ -197,6 +203,8 @@ Person {firstName: "Lidiya", lastName: "Tekle", age: 28, country: "Finland", ci
 
 El constructor dentro de una clase es una función incorporada que nos permite crear un blueprint para el objeto. En una clase podemos crear métodos de clase. Los métodos son funciones de JavaScript dentro de la clase. Vamos a crear algunos métodos de clase.
 
+Si necesitas que un método maneje operaciones asíncronas (como hacer un fetch a una API) y devuelva una Promesa natural, puedes usar la palabra clave `async` colocándola exactamente antes del nombre del método. Por ejemplo: `async comprar() { await fetch(...) }`.
+
 ```js
 class Person {
   constructor(firstName, lastName, age, country, city) {
@@ -270,6 +278,9 @@ console.log(person2.skills);
 
 Un método puede ser un método regular o un getter o un setter. Veamos, getter y setter.
 
+El uso de getters y setters nos ayuda a respetar el principio de **Encapsulamiento** en la Programación Orientada a Objetos. Este concepto dicta que el estado interno de un objeto debe estar protegido y no debe ser manipulado de forma directa e indiscriminada (ej: `cuenta.saldo = 9999`), sino a través de métodos expuestos que validen la transacción.
+
+En las versiones modernas de JavaScript (ES2022+), podemos definir una **propiedad de clase PRIVADA** que prohíba estrictamente su lectura o modificación desde afuera **prefijando el nombre de la propiedad con un símbolo Hash `#`** (por ejemplo: `#saldo = 0;`).
 
 ---
 
@@ -447,280 +458,4 @@ console.log(person2.getScore);
 
 console.log(person1.getSkills);
 console.log(person2.getSkills);
-console.log(person3.getSkills);
-
-console.log(person1.getPersonInfo());
-console.log(person2.getPersonInfo());
-console.log(person3.getPersonInfo());
-```
-
----
-
-
-```sh
-1
-1
-["HTML", "CSS", "JavaScript"]
-["Planning", "Managing", "Organizing"]
-[]
-Asabeneh Yetayeh is 250. He lives Helsinki, Finland. He knows HTML, CSS and JavaScript
-Lidiya Tekle is 28. He lives Espoo, Finland. He knows Planning, Managing and Organizing
-John Doe is 50. He lives Mars city, Mars.
-```
-
-
----
-
-### Método Static
-
-La palabra clave static define un método estático para una clase. Los métodos estáticos no se llaman en las instancias de la clase. En cambio, se llaman en la propia clase. A menudo se trata de funciones de utilidad, como las funciones para crear o clonar objetos. Un ejemplo de método estático es _Date.now()_. El método _now_ se llama directamente desde la clase.
-
-```js
-class Person {
-  constructor(firstName, lastName, age, country, city) {
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.age = age;
-    this.country = country;
-    this.city = city;
-    this.score = 0;
-    this.skills = [];
-  }
-  getFullName() {
-    const fullName = this.firstName + " " + this.lastName;
-    return fullName;
-  }
-  get getScore() {
-    return this.score;
-  }
-  get getSkills() {
-    return this.skills;
-  }
-  set setScore(score) {
-    this.score += score;
-  }
-  set setSkill(skill) {
-    this.skills.push(skill);
-  }
-  getPersonInfo() {
-    let fullName = this.getFullName();
-    let skills =
-      this.skills.length > 0 &&
-      this.skills.slice(0, this.skills.length - 1).join(", ") +
-        ` and ${this.skills[this.skills.length - 1]}`;
-
-    let formattedSkills = skills ? `He knows ${skills}` : "";
-
-    let info = `${fullName} is ${this.age}. He lives ${this.city}, ${this.country}. ${formattedSkills}`;
-    return info;
-  }
-  static favoriteSkill() {
-    const skills = ["HTML", "CSS", "JS", "React", "Python", "Node"];
-    const index = Math.floor(Math.random() * skills.length);
-    return skills[index];
-  }
-  static showDateTime() {
-    let now = new Date();
-    let year = now.getFullYear();
-    let month = now.getMonth() + 1;
-    let date = now.getDate();
-    let hours = now.getHours();
-    let minutes = now.getMinutes();
-    if (hours < 10) {
-      hours = "0" + hours;
-    }
-    if (minutes < 10) {
-      minutes = "0" + minutes;
-    }
-
-    let dateMonthYear = date + "." + month + "." + year;
-    let time = hours + ":" + minutes;
-    let fullTime = dateMonthYear + " " + time;
-    return fullTime;
-  }
-}
-
-console.log(Person.favoriteSkill());
-console.log(Person.showDateTime());
-```
-
----
-
-
-```sh
-Node
-15.1.2020 23:56
-```
-
-Los métodos estáticos son métodos que pueden ser utilizados como funciones de utilidad.
-
-
----
-
-## Herencia
-
-Utilizando la herencia podemos acceder a todas las propiedades y métodos de la clase padre. Esto reduce la repetición de código. Si recuerdas, tenemos una clase padre Persona y crearemos hijos a partir de ella. Nuestra clase de niños podría ser estudiante, enseñar, etc.
-
-```js
-// sintaxis
-class ChildClassName extends {
- // el código va aquí
-}
-```
-
-Vamos a crear una clase hija Student a partir de la clase padre Person.
-
-```js
-class Student extends Person {
-  saySomething() {
-    console.log("I am a child of the person class");
-  }
-}
-
-const s1 = new Student("Asabeneh", "Yetayeh", "Finland", 250, "Helsinki");
-console.log(s1);
-console.log(s1.saySomething());
-console.log(s1.getFullName());
-console.log(s1.getPersonInfo());
-```
-
----
-
-
-```sh
-Student {firstName: "Asabeneh", lastName: "Yetayeh", age: "Finland", country: 250, city: "Helsinki", …}
-I am a child of the person class
-Asabeneh Yetayeh
-Student {firstName: "Asabeneh", lastName: "Yetayeh", age: "Finland", country: 250, city: "Helsinki", …}
-Asabeneh Yetayeh is Finland. He lives Helsinki, 250.
-```
-
-
----
-
-### Anulación de métodos
-
-Como puedes ver, conseguimos acceder a todos los métodos de la clase Persona y lo utilizamos en la clase hija Student. Podemos personalizar los métodos padre, podemos añadir propiedades adicionales a una clase hija. Si queremos personalizar, los métodos y si queremos añadir propiedades extra, necesitamos usar la función del constructor la clase hija también. Dentro de la función constructora llamamos a la función super() para acceder a todas las propiedades de la clase padre. La clase Persona no tenía género pero ahora vamos a dar la propiedad género para la clase hija, Student. Si se utiliza el mismo nombre de método en la clase hija, se anulará el método padre.
-
-```js
-class Student extends Person {
-  constructor(firstName, lastName, age, country, city, gender) {
-    super(firstName, lastName, age, country, city);
-    this.gender = gender;
-  }
-
-  saySomething() {
-    console.log("I am a child of the person class");
-  }
-  getPersonInfo() {
-    let fullName = this.getFullName();
-    let skills =
-      this.skills.length > 0 &&
-      this.skills.slice(0, this.skills.length - 1).join(", ") +
-        ` and ${this.skills[this.skills.length - 1]}`;
-
-    let formattedSkills = skills ? `He knows ${skills}` : "";
-    let pronoun = this.gender == "Male" ? "He" : "She";
-
-    let info = `${fullName} is ${this.age}. ${pronoun} lives in ${this.city}, ${this.country}. ${formattedSkills}`;
-    return info;
-  }
-}
-
-const s1 = new Student(
-  "Asabeneh",
-  "Yetayeh",
-  250,
-  "Finland",
-  "Helsinki",
-  "Male"
-);
-const s2 = new Student("Lidiya", "Tekle", 28, "Finland", "Helsinki", "Female");
-s1.setScore = 1;
-s1.setSkill = "HTML";
-s1.setSkill = "CSS";
-s1.setSkill = "JavaScript";
-
-s2.setScore = 1;
-s2.setSkill = "Planning";
-s2.setSkill = "Managing";
-s2.setSkill = "Organizing";
-
-console.log(s1);
-
-console.log(s1.saySomething());
-console.log(s1.getFullName());
-console.log(s1.getPersonInfo());
-
-console.log(s2.saySomething());
-console.log(s2.getFullName());
-console.log(s2.getPersonInfo());
-```
-
----
-
-
-```sh
-Student {firstName: "Asabeneh", lastName: "Yetayeh", age: 250, country: "Finland", city: "Helsinki", …}
-Student {firstName: "Lidiya", lastName: "Tekle", age: 28, country: "Finland", city: "Helsinki", …}
-I am a child of the person class
-Asabeneh Yetayeh
-Student {firstName: "Asabeneh", lastName: "Yetayeh", age: 250, country: "Finland", city: "Helsinki", …}
-Asabeneh Yetayeh is 250. He lives in Helsinki, Finland. He knows HTML, CSS and JavaScript
-I am a child of the person class
-Lidiya Tekle
-Student {firstName: "Lidiya", lastName: "Tekle", age: 28, country: "Finland", city: "Helsinki", …}
-Lidiya Tekle is 28. She lives in Helsinki, Finland. He knows Planning, Managing and Organizing
-```
-
-Ahora, el método getPersonInfo ha sido anulado e identifica si la persona es hombre o mujer.
-
----
-
-## 💻 Ejercicios Prácticos (Clases)
-
-**Consigna 1:** Crea una clase `Animal` con propiedades `name`, `age`, `color` y `legs` usando el método `constructor`.
-**[Solución]**
-```javascript
-class Animal {
-  constructor(name, age, color, legs) {
-    this.name = name;
-    this.age = age;
-    this.color = color;
-    this.legs = legs;
-  }
-}
-const miMascota = new Animal('Pelusa', 2, 'blanco', 4);
-console.log(miMascota.name); // Pelusa
-```
-
-**Consigna 2:** Añade a la clase `Animal` un método regular llamado `getAnimalInfo` que retorne un resumen de las propiedades.
-**[Solución]**
-```javascript
-class AnimalV2 {
-  constructor(name, age, color, legs) {
-    this.name = name;
-    this.age = age;
-    this.color = color;
-    this.legs = legs;
-  }
-  getAnimalInfo() {
-    return `${this.name} es de color ${this.color} y tiene ${this.age} años.`;
-  }
-}
-const rex = new AnimalV2('Rex', 5, 'negro', 4);
-console.log(rex.getAnimalInfo()); // Rex es de color negro y tiene 5 años.
-```
-
-**Consigna 3:** Crea una clase `Dog` que herede (con `extends`) de `Animal`. Añade un nuevo método exclusivo de la clase hija llamado `bark`.
-**[Solución]**
-```javascript
-class Dog extends Animal {
-  bark() {
-    return '¡Guau guau!';
-  }
-}
-const perrito = new Dog('Rocky', 1, 'marrón', 4);
-console.log(perrito.getAnimalInfo ? perrito.name : perrito.name); // Rocky
-console.log(perrito.bark()); // ¡Guau guau!
-```
+console.log(person3.getSkills

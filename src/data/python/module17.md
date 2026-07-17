@@ -2,7 +2,7 @@
 
 ## Manejo de excepciones
 
-Python utiliza _try_ y _except_ para manejar errores de forma elegante. Salir de forma controlada (o manejar errores con elegancia) es una buena práctica: el programa detecta una condición de error y la maneja adecuadamente, normalmente mostrando un mensaje descriptivo en la terminal o en un registro. Las excepciones suelen deberse a factores externos al programa (entrada errónea, nombre de archivo incorrecto, archivo no encontrado, fallos de I/O, etc.). El manejo adecuado de excepciones evita que las aplicaciones se bloqueen.
+Python utiliza _try_ y _except_ para manejar errores de forma elegante. Salir de forma controlada (o manejar errores con elegancia) es una buena práctica: el programa detecta una condición de error y la maneja adecuadamente, normalmente mostrando un mensaje descriptivo en la terminal o en un registro. Las excepciones suelen deberse a factores externos al programa (entrada errónea, nombre de archivo incorrecto, archivo no encontrado, fallos de I/O, etc.). El manejo adecuado de excepciones evita que las aplicaciones se bloqueen. Un código profesional nunca debe crashear mostrando texto rojo al usuario; el manejo de excepciones intercepta el problema antes de que el programa se cuelgue abruptamente.
 
 En la sección anterior hemos cubierto los distintos tipos de errores en Python. Si usamos _try_ y _except_ correctamente, podemos impedir que esos errores hagan que el programa falle.
 
@@ -24,7 +24,11 @@ except:
     print('Ocurrió un error')
 ```
 
-En el ejemplo anterior, el segundo operando es una cadena. Podemos convertirlo a int o float para sumarlo a un número; si no lo hacemos, se ejecutará el bloque _except_.
+En el ejemplo anterior, el segundo operando es una cadena. Podemos convertirlo a int o float para sumarlo a un número; si no lo hacemos, se ejecutará el bloque _except_. El bloque `try` actúa como la zona donde colocamos el código "peligroso" que sospechamos que podría fallar. Si falla, el flujo salta instantáneamente al bloque de rescate `except`, el cual se ejecuta SI Y SOLO SI ocurrió una excepción.
+
+Python fomenta una filosofía de diseño conocida como **EAFP** ("Easier to ask for Forgiveness than Permission" - Es más fácil pedir perdón que permiso). En lugar de hacer múltiples comprobaciones `if` preventivas validando tipos de datos (pedir permiso), se prefiere asumir que los datos están bien, intentar la operación directamente en un `try` y atrapar el error si falla (pedir perdón).
+
+Sin embargo, hay que tener cuidado con el uso de un `except:` general (conocido como *bare except*), como se ve en el ejemplo de arriba. Atrapar errores sin especificar cuáles se esperan atrapará ABSOLUTAMENTE TODOS los errores (incluso interrupciones de teclado o salidas del sistema). Esto se considera una mala práctica (un antipatrón) porque oculta o "silencia" bugs reales (swallowing errors). Además, ten en cuenta que los errores de sintaxis (`SyntaxError`) ocurren antes del tiempo de ejecución (durante la fase de parseo), por lo que el programa ni siquiera inicia y NO PUEDEN ser atrapados por un bloque `try-except`.
 
 
 ---
@@ -45,9 +49,9 @@ except:
 Ocurrió un error
 ```
 
-En el ejemplo anterior, se ejecuta el bloque de excepción, pero no sabemos exactamente qué pasó. Para identificar el problema podemos capturar tipos de excepción concretos.
+En el ejemplo anterior, se ejecuta el bloque de excepción, pero no sabemos exactamente qué pasó. Para identificar el problema podemos capturar tipos de excepción concretos. El programador debe declarar la clase del error que espera interceptar (por ejemplo, `except ZeroDivisionError:` para atrapar específicamente un error de división por cero).
 
-En el siguiente ejemplo capturamos y mostramos el tipo de error:
+En el siguiente ejemplo capturamos y mostramos el tipo de error. Puedes encadenar múltiples bloques `except`, dándote el poder de responder de forma diferente dependiendo de QUÉ fue lo que falló:
 
 ```py
 try:
@@ -69,7 +73,13 @@ Introduce tu nombre:Asabeneh
 Se produjo un error de tipo (TypeError)
 ```
 
-En el ejemplo anterior la salida será _TypeError_. Ahora añadamos bloques adicionales:
+En el ejemplo anterior la salida será _TypeError_. 
+
+Si deseas aplicar el mismo plan de rescate a varios errores específicos, puedes atraparlos en una misma línea pasándolos encapsulados dentro de una tupla: `except (TypeError, ValueError):`.
+
+Es importante recordar que en Python los errores forman un "Árbol Genealógico" (Jerarquía de Clases). Si utilizas `except Exception:`, al atrapar la clase base Padre (`Exception`), estarás atrapando a TODOS sus hijos de manera automática (TypeError, ValueError, KeyError, etc.). Por ello, siempre debes colocar los bloques `except` más específicos (los hijos) arriba y los más generales (los padres) al final, o el general devorará a los específicos.
+
+Ahora añadamos bloques adicionales:
 
 ```py
 try:
@@ -97,6 +107,9 @@ Este bloque se ejecuta normalmente después de try
 Este bloque siempre se ejecuta.
 ```
 
+El bloque opcional `else` se ejecuta EXCLUSIVAMENTE si el bloque `try` finalizó exitosamente SIN lanzar absolutamente ninguna excepción. Es muy elegante para separar el código que puede fallar del código que depende de que no falle.
+Por su parte, el bloque `finally` es código crítico de limpieza (Clean-up) que se ejecutará SIEMPRE e incondicionalmente sin importar si el `try` falló o si tuvo éxito (se usa el 100% de las veces para cerrar conexiones a Bases de Datos o archivos abiertos).
+
 También podemos simplificar el manejo de excepción así:
 
 ```py
@@ -108,6 +121,25 @@ try:
 except Exception as e:
     print(e)
 ```
+
+En la sintaxis `except Exception as e:`, el alias `as e` significa que la variable `e` es una instancia (Objeto) del error propiamente dicho. Captura el mensaje descriptivo y los detalles internos del error lanzado por Python para poder imprimirlo en un Log y entender qué causó el error exacto.
+
+### Conceptos Avanzados de Excepciones
+
+**Lanzar excepciones (`raise`) y Excepciones Personalizadas**
+Si como programador decides LANZAR FORZOSAMENTE (trigger) una excepción intencional (por ejemplo, para validar datos y abortar procesos malos tempranamente), utilizas la palabra clave `raise` (ej. `raise ValueError('Edad no puede ser negativa')`). 
+También puedes crear tus Propias Excepciones (Custom Exceptions) creando una Clase nueva que herede directamente de la clase base nativa `Exception` (ej. `class SaldoInsuficienteError(Exception): pass`). Esto le da una claridad semántica increíble al manejo de errores del dominio de la aplicación.
+Además, si dentro de un bloque `except` pones la palabra `raise` sola, esto detiene la ejecución del bloque actual y vuelve a propagar (re-raise) EL MISMO error original que acaba de ser atrapado, enviándolo al nivel superior.
+
+**El comportamiento de `finally` y `return`**
+Como el bloque `finally` se ejecuta ABSOLUTAMENTE SIEMPRE en la rampa de salida, si tienes un bloque `try` con un `return 1` y un bloque `finally` asociado con un `return 2`, la función retornará `2`. El `return` del `finally` tiene la última palabra y sobrescribe silenciosamente cualquier valor devuelto previamente en el `try`.
+
+**Afirmaciones (`assert`)**
+Otra herramienta útil es la instrucción `assert` (ej. `assert x > 0, 'La variable debe ser positiva'`). Es una prueba de cordura rápida (Sanity Check) que levanta un `AssertionError` de inmediato si la condición proporcionada evalúa a Falso. Se utiliza fuertemente en Testing interno para afirmar agresivamente un estado y prevenir daños colaterales.
+
+**Buenas prácticas y Manejo Global (APIs)**
+Las excepciones (como su nombre lo indica) son para lidiar con Casos Excepcionales, Anómalos o de Error (Failure path). Usar excepciones y bloques try-except en lugar de IFs para manejar lógica de control de flujo estándar de negocio ralentiza el código gravemente y es considerado un mal diseño arquitectónico.
+Finalmente, si estás desarrollando una API y ocurre un error interno en la base de datos que tu código no supo atrapar localmente, este debe atraparse en un Global Exception Handling (por ejemplo, en un Middleware superior en el Framework como FastAPI o Django). Allí se debe registrar el error en el Log interno para los devs, y enviarle un mensaje JSON limpio al usuario con Código de Estado 500 (Internal Server Error). Jamás se debe dejar sin atrapar para que el cliente reciba el Stack Trace completo.
 
 
 ---
@@ -274,6 +306,3 @@ print(fruits_and_veges)
 ```sh
 [{'fruit': 'banana', 'veg': 'Tomato'}, {'fruit': 'orange', 'veg': 'Potato'}, {'fruit': 'mango', 'veg': 'Cabbage'}, {'fruit': 'lemon', 'veg': 'Onion'}, {'fruit': 'lime', 'veg': 'Carrot'}]
 ```
-
-
----

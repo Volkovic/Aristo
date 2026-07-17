@@ -4,7 +4,7 @@
 
 ### ¿Qué es un módulo?
 
-Un módulo es un archivo que contiene un conjunto de código o funciones que se pueden incluir en una aplicación. Un módulo puede ser un archivo con una sola variable, una función o una biblioteca de gran escala.
+Un módulo es un archivo que contiene un conjunto de código o funciones que se pueden incluir en una aplicación. Un módulo puede ser un archivo con una sola variable, una función o una biblioteca de gran escala. En Python, cualquier archivo de texto con extensión `.py` que contenga funciones, clases y variables diseñadas para ser incluidas en otros proyectos se considera un módulo.
 
 ### Crear módulos
 
@@ -17,6 +17,8 @@ def generate_full_name(firstname, lastname):
 ```
 
 En el directorio del proyecto crea un archivo main.py e importa mymodule.py.
+
+Si tienes muchos módulos, puedes agruparlos en carpetas. En Python, para que una simple carpeta llena de módulos `.py` se transforme formalmente en un "Paquete" (Package) importable, debes incluir un archivo (usualmente vacío) llamado `__init__.py` dentro de ese directorio.
 
 
 ---
@@ -31,12 +33,18 @@ import mymodule
 print(mymodule.generate_full_name('Asabeneh', 'Yetayeh')) # Asabeneh Yetayeh
 ```
 
+Es importante saber qué ocurre internamente al importar un módulo. Cuando importas un archivo por primera vez, Python compila y ejecuta todo el código de nivel superior (fuera de funciones o clases) de arriba a abajo. Para optimizar el rendimiento (Performance), Python guarda el módulo en caché en la memoria RAM; si otro archivo vuelve a intentar importarlo, usará la versión cacheada en lugar de volver a leerlo desde el disco duro.
+
+Para evitar que cierto código (como pruebas o impresiones en consola) se ejecute accidentalmente al ser importado, se utiliza la condición mágica `if __name__ == '__main__':`. Este bloque de seguridad asegura que el código en su interior SOLO se ejecute si el archivo es ejecutado directamente desde la consola, pero se ignora si el archivo fue importado como módulo en otro script.
+
+Por convención y buenas prácticas (Guía de Estilos PEP 8), todas tus sentencias `import` deben colocarse siempre en bloque en la parte superior absoluta del archivo.
+
 
 ---
 
 ### Importar funciones desde un módulo
 
-Podemos tener muchas funciones en un archivo y podemos importar cada una por separado.
+Podemos tener muchas funciones en un archivo y podemos importar cada una por separado. Python detecta automáticamente los archivos locales en la misma ruta, por lo que puedes importar usando el nombre del archivo sin la extensión `.py`.
 
 ```py
 # archivo main.py
@@ -68,12 +76,18 @@ print(p)
 print(p['firstname'])
 ```
 
+También es posible importar un módulo completo y darle un alias (un apodo más corto) para no escribir su nombre largo todo el tiempo usando la sintaxis `import nombre_modulo as alias`, por ejemplo: `import pandas as pd`.
+
+*Nota sobre colisiones:* Si usas la sintaxis `from modulo import *`, importarás absolutamente todas las funciones y variables directamente a tu espacio de nombres global. Esto se considera una mala práctica porque puede generar conflictos. Por ejemplo, si tienes una variable local `pi = 3` y luego haces `from math import pi`, el valor importado sobrescribirá en memoria a tu variable original (fenómeno conocido como *Shadowing* o colisión de nombres).
+
 
 ---
 
 ## Importar módulos incorporados
 
-Al igual que otros lenguajes, podemos importar módulos usando la palabra clave import. A continuación importamos algunos módulos incorporados que usamos con frecuencia. Algunos módulos comunes son: math, datetime, os, sys, random, statistics, collections, json, re
+Al igual que otros lenguajes, podemos importar módulos usando la palabra clave import. A esta gigantesca colección de módulos integrados que vienen preinstalados al descargar Python se le conoce como la **Librería Estándar (Standard Library)**. Gracias a ella, se dice que Python viene con "baterías incluidas", ya que provee soluciones listas para usarse sin necesidad de descargas adicionales. A continuación importamos algunos módulos incorporados que usamos con frecuencia. Algunos módulos comunes son: math, datetime, os, sys, random, statistics, collections, json, re.
+
+Para instalar módulos o paquetes de terceros (creados por la comunidad, ajenos a la librería estándar), se utiliza el gestor de paquetes de la terminal con el comando `pip install nombre_del_paquete`.
 
 ### Módulo OS
 
@@ -126,7 +140,7 @@ Algunos comandos útiles de sys:
 sys.exit()
 # conocer el tamaño máximo de un entero
 sys.maxsize
-# conocer la ruta de módulos
+# sys.path es una lista de directorios (paths) donde el intérprete buscará exhaustivamente un módulo al hacer import
 sys.path
 # conocer la versión de Python en uso
 sys.version
@@ -165,7 +179,7 @@ print(math.ceil(9.81))   # 10, redondeo hacia arriba
 print(math.log10(100))   # 2, logaritmo base 10
 ```
 
-Ahora que hemos importado el módulo math con muchas funciones útiles, podemos ver qué funciones contiene usando help(math) o dir(math). Si sólo queremos importar funciones específicas podemos hacerlo así:
+Ahora que hemos importado el módulo math con muchas funciones útiles, podemos ver qué funciones contiene usando `help(math)` o la función integrada `dir(math)`. La función `dir(modulo)` es una excelente herramienta de introspección que devuelve una lista ordenada alfabéticamente de TODOS los nombres (funciones, variables, clases) definidos o exportables por ese módulo. Si sólo queremos importar funciones específicas podemos hacerlo así:
 
 ```py
 from math import pi
@@ -222,14 +236,12 @@ print(string.punctuation)   # !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
 
 ### Módulo random
 
-Ahora que sabes importar módulos, familiaricémonos con random. El módulo random nos da números aleatorios entre 0 y 0.9999. El módulo tiene muchas funciones; aquí usamos random y randint.
+Ahora que sabes importar módulos, familiaricémonos con random. El módulo random nos da números aleatorios entre 0 y 0.9999. El módulo tiene muchas funciones; aquí usamos random, randint y choice.
 
 ```py
-from random import random, randint
+from random import random, randint, choice
 print(random())   # no necesita parámetros; devuelve un valor entre 0 y 0.9999
 print(randint(5, 20)) # devuelve un entero aleatorio en [5, 20] (inclusive)
+usuarios = ['A', 'B', 'C']
+print(choice(usuarios)) # toma una secuencia (como una lista) y retorna un elemento al azar de manera equitativa
 ```
-
-
-
----

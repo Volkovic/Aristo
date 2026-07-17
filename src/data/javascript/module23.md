@@ -3,6 +3,14 @@
 Eventos HTML comunes: onclick, onchange, onmouseover, onmouseout, onkeydown, onkeyup, onload.
 Podemos añadir el método **event_listener** (escuchador de eventos) a cualquier objeto DOM. Utilizamos el método **_addEventListener()_** para escuchar diferentes tipos de eventos en los elementos HTML. El método _addEventListener()_ toma dos argumentos, un event listener y una función callback.
 
+El método `addEventListener(tipo, callback)` es el estándar actual en JavaScript. A diferencia de asignar eventos directamente (como sobrescribir la propiedad `onclick = function`), `addEventListener` permite agregar múltiples "oyentes" del mismo tipo al mismo elemento sin pisarse entre sí.
+
+Al escuchar un evento, el navegador inyecta automáticamente un **Objeto de Evento (`e`)** al callback. Este objeto está cargado con información útil sobre el evento disparado, como las coordenadas exactas del click (`e.clientX`), la tecla presionada (`e.key` o `e.code`), o el elemento objetivo (`e.target`).
+
+**Propagación y Prevención de Eventos:**
+- **Event Bubbling (Propagación):** Por defecto, casi todos los eventos en el DOM tienen una fase de burbuja. Esto significa que si haces click en un botón dentro de un div, el evento se dispara primero en el botón, luego "burbujea" hacia el div, y luego sigue subiendo hacia el document. Puedes detener esto usando `e.stopPropagation()`.
+- **Prevent Default:** Muchos elementos tienen comportamientos nativos. Por ejemplo, si tienes un formulario (form) en HTML y escuchas el evento `submit`, la página se recargará automáticamente al enviarlo. Para evitar esto y manejar los datos con JS, debes usar `e.preventDefault()`, lo cual bloquea el comportamiento nativo y por defecto del navegador.
+
 ```js
 selectedElement.addEventListener("eventlistner", function (e) {
   // la actividad que quieres que ocurra después del evento estará aquí
@@ -118,6 +126,8 @@ El siguiente es un ejemplo de evento de tipo click.
 Para adjuntar un event listener a un elemento, primero seleccionamos el elemento y luego adjuntamos el método addEventListener. El event listener toma como argumento el tipo de evento y las funciones de callback.
 
 El siguiente es un ejemplo de evento de tipo click.
+
+*Nota:* Si quieres que un elemento cambie temporalmente (por ejemplo, su color de fondo a rojo) solo mientras el ratón del usuario pase (vuele) por encima, y vuelva a su color original cuando el ratón salga, los eventos ideales a usar en JS son `'mouseenter'` (cuando el puntero entra físicamente a la caja del elemento) y `'mouseleave'` (cuando sale). También existen `'mouseover'` y `'mouseout'`. Cabe destacar que el concepto de `'hover'` es exclusivo de CSS y no existe como evento JS puro.
 
 **Ejemplo: mouseenter**
 
@@ -306,38 +316,23 @@ Podemos acceder a todos los números de teclas del teclado utilizando diferentes
 
 ---
 
-## 💻 Ejercicios Prácticos (DOM - Eventos)
+## El Ecosistema Moderno de JavaScript y el Futuro
 
-**Consigna 1:** Selecciona un botón en el DOM y agrégale un event listener que imprima "¡Me hiciste click!" en la consola cada vez que sea presionado.
-**[Solución]**
-```javascript
-// HTML: <button id="btn-click">Haz click</button>
-const button = document.getElementById('btn-click');
+A medida que finalizas tu aprendizaje de Vanilla JS, es vital entender el panorama general de JavaScript en la industria actual.
 
-button.addEventListener('click', () => {
-  console.log('¡Me hiciste click!');
-});
-```
+**Más allá del Navegador y Node.js**
+Hoy en día, JavaScript se ha vuelto omnipresente. Ya no es exclusivo de navegadores; puede crear Servidores Web backend de alto tráfico, programar scripts de CLI, construir aplicaciones de escritorio (con Electron), y hasta entrenar IA y manipular Robótica. Todo esto fue posible gracias a que en 2009, Ryan Dahl extrajo el **motor V8 Engine** (una bestia compiladora JIT de Google Chrome que leía JS y lo traducía a código de máquina ultrarrápido) y lo embebió dentro de C++ para dar a luz al ecosistema **Node.js**.
 
-**Consigna 2:** Agrega un evento `mouseenter` a un div (para detectar cuando el mouse pasa por encima) y cambia su color de fondo a rojo temporalmente.
-**[Solución]**
-```javascript
-// HTML: <div id="caja" style="width:100px;height:100px;background:blue;"></div>
-const caja = document.getElementById('caja');
+Para migrar tus conocimientos síncronos de JS hacia un servidor Node.js que reciba decenas de consultas simultáneas, debes dominar obligatoriamente el **Modelo Asíncrono Non-Blocking I/O (El Event Loop de Node)**. Debes saber cómo delegar Promesas para evitar bloquear el hilo (Thread) principal, permitiendo que tu servidor siga escuchando nuevos usuarios libremente. Históricamente, esto generaba el "Callback Hell" (La Pirámide de la Perdición), pero la sintaxis **`async / await`** (introducida en ES2017) resolvió este problema arquitectónico fundamental, permitiéndote leer o escribir flujos temporales inciertos (HTTP, BD) con la sintaxis plana, estructurada y limpia de un código síncrono imperativo.
 
-caja.addEventListener('mouseenter', () => {
-  caja.style.backgroundColor = 'red';
-});
-// (Tip: puedes agregar otro evento 'mouseleave' para restaurar el color azul)
-```
+**Evolución del Lenguaje y Conceptos Clave**
+En el año 2015, JavaScript sufrió su evolución más cataclísmica y salvadora: **ECMAScript 6 (ES6 o ES2015)**. Este conjunto de adiciones nos trajo `let`, `const`, Arrow Functions, Clases, Promesas y Destructuring.
+        
+A nivel de memoria, de todos los tipos en JS, es crucial recordar que los **tipos primitivos** (Number, String, Boolean, Null, Undefined, Symbol, BigInt) se transmiten (asignan) SIEMPRE "por valor" (creando una copia profunda inmutable e independiente), mientras que los complejos (Objetos y Arrays) pasan "por referencia" (un puntero a la misma zona mutante de la RAM).
+        
+Otro concepto avanzado vital para entrevistas son los **Closures**. En términos simples, son funciones que están anidadas, donde la función interior hereda mágicamente una "mochila de memoria" (con las variables que existían a su alrededor al nacer) que lleva consigo para siempre, aunque la función creadora ya no exista.
 
-**Consigna 3:** Captura el evento `input` de un campo de texto y muestra en consola cada letra que el usuario va escribiendo.
-**[Solución]**
-```javascript
-// HTML: <input type="text" id="campo-texto" />
-const inputTexto = document.getElementById('campo-texto');
-
-inputTexto.addEventListener('input', (evento) => {
-  console.log('El valor actual es:', evento.target.value);
-});
-```
+**Herramientas y Frameworks Modernos**
+- **TypeScript:** Para futuros proyectos corporativos de mediana y gran escala, un desarrollador debería adoptar TypeScript porque proporciona un sistema de Tipos Estáticos estricto (Static Typing) por encima de JS, atrapando silenciosamente el 80% de los errores y Bugs de ejecución (TypeError) en TIEMPO DE ESCRITURA en tu editor (VS Code), sin que siquiera tengas que ejecutar tu código.
+- **React, Vue y el DOM:** Conocer a la perfección el Document Object Model (DOM) de JavaScript Vanilla puro es crítico incluso si vas a trabajar con bibliotecas declarativas. Porque bajo las complejas abstracciones mágicas (Virtual DOM) de todas esas librerías, el único que sigue repintando la pantalla y procesando eventos físicamente en el navegador es el viejo DOM real. Conocer las bases te previene de errores de rendimiento catastróficos. Estas librerías manejan el concepto filosófico **UI = f(State)**: la Pantalla es una función directa y declarativa de su Estado Interno. Si tus variables (Estado) cambian, la UI muta, se destruye y se re-dibuja sola de forma automática para reflejar esos datos.
+- **Inmutabilidad (Immutability):** Adoptado firmemente por Redux y React, este principio dicta que al evitar cambiar objetos en el mismo lugar de la memoria y preferir retornar nuevas copias alteradas (priorizando métodos como `.map`, `.filter`

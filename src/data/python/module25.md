@@ -312,7 +312,7 @@ print(df.shape) # número de filas y columnas
 (10000, 3)
 ```
 
-Como puedes ver, este conjunto de datos tiene 10000 filas y 3 columnas. Obtengamos más información sobre los datos:
+Como puedes ver, este conjunto de datos tiene 10000 filas y 3 columnas. Además de `shape`, un método vital para cualquier analista es `df.info()`. Este método proporciona una radiografía completa del DataFrame, mostrando la cantidad total de filas, columnas, los nombres de las columnas, la cantidad de valores no nulos y los tipos de datos en memoria (como `float64`, `object`, `int64`), así como el uso de RAM. Obtengamos más información sobre los datos:
 
 ```python
 print(df.columns) # nombres de las columnas
@@ -361,10 +361,21 @@ min       54.263133     64.700127
 max       78.998742    269.989699
 ```
 
+---
+
+### Manejo de Valores Nulos (Missing Values)
+
+En Data Science, los valores nulos o vacíos son una epidemia persistente que puede arruinar modelos estadísticos. Pandas utiliza el valor global estándar `NaN` (Not a Number), originado en NumPy, para denotar a las celdas perdidas o inexistentes en la tabla. Cualquier operación matemática con un `NaN` resultará irremediablemente en `NaN`.
+
+Para lidiar con ellos, tenemos dos enfoques principales. El método drástico es usar `df.dropna()`, que elimina por completo cualquier fila entera que contenga al menos un `NaN`. La alternativa pacífica y preferible es la imputación mediante `df.fillna(valor)`, que inyecta o rellena artificialmente esos vacíos con un valor de contingencia seguro (como un 0 o el promedio de la columna para salvar la fila).
+
+Es importante destacar que, por extrema seguridad funcional, casi ninguna orden que ejecutes en Pandas (como `dropna`, `fillna` o `rename`) destruirá la base de datos original, sino que devolverá una copia nueva. Si deseas que el cambio mutile permanentemente tu variable original, debes agregar explícitamente el argumento `inplace=True` (por ejemplo, `df.dropna(inplace=True)`).
 
 ---
 
 ## Modificar DataFrame
+
+Al manipular datos masivos en Pandas, es crucial evitar el uso de bucles convencionales de Python (como `for fila in tabla:`). Las iteraciones estándar anularían por completo la velocidad del motor subyacente (basado en C y NumPy), tardando horas en procesar lo que tomaría milisegundos. En su lugar, Pandas utiliza operaciones vectorizadas masivas que aplican cambios a toda una columna o DataFrame de golpe.
 
 ### Crear DataFrame
 
@@ -442,7 +453,7 @@ df
 2   Sofía   China     Cantón      69     169
 ```
 
-2. Modificando con loc:
+2. Modificando con loc: El indexador `.loc[]` ('Location') opera estrictamente basado en ETIQUETAS (nombres de filas y columnas). Es ideal y seguro para acceder a celdas por su nombre textual.
 ```python
 df.loc[1, 'Name'] = 'Lucía'
 df
@@ -455,7 +466,7 @@ df
 2  Sofía   China     Cantón      69     169
 ```
 
-3. Modificando con iloc:
+3. Modificando con iloc: El indexador `.iloc[]` ('Integer Location') ignora rotundamente cualquier nombre o etiqueta y funciona EXCLUSIVAMENTE basándose en la posición pura (índices enteros 0, 1, 2), simulando una matriz tradicional de Python.
 ```python
 print('Datos originales:\n', df)
 df.iloc[1, 0] = 'Paco'
@@ -548,5 +559,14 @@ print(df[(df['age'] > 20) & (df['empleado'] == True)])
 2  Carlos  Reino Unido   22      True
 ```
 
+---
+
+### Agrupación de Datos (GroupBy)
+
+Inspirado enteramente en las bases de datos relacionales SQL, Pandas ofrece el poderoso método `df.groupby()`. Este método permite consolidar o agrupar filas que comparten un mismo dato repetido (por ejemplo, agrupar por 'Departamento' o 'País') y luego colapsarlas (Aggregation) aplicando una función métrica (como `.mean()` o `.sum()`) para calcular promedios numéricos o totales de todo su equipo interno.
 
 ---
+
+### Exportar DataFrame a CSV
+
+Una vez finalizado el análisis y transformación de los datos, el proceso estelar es exportar y guardar (persistir) los resultados finales en tu disco duro. Para ello, utilizamos el método `df.to_csv('salida.csv', index=False)`. Pasar la bandera `index=False` es una convención imperativa que evita que Pandas añada una columna superflua inyectando los índices numéricos puros (0, 1, 2, 3) permanentemente al archivo plano de texto, lo cual arruinaría su formato.

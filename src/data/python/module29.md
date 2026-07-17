@@ -467,5 +467,25 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=port)
 ```
 
-
 ---
+
+### Evolución Moderna: FastAPI y Conceptos Avanzados
+
+Aunque Flask es una excelente herramienta para aprender y construir APIs, en los últimos años **FastAPI** ha revolucionado el desarrollo en Python. Es un framework moderno y de altísimo rendimiento construido desde cero que exprime el Tipado Estático (Type Hints) y la Asincronía (Async/Await) de Python, compitiendo en velocidad pura con lenguajes veloces como NodeJS y Go. Para arrancar aplicaciones programadas en FastAPI, se utiliza universalmente **Uvicorn**, un servidor web ASGI (Asynchronous Server Gateway Interface) ultrarrápido.
+
+Una de las mayores ventajas de productividad (Developer Experience) que ofrece FastAPI de manera completamente gratuita e inmediata es que autogenera y actualiza mágicamente una Documentación interactiva impecable (utilizando Swagger UI) en la ruta `/docs`. Esto se logra gracias a que FastAPI se basa en la especificación **OpenAPI**, el estándar mundial que formaliza contractualmente cómo luce la interfaz de una API RESTful, permitiendo generar clientes en más de 50 lenguajes automáticamente.
+
+#### Sintaxis, Asincronía y Pydantic
+
+A diferencia de Flask, la sintaxis en FastAPI declara la intención desde el decorador, por ejemplo: `@app.get('/')`. Además, es fuertemente recomendado el uso de `async def` al crear funciones de ruta (Endpoints). La palabra `async` permite la Asincronía (Non-Blocking I/O): mientras tu ruta espera a que la base de datos responda, el servidor puede atender miles de otras peticiones entrantes sin congelar el hilo principal.
+
+FastAPI utiliza la librería **Pydantic** como motor encargado de la validación mágica y conversión de los datos usando los Type Hints. Si declaras una ruta con un parámetro en la URL como `@app.get('/usuarios/{item_id}')`, debes inyectarlo en la firma de la función: `async def leer_usuario(item_id: int):`. Pydantic forzará la conversión a entero. Si agregas un parámetro a la función que NO formaba parte de la URL (Ej: `buscar: str = None`), FastAPI asume automáticamente que se trata de un Query Parameter (`?buscar=algo`) y te lo inyecta listo para usarse.
+
+Para recibir y validar el Cuerpo JSON (Payload) complejo de un método `POST`, debes obligatoriamente heredar tu modelo de datos de la clase `BaseModel` perteneciente a Pydantic. Al devolver respuestas al cliente, simplemente haces `return datos` (ya sea un diccionario, lista o modelo Pydantic) y FastAPI serializa de forma automática y asombrosa todo a texto JSON HTTP. Si necesitas devolver un error controlado (Ej: código 404), importas y levantas una excepción con `raise HTTPException(status_code=404, detail='Usuario No Encontrado')`.
+
+#### Arquitectura, Seguridad y Despliegue
+
+A medida que tu API crece, FastAPI ofrece herramientas avanzadas:
+- **Inyección de Dependencias:** Usando la función `Depends()`, FastAPI provee un mecanismo modular extremadamente poderoso que permite compartir lógica común (como verificar contraseñas o abrir conexiones) inyectándola en las rutas automáticamente justo antes de que se ejecuten.
+- **APIRouter:** Para evitar que tu archivo principal engorde a miles de líneas, se recomienda usar el módulo `APIRouter` (`router = APIRouter()`). Construyes mini-FastAPIs en otros archivos y luego los enchufas al árbol principal.
+- **Middlewares y CORS:** Los Middlewares son funciones centinelas que interceptan TODO el tráfico global (cada Request que entra y Response que sale), ideales para medir tiempos o registrar IPs. Aquí también se configura el **CORS** (Cross-Origin Resource Sharing), un mecanismo de seguridad de los navegadores que bloquea peticiones hechas hacia tu API desde dominios Web (URLs Frontend) que tú no hayas autorizado explíc

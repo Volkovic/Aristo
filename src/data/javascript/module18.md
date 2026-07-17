@@ -14,6 +14,10 @@ Una promesa pendiente puede ser cumplida con un valor, o rechazada con una razó
 
 Como los métodos _Promise.prototype.then()_ y _Promise.prototype.catch()_ devuelven promesas, pueden encadenarse.
 
+Es importante destacar que si dentro de un bloque `.then(data => { ... })` retornas un nuevo valor (por ejemplo, `return data * 2`), ese bloque produce mágicamente y retorna UNA NUEVA PROMESA resuelta con ese valor modificado. Esto es lo que permite el encadenamiento o *Method Chaining*. Además, gracias a la propagación de errores (Error Propagation), si tienes múltiples `.then()` seguidos, basta con colocar un solo bloque `.catch()` al final absoluto; si cualquier `.then()` falla, el motor aborta inmediatamente el resto de los `.then()` y viaja (salta) directo al `.catch()` del fondo para atrapar el error.
+
+Para entender cómo JavaScript maneja este asincronismo, debemos hablar del **Event Loop** (Bucle de Eventos). En JavaScript, todo el código síncrono bloqueante en la "Call Stack" (Pila de Llamadas) principal DEBE terminar de ejecutarse primero. Solo cuando la pila está vacía, el Event Loop inyecta las tareas asíncronas. Por ejemplo, si ejecutas `setTimeout(() => console.log('Hola'), 0); console.log('Mundo');`, se imprimirá primero 'Mundo' y luego 'Hola', ya que la mera invocación de `setTimeout` envía su callback a la cola asíncrona de la Web API (Macrotask Queue), dándole prioridad al código síncrono. 
+Dentro de las tareas asíncronas, existen jerarquías. Los callbacks de `.then()` y `await` no van a la cola normal, sino a la **Cola de Microtareas (Microtask Queue)**. Esta es una cola de espera de máxima prioridad exclusiva para promesas. Si un `setTimeout` (Macrotarea) y una Promesa resuelta (Microtarea) compiten al mismo tiempo en la sala de espera, el Event Loop le dará pase libre y prioridad absoluta siempre a la Promesa.
 
 ---
 
@@ -150,7 +154,7 @@ Something wrong has happened
 
 ## Fetch API
 
-La API Fetch proporciona una interfaz para obtener recursos (incluso a través de la red). A cualquiera que haya utilizado XMLHttpRequest le resultará familiar, pero la nueva API ofrece un conjunto de funciones más potente y flexible. En este reto utilizaremos fetch para solicitar url y APIS. Además de esto, veamos una demostración del caso de uso de las promesas en el acceso a los recursos de la red utilizando la API fetch.
+La API Fetch proporciona una interfaz para obtener recursos (incluso a través de la red). A cualquiera que haya utilizado XMLHttpRequest le resultará familiar, pero la nueva API ofrece un conjunto de funciones más potente y flexible. Es una función nativa asíncrona del navegador para solicitar recursos por red HTTP, que retorna inherentemente una Promesa. En este reto utilizaremos fetch para solicitar url y APIS. Además de esto, veamos una demostración del caso de uso de las promesas en el acceso a los recursos de la red utilizando la API fetch.
 
 ```js
 const url = "https://restcountries.com/v2/all"; // api de países
@@ -179,7 +183,7 @@ square(2);
 ```
 
 ```sh
-Promesa {<resolved>: 4}
+Promesa {<resolved>: 4}
 ```
 
 La palabra _async_ delante de una función significa que esa función devolverá una promesa. La función cuadrada anterior en lugar de un valor devuelve una promesa.
@@ -235,6 +239,14 @@ const fetchData = async () => {
 console.log("===== async and await");
 fetchData();
 ```
+
+El uso de `await` revolucionó el código de red y bases de datos porque previene el infame *Callback Hell* (código anidado en forma de pirámide invertida), permitiendo leer y razonar sobre el código temporal y asíncrono en una elegante estructura visual *Top-Down* (de arriba hacia abajo), como si fuera código síncrono clásico.
+
+Sin embargo, hay que tener cuidado con el rendimiento. Si tienes tres peticiones de red independientes que duran 2 segundos cada una y usas tres `await` consecutivos uno debajo del otro, el código tardará 6 segundos en total, ya que los `await` se bloquean secuencialmente haciendo un "cuello de botella" artificial innecesario. Para solucionar esto y ejecutar promesas en paralelo, JavaScript ofrece métodos estáticos muy potentes:
+
+- **`Promise.all([promesa1, promesa2])`**: Toma un array de Promesas simultáneas y retorna UNA SOLA promesa maestra que se resuelve ÚNICAMENTE cuando todas y cada una de las promesas del array han terminado con éxito. Tiene una política de "Todo o Nada": si una sola promesa falla y entra en estado *Rejected*, el `Promise.all` entero se autodescarta, entra en cortocircuito y salta instantáneamente al bloque Catch de rechazo, perdiendo todo el trabajo.
+- **`Promise.allSettled()`**: Introducido en ES2020, es el método moderno que deberías utilizar si quieres que todas las peticiones terminen y recopilar tanto los éxitos como los fallos detallados sin que un solo fallo derrumbe el resto.
+- **`Promise.race([p1, p2, p3])`**: Ejecuta una carrera de promesas y se resuelve (o rechaza) estrictamente con el resultado de la PRIMERA promesa que logre finalizar (la más veloz), ignorando a las perdedoras. Es ideal para programar patrones de tiempo de expiración (Timeout Patterns).
 
 ---
 

@@ -13,6 +13,12 @@ for(inicialización, condición, incremento/decremento){
 }
 ```
 
+Es importante entender el orden de ejecución en esta estructura: la inicialización ocurre una sola vez al principio, la condición se evalúa antes de cada vuelta, y el **incremento/decremento se ejecuta siempre al final de cada iteración**, justo después de ejecutar el bloque de código interno y antes de volver a evaluar la condición.
+
+Además, la sintaxis del bucle `for` es sumamente expresiva y flexible. Puedes declarar múltiples variables separadas por comas en la inicialización (ej. `for(let i = 0, j = 10; i < 10; i++, j--)`). Incluso puedes omitir las tres partes para crear un bucle infinito válido sintácticamente: `for (;;) { }`. 
+
+Históricamente, si usas `var` en lugar de `let` para declarar el contador (ej. `for (var i = 0; i < 3; i++)`), ocurre una peculiaridad: la variable sobrevive (se "filtra") fuera del bucle porque `var` tiene ámbito de función, no de bloque. Hoy en día, siempre se recomienda usar `let` para evitar contaminar el entorno.
+
 ```js
 for (let i = 0; i <= 5; i++) {
   console.log(i);
@@ -98,10 +104,17 @@ for (let i = 0; i < countries.length; i++) {
 console.log(newArr); // ["FINLAND", "SWEDEN", "NORWAY", "DENMARK", "ICELAND"]
 ```
 
+**Bucles anidados y Matrices**
+Para recorrer estructuras de datos más complejas, como matrices (arrays multidimensionales o arrays de arrays, ej: `[[1, 2], [3, 4]]`), se utilizan bucles anidados (un bucle dentro de otro bucle). En un escenario de dos bucles anidados (ej. `for (let i=0; i<3; i++) { for (let j=0; j<3; j++) { ... } }`), el bucle interior se ejecuta por completo en cada vuelta del exterior. En este caso, matemáticamente se ejecutaría 9 veces en total (3 x 3).
+
+Si utilizas la sentencia `break` en el bucle interior, se rompe ÚNICAMENTE ese bucle interior, y la ejecución retorna al bucle exterior para seguir su próxima vuelta. Para romper ambos bucles a la vez desde adentro, JavaScript permite el uso de **Labels (Etiquetas)**. Puedes nombrar un bloque de código y usarlo junto a break (ej: `break miBucleExterno;`).
+
 ---
 
 
 ### Bucle while
+
+En un bucle `while`, la condición se evalúa ANTES de entrar al bloque. Si la condición evalúa inicialmente a `false`, el bloque de código interior jamás se ejecuta. Un error muy común en este tipo de bucles (que causa típicamente un bucle infinito fatal) es olvidar escribir la lógica dentro del bloque que hace avanzar el contador o modifica la condición para que eventualmente sea falsa (ej: olvidar el `i++`).
 
 ```js
 let i = 0;
@@ -118,6 +131,8 @@ while (i <= 5) {
 
 ### Bucle do while
 
+La principal diferencia entre un bucle `while` y un bucle `do while` es que este último evalúa la condición al final. Esto asegura que el bloque de código se ejecute obligatoriamente al menos una vez, aunque la condición sea falsa desde el principio.
+
 ```js
 let i = 0;
 do {
@@ -133,7 +148,11 @@ do {
 
 ### Bucle for of
 
-Usamos el bucle for of para arrays. Es una forma muy práctica de iterar a través de un array, si no estamos interesados en el index de cada elemento del array.
+Usamos el bucle for of para arrays. Es una forma muy práctica e ideal (introducida en ES6) de iterar a través de un array u otro elemento iterable obteniendo directamente sus valores, si no estamos interesados en el index de cada elemento del array.
+
+Además de los arrays, los Strings en JavaScript también implementan el protocolo Iterable. Por lo tanto, sí se puede iterar un String con el bucle `for...of`, el cual iterará sobre cada uno de los caracteres del string (uno por uno).
+
+Ten en cuenta que al iterar sobre valores primitivos con `for...of`, la variable iteradora recibe una copia del valor. Si intentas modificarla (ej. `for (let n of nums) { n += 5; }`), el array original NO será mutado ni modificado.
 
 ```js
 for (const element of arr) {
@@ -202,9 +221,26 @@ console.log(newArr); // ["FINLAND", "SWEDEN", "NORWAY", "DENMARK", "ICELAND"]
 
 ---
 
+### Bucle for in
+
+Mientras que `for...of` itera sobre valores, el bucle `for...in` está diseñado específicamente para iterar (recorrer) sobre las propiedades (claves/índices) de un Objeto literal.
+
+```js
+const obj = { a: 1, b: 2 };
+for (const x in obj) {
+  console.log(x);
+}
+```
+
+En la primera iteración del ejemplo anterior, la variable `x` toma el valor de la CLAVE en formato string (`'a'`), no el valor numérico (`1`).
+
+**Nota importante:** NO es recomendable usar `for...in` para iterar Arrays convencionales. Esto se debe a que itera sobre todas las propiedades enumerables (incluso las heredadas o inyectadas manualmente en el prototipo del Array por alguna librería), además de que el orden de iteración no está garantizado.
+
+---
+
 ### break
 
-Break se utiliza para interrumpir un bucle.
+Break se utiliza para interrumpir un bucle. Es la palabra clave que utilizas para detener forzosamente y SALIR de un bucle antes de que alcance su límite natural.
 
 ```js
 for (let i = 0; i <= 5; i++) {
@@ -224,7 +260,7 @@ El código anterior se detiene si se encuentran 3 en el proceso de iteración.
 
 ### continue
 
-Usamos la palabra clave _continue_ para omitir ciertas iteraciones.
+Usamos la palabra clave _continue_ para omitir ciertas iteraciones. A diferencia de `break`, `continue` sirve para saltarse la iteración actual y pasar inmediatamente a la siguiente iteración (forzando al bucle a saltar al incremento y a la siguiente evaluación).
 
 ```js
 for (let i = 0; i <= 5; i++) {

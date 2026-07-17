@@ -83,6 +83,22 @@ Number of countries: 5
 ```
 
 
+---
+
+### Listas anidadas
+
+Las listas en Python pueden contener otras listas como elementos, lo que se conoce como listas anidadas. Esto es muy útil para crear matrices matemáticas o estructuras multidimensionales sin límite de profundidad.
+
+Al usar la función `len()` en una lista que contiene sub-listas, esta cuenta cada sub-lista como un único elemento directo, sin importar cuántos elementos contenga en su interior.
+
+```py
+matriz = [[1, 2], [3, 4]]
+print(matriz[0]) # [1, 2]
+
+lista_mixta = [1, 2, [3, 4]]
+print(len(lista_mixta)) # 3, porque contiene el 1, el 2 y la sub-lista completa
+```
+
 
 ---
 
@@ -295,7 +311,7 @@ print(fruits)  # ['orange', 'mango', 'banana']
 
 ### Eliminar con `pop()`
 
-Usa `pop()` para eliminar el elemento en el índice dado (si no se indica, elimina el último elemento):
+Usa `pop()` para eliminar y retornar el elemento en el índice dado (si no se indica, elimina y devuelve el último elemento de la lista):
 
 ```py
 # Sintaxis
@@ -430,6 +446,25 @@ fruits = ['banana', 'orange', 'mango', 'lemon']
 vegetables = ['Tomato', 'Potato', 'Cabbage', 'Onion', 'Carrot']
 fruits.extend(vegetables)
 print('Fruits and vegetables:', fruits ) # Fruits and vegetables: ['banana', 'orange', 'mango', 'lemon', 'Tomato', 'Potato', 'Cabbage', 'Onion', 'Carrot']
+```
+
+
+---
+
+### Repetir listas
+
+Al igual que con los strings, puedes usar el operador de multiplicación (`*`) para repetir la secuencia de los elementos de una lista la cantidad de veces que especifiques.
+
+```py
+# Sintaxis
+lst = ['item1', 'item2']
+lst_repetida = lst * 2
+```
+
+```py
+numeros = [1, 2, 3]
+numeros_repetidos = numeros * 3
+print(numeros_repetidos) # [1, 2, 3, 1, 2, 3, 1, 2, 3]
 ```
 
 

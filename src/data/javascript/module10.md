@@ -1,6 +1,7 @@
 ## Set
 
 Set (conjunto) es una colección de elementos. Set sólo puede contener elementos únicos.
+A diferencia de los objetos tradicionales, los Sets (y Maps) en JavaScript conservan el orden cronológico estricto en el que los elementos fueron insertados. Además, aunque en JavaScript `NaN !== NaN`, un Set utiliza un algoritmo interno (SameValueZero) que considera que todos los `NaN` son idénticos, por lo que sí puedes almacenar `NaN` como un valor válido y el Set no permitirá duplicados de este.
 Veamos cómo crear set en la sección siguiente.
 
 ### Creación de set vacío
@@ -37,6 +38,8 @@ console.log(setOfLanguages);
 ```sh
 Set(4) {"English", "Finnish", "French", "Spanish"}
 ```
+
+Este comportamiento es muy útil para crear rápidamente un array con elementos únicos a partir de un array que tiene duplicados. Para convertir el Set de vuelta a un array, puedes usar el método `Array.from(new Set(arr))` o el operador de dispersión `[...new Set(arr)]`.
 
 ---
 
@@ -279,6 +282,8 @@ Set(2) {1, 2}
 
 ## Map
 
+La diferencia más importante entre un `Map` y un `Object` clásico de JavaScript es que en un Objeto literal las claves solo pueden ser strings o symbols, mientras que en un Map, las claves pueden ser de cualquier tipo (incluso objetos, funciones o booleanos). Si utilizas un objeto como clave, el Map almacena la referencia de ese objeto en memoria como la clave legítima. Al igual que los Sets, los Maps conservan el orden cronológico estricto en el que los elementos/claves fueron insertados.
+
 ### Creación de un Map vacío
 
 ```js
@@ -331,6 +336,7 @@ Map(3) {"Finland" => "Helsinki", "Sweden" => "Stockholm", "Norway" => "Oslo"}
 3
 ```
 
+Si intentas hacer un `.set()` en un Map con una clave que ya existe, este no creará un duplicado, sino que sobrescribirá el valor anterior asociado a esa clave.
 
 ---
 
@@ -344,6 +350,7 @@ console.log(countriesMap.get("Finland"));
 Helsinki
 ```
 
+Si intentas obtener el valor de una clave que no existe en el Map (por ejemplo, `countriesMap.get('clave_falsa')`), el método simplemente retorna `undefined`.
 
 ---
 
@@ -373,6 +380,8 @@ for (const country of countriesMap) {
 (2) ["Norway", "Oslo"]
 ```
 
+Si quieres iterar sobre partes específicas de un Map, puedes usar sus métodos iteradores: `.keys()` para las claves, `.values()` para iterar solo sobre los valores, y `.entries()` para los pares.
+
 ---
 
 
@@ -387,3 +396,11 @@ Finland Helsinki
 Sweden Stockholm
 Norway Oslo
 ```
+
+---
+
+## WeakMap y WeakSet
+
+Además de las estructuras anteriores, JavaScript cuenta con `WeakMap` y `WeakSet`. La diferencia principal entre `Map` y `WeakMap` es que `WeakMap` solo acepta OBJETOS como claves y utiliza referencias débiles. Esto significa que no previene que el recolector de basura (Garbage Collector) elimine esos objetos si no hay otras referencias a ellos, evitando fugas de memoria.
+
+Debido a que sus claves están débilmente referenciadas y el Garbage Collector podría borrarlas en cualquier momento, su "tamaño" es impredecible en tiempo de ejecución. Por esta razón, en un `WeakMap` o `WeakSet` NO puedes usar la propiedad `.size` ni iterarlos con bucles como `for...of`.

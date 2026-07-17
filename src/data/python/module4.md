@@ -56,6 +56,12 @@ print(len(first_name) > len(last_name)) # True
 print(len(full_name)) # 16
 ```
 
+Además de concatenar, también podemos repetir una cadena múltiples veces utilizando el operador de multiplicación (`*`) junto con un número entero.
+
+```py
+laugh = 'Ha'
+print(laugh * 3) # HaHaHa
+```
 
 ---
 
@@ -190,6 +196,8 @@ print(f'{a} ** {b} = {a ** b}')
 
 Las cadenas en Python son secuencias de caracteres y comparten los mismos métodos de acceso que otras secuencias como listas y tuplas. La forma más sencilla de extraer caracteres individuales (o elementos de cualquier secuencia) es desempaquetarlos en variables.
 
+Es importante destacar que las cadenas en Python son **inmutables**. Esto significa que, una vez creada una cadena, no se pueden cambiar, reemplazar o reasignar sus caracteres individuales directamente usando su índice (por ejemplo, intentar `language[0] = 'H'` lanzará un error de tipo `TypeError`). Si necesitas modificar una cadena, debes crear una nueva.
+
 #### Desempaquetar caracteres
 
 ```
@@ -279,6 +287,15 @@ Hay muchos métodos para manipular y formatear cadenas. A continuación vemos al
 ```py
 challenge = 'thirty days of python'
 print(challenge.capitalize()) # 'Thirty days of python' (primera letra en mayúscula)
+```
+
+- lower(): convierte todos los caracteres de la cadena a minúsculas
+- upper(): convierte todos los caracteres de la cadena a mayúsculas
+
+```py
+word = 'HoLa'
+print(word.lower()) # 'hola'
+print(word.upper()) # 'HOLA'
 ```
 
 - count(): devuelve el número de ocurrencias de una subcadena: `count(subcadena, start=.., end=..)`. `start` y `end` definen el rango de conteo.
@@ -510,7 +527,3 @@ print(challenge.startswith('thirty')) # True
 challenge = '30 days of python'
 print(challenge.startswith('thirty')) # False (no empieza con 'thirty')
 ```
-
-
-
----

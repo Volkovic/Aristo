@@ -182,7 +182,7 @@ print(re.split('\n', txt)) # dividir usando \n - salto de línea
 
 ## Construir patrones RegEx
 
-Para declarar una cadena usamos comillas simples o dobles. Para declarar un patrón RegEx usamos una cadena raw, escrita como r''.
+Para declarar una cadena usamos comillas simples o dobles. Para declarar un patrón RegEx usamos una cadena cruda (raw string), escrita como r''. Esto es muy importante porque le dice a Python que ignore las barras invertidas (\\) y no las trate como caracteres de escape especiales (como saltos de línea), enviándolas puras al motor RegEx.
 El siguiente patrón reconoce solo 'apple' en minúsculas; para ignorar mayúsculas/minúsculas reescribimos el patrón o añadimos la bandera re.I.
 
 ```py
@@ -242,6 +242,15 @@ matches = re.findall(regex_pattern, txt)
 print(matches)  # ['6', '2019', '8', '2021']
 ```
 
+El metacarácter `\w` (Word character) es súper útil para validar nombres de usuario o variables, ya que incluye cualquier letra (mayúscula o minúscula), número y el guion bajo `_`.
+
+```py
+regex_pattern = r'\w+'  # \w coincide con cualquier letra, número o guion bajo (_)
+txt = 'User_123 is logged in.'
+matches = re.findall(regex_pattern, txt)
+print(matches)  # ['User_123', 'is', 'logged', 'in']
+```
+
 
 ---
 
@@ -262,7 +271,7 @@ matches = re.findall(regex_pattern, txt)
 print(matches)  # []
 ```
 
-Si no hay '\d' literal en el texto, no se encuentran coincidencias.
+Si no hay '\d' literal en el texto, no se encuentran coincidencias. Si realmente quieres buscar un punto gramatical en el texto (por ejemplo, el final de una oración), debes escaparlo usando una barra invertida: `\.`. De lo contrario, el motor RegEx lo interpretará como el metacarácter comodín que coincide con cualquier carácter.
 
 
 ---
@@ -362,5 +371,13 @@ matches = re.findall(regex_pattern, txt)
 print(matches)  # ['6,', '2019', '8,', '2021']
 ```
 
+- Indicar final (`$`)
+
+Así como el circunflejo (`^`) obliga al patrón a coincidir solo al inicio del string, el símbolo de dólar (`$`) obliga a coincidir solo al final absoluto del string. Usar ambos (`^patron$`) es ideal para validar que todo el texto cumpla un formato exacto (como un email), sin basura antes o después.
+
 
 ---
+
+### Agrupación con Paréntesis (...)
+
+Los paréntesis `(...)` se utilizan en RegEx para agrupar una sub-expresión. Esto tiene dos propósitos principales: permite aplicar un cuantificador a un bloque entero (por ejemplo, el patrón `(ab)+` repetirá la secuencia exacta 'ab', coincidiendo con 'ababab') y crea Grupos de Captura, lo que permite extraer ese pedazo específico de información de forma aislada.

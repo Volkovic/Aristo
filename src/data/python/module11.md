@@ -6,7 +6,7 @@ Hasta ahora hemos aprendido muchas funciones integradas de Python. En esta secci
 
 ### Definir funciones
 
-Una función es un bloque de código reutilizable o una sentencia de programación que realiza una tarea específica. Para definir o declarar una función, Python provee la palabra clave def. La sintaxis para definir funciones es la siguiente. El código dentro de la función solo se ejecuta cuando la llamamos o la invocamos.
+Una función es un bloque de código reutilizable o una sentencia de programación que realiza una tarea específica. Para definir o declarar una función, Python provee la palabra clave def. La sintaxis para definir funciones es la siguiente. El código dentro de la función solo se ejecuta cuando la llamamos o la invocamos. Si necesitas definir la firma estructural de una función vacía para dejar su programación para más tarde sin que Python arroje un `SyntaxError`, puedes usar la sentencia `pass`.
 
 
 ---
@@ -264,6 +264,40 @@ def find_even_numbers(n):
 print(find_even_numbers(10))
 ```
 
+- Devolver múltiples valores (Empaquetado de Tuplas):
+  En Python, una función puede devolver múltiples valores a la vez separándolos por comas. Python los agrupa automáticamente en una Tupla (Tuple Packing).
+  **Ejemplo:**
+
+```py
+def get_user_info():
+    name = 'Asabeneh'
+    age = 250
+    return name, age
+print(get_user_info()) # ('Asabeneh', 250)
+```
+
+
+---
+
+### Ámbito de las variables (Scope) y la palabra clave `global`
+
+El ámbito (Scope) define la visibilidad y el tiempo de vida de una variable, es decir, desde qué partes del código se puede acceder a ella. Las variables creadas DENTRO de una función pertenecen al ámbito **Local** y desaparecen (son destruidas) al finalizar la función. Si intentas acceder a una variable local desde fuera de la función, Python arrojará un `NameError`.
+
+Por otro lado, las variables creadas FUERA de cualquier función pertenecen al ámbito **Global**. Si necesitas modificar una variable de ámbito global desde adentro de una función, debes declararla explícitamente usando la palabra clave `global` antes de modificarla.
+
+**Ejemplo:**
+
+```py
+x = 10 # Variable global
+
+def modify_global():
+    global x
+    x = 20 # Modifica la variable global en lugar de crear una local
+
+modify_global()
+print(x) # 20
+```
+
 
 ---
 
@@ -342,6 +376,23 @@ print(sum_all_nums(2, 3, 5)) # 10
 
 ---
 
+### Número arbitrario de argumentos por clave (**kwargs)
+
+De manera similar a `*args`, si queremos pasar un número arbitrario de argumentos nombrados (keyword arguments), utilizamos un parámetro precedido por un doble asterisco `**` (por convención llamado `**kwargs`). Esto empaqueta todos los argumentos nombrados sobrantes en un Diccionario.
+
+**Ejemplo:**
+
+```py
+def print_user_info(**kwargs):
+    for key, value in kwargs.items():
+        print(f"{key}: {value}")
+
+print_user_info(name="Asabeneh", country="Finland", age=250)
+```
+
+
+---
+
 ### Parámetros por defecto y arbitrarios en funciones
 
 ```py
@@ -366,6 +417,58 @@ def do_something(f, x):
 print(do_something(square_number, 3)) # 27
 ```
 
+
+---
+
+### Documentación (Docstrings) y Pistas de Tipo (Type Hints)
+
+Para explicar qué hace una función para que otros desarrolladores la entiendan, se utiliza un **Docstring**. Es una cadena de texto documentativa incrustada con comillas triples `'''` o `"""` inmediatamente debajo de la definición `def`.
+
+Además, Python permite usar **Type Hints** (Pistas de Tipo) en los parámetros y el valor de retorno (ej: `def sumar(a: int, b: int) -> int:`). Son sugerencias informativas opcionales para IDEs y linters que ayudan a detectar errores antes de ejecutar el código, aunque Python las ignorará en tiempo de ejecución debido a su tipado dinámico.
+
+**Ejemplo:**
+
+```py
+def sumar(a: int, b: int) -> int:
+    """
+    Esta función recibe dos números enteros y retorna su suma.
+    """
+    return a + b
+```
+
+
+---
+
+### Funciones como Objetos de Primera Clase y Funciones Lambda
+
+En Python, las funciones son **objetos de primera clase** (*First-Class Citizens*). Esto significa que pueden tratarse como cualquier otra variable: puedes asignarlas a variables, pasarlas como argumentos a otras funciones y retornarlas desde otras funciones.
+
+Además de las funciones regulares definidas con `def`, Python permite crear funciones anónimas en una sola línea utilizando la palabra clave `lambda`. Estas funciones no requieren `return` (lo hacen implícito) y constan de una sola expresión.
+
+**Ejemplo:**
+
+```py
+# Función Lambda
+cuadrado = lambda x: x * x
+print(cuadrado(5)) # 25
+```
+
+
+---
+
+### Recursividad (Recursion)
+
+Una función puede llamarse a sí misma desde adentro de su propio código. A esto se le llama **Recursividad**. Es una técnica matemática poderosa, pero debe tener una condición de salida estricta; de lo contrario, provocará un bucle infinito y un error de desbordamiento de pila (*Stack Overflow*).
+
+**Ejemplo:**
+
+```py
+def factorial(n):
+    if n <= 1:
+        return 1
+    return n * factorial(n - 1)
+print(factorial(5)) # 120
+```
 
 
 ---

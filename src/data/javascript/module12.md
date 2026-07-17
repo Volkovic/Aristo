@@ -72,7 +72,7 @@ let regEx = new RegExp("love", "gi");
 
 ### Métodos del objeto RegExp
 
-Veamos algunos de los métodos RegExp
+Veamos algunos de los métodos RegExp. Es importante destacar la diferencia entre los métodos que pertenecen a la clase `RegExp` y los que pertenecen al prototipo de la clase `String` (`String.prototype`). Mientras que métodos como `test()` se ejecutan directamente sobre la expresión regular (ej. `regex.test(str)`), métodos como `match()`, `search()` y `replace()` son métodos propios de las cadenas de texto que reciben una expresión regular como argumento (ej. `str.match(regex)`).
 
 #### Pruebas de coincidencia
 
@@ -212,6 +212,8 @@ Soy profesora y me encanta enseñar. No hay nada más gratificante que educar y 
 - \\: utiliza para evadir caracteres especiales
   - \d significa: coincide cuando el string contiene dígitos (numeros del 0-9)
   - \D significa: coincide cuando el string no contiene dígitos
+  - \w significa: cualquier carácter de palabra (caracteres alfanuméricos y el guion bajo _). Es equivalente a [a-zA-Z0-9_].
+  - \s significa: un espacio en blanco (incluyendo espacios, tabulaciones y saltos de línea).
 - . : cualquier carácter excepto la nueva línea (\n)
 - ^: comienza con
   - r'^substring' eg r'^love', una frase que comienza con la palabra love
@@ -230,7 +232,7 @@ Soy profesora y me encanta enseñar. No hay nada más gratificante que educar y 
 - {3,8}: De 3 a 8 caracteres
 - |: O bien
   - r'apple|banana' significa tanto una manzana como un plátano
-- (): Capturar y agrupar
+- (): Capturar y agrupar. Permite agrupar varios tokens juntos y extraer o "capturar" sub-partes específicas de la coincidencia para usarlas luego.
 
 ---
 

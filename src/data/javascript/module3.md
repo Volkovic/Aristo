@@ -22,6 +22,7 @@ Acordamos que los valores booleanos son true o false.
 
 - Todos los números (positivos y negativos) son verdaderos excepto cero
 - Todos las string (cadenas) son verdaderos excepto un string vacío ('')
+- Todos los objetos y arrays (incluso si están vacíos, como `{}` o `[]`) son verdaderos
 - El booleano true
 
 ### Valores falsos
@@ -72,6 +73,8 @@ let firstName = "Asabeneh";
 let country = "Finland";
 ```
 
+Además del signo igual simple, existen operadores de asignación compuestos que abrevian operaciones matemáticas. Por ejemplo, `x += 3` es una forma más limpia y corta de escribir `x = x + 3`. Lo mismo aplica para `+=`, `-=`, `*=`, `/=` y `%=`.
+
 Operadores de asignación
 
 
@@ -87,7 +90,7 @@ Los operadores aritméticos son operadores matemáticos.
 - Resta(-): a - b
 - Multiplicación(\*): a \* b
 - División(/): a / b
-- Módulo(%): a % b
+- Módulo(%): a % b (calcula el resto o residuo de una división)
 - Exponencial(**): a ** b
 
 ```js
@@ -180,6 +183,10 @@ console.log("tomato".length == "potato".length); // true
 console.log("python".length > "dragon".length); // false
 ```
 
+Un caso curioso de coerción de tipos en JavaScript es la expresión `[] == ![]`, la cual devuelve `true`. Esto sucede porque el array vacío `[]` es un valor verdadero (truthy), por lo que `![]` se evalúa como `false`. Luego, la comparación queda `[] == false`. Al forzar ambos lados a un número, `false` se convierte en `0` y el array vacío también se convierte en `0`, resultando en `0 == 0`.
+
+Además, ten cuidado con las comparaciones encadenadas como `3 > 2 > 1`. Esta expresión se evalúa de izquierda a derecha: primero `3 > 2` es `true`, y luego la expresión se convierte en `true > 1`. Al forzar `true` a número, equivale a `1`, por lo que `1 > 1` resulta ser `false`.
+
 ---
 
 
@@ -195,6 +202,13 @@ Los siguientes símbolos son los operadores lógicos más comunes:
 El operador && se vuelve verdadero sólo si los dos operandos son verdaderos.
 El operador || se vuelve verdadero cualquiera de los operandos es verdadero.
 El operador ! niega true a false y false a true.
+
+En realidad, los operadores lógicos en JavaScript no devuelven estrictamente `true` o `false`, sino que devuelven el valor de uno de los operandos mediante un mecanismo llamado "cortocircuito" (short-circuiting).
+El operador `&&` (AND) evalúa de izquierda a derecha y devuelve el primer valor falso (falsy) que encuentre. Si todos son verdaderos, devuelve el último valor evaluado (por ejemplo, `'manzana' && 'banana'` devuelve `'banana'`).
+El operador `||` (OR) busca el primer valor verdadero (truthy). En el momento en que lo encuentra, devuelve su valor y hace cortocircuito, ignorando el resto (por ejemplo, `'' || 'Por defecto'` devuelve `'Por defecto'`, un patrón muy usado para asignar valores por defecto).
+
+**Operador Nullish Coalescing (??)**
+Introducido en ES2020, el operador `??` es similar a `||`, pero con una diferencia clave: solo evalúa y retorna el lado derecho si el lado izquierdo es estrictamente `null` o `undefined`. Esto soluciona el problema común donde valores falsy válidos como `0` o un string vacío (`''`) eran sobreescritos accidentalmente al usar `||`.
 
 ```js
 // && ejemplo de operador ampersand
@@ -223,7 +237,9 @@ let isMarried = !false; // true
 
 ### Operadores de Incremento
 
-En JavaScript usamos el operador de incremento para aumentar un valor almacenado en una variable. El incremento podría ser antes o después del incremento. Veamos cada uno de ellos:
+En JavaScript usamos el operador de incremento para aumentar un valor almacenado en una variable. El incremento podría ser antes o después del incremento. 
+
+La diferencia principal radica en el valor que retornan en el momento de la ejecución: el pre-incremento (`++x`) suma 1 a la variable y RETORNA el nuevo valor sumado. En cambio, el post-incremento (`x++`) retorna el valor ORIGINAL de la variable para ser usado en la expresión actual, y LUEGO le suma 1 en memoria. Veamos cada uno de ellos:
 
 1. Pre-incremento
 
@@ -513,4 +529,4 @@ console.log(`${date}/${month}/${year} ${hours}:${minutes}`); // 4/1/2020 0:56
 ```
 
 
-[<< D�a 2](../dia_02_tipos_de_datos.md) | [D�a 4 >>](../dia_04_Condicionales/dia_04_Condicionales.md)
+[<< Da 2](../dia_02_tipos_de_datos.md) | [Da 4 >>](../dia_04_Condicionales/dia_04_Condicionales.md)

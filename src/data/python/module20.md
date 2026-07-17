@@ -4,9 +4,11 @@
 
 ### ¿Qué es PIP?
 
-PIP significa Preferred Installer Program, que en español puede traducirse como «programa de instalación preferido». Usamos _pip_ para instalar paquetes de Python.
+PIP significa Preferred Installer Program, que en español puede traducirse como «programa de instalación preferido». También es conocido por el acrónimo recursivo clásico **«PIP Installs Packages»**. Usamos _pip_ para instalar paquetes de Python.
 Un paquete es una colección de módulos (o subpaquetes) que podemos instalar y luego importar en nuestras aplicaciones.
 En la práctica, en lugar de reescribir utilidades comunes, instalamos paquetes útiles y los importamos.
+
+Cuando ejecutas un comando de instalación, la herramienta PIP se conecta silenciosamente a los servidores web del **PyPI (Python Package Index)**. PyPI es el repositorio de software oficial público en internet donde residen todos los paquetes de terceros (third-party) alojados por la comunidad global de Python. Desde allí, PIP busca el código fuente y lo descarga a tu computadora.
 
 
 ---
@@ -32,6 +34,8 @@ pip --version
 ```
 
 Si ves un número diferente, significa que pip está instalado en tu sistema.
+
+A veces, al usar PIP, puedes ver un mensaje de advertencia (WARNING) indicando que hay una nueva versión disponible (ej. *'You are using pip version 20.2.3; however, version 23.2 is available'*). Esto ocurre porque PIP es un programa en sí mismo y los desarrolladores lanzan nuevas versiones constantemente. Mantener PIP actualizado previene errores bizarros al instalar dependencias modernas que usan nuevos sistemas de compilación. Para decirle a PIP que se actualice a sí mismo a la última versión, debes ejecutar `python -m pip install --upgrade pip`. Al usar `python -m`, le decimos a Python que ejecute PIP como un módulo, lo que permite que PIP se sobrescriba a sí mismo (especialmente en Windows) sin lanzar un error de 'archivo en uso'.
 
 
 ---
@@ -78,6 +82,16 @@ pip install pandas
 >>> import pandas
 ```
 
+Cuando haces `pip install`, las librerías se instalan físicamente en la carpeta `site-packages` dentro del entorno activo de Python. El `sys.path` de Python siempre busca primero ahí adentro cuando usas la instrucción `import`.
+
+Si necesitas obligar a PIP a actualizar un paquete de terceros que ya está instalado en tu máquina a su versión más nueva, puedes usar el flag `--upgrade` (o `-U`). Por ejemplo: `pip install pandas --upgrade`. Esto le dice a PIP que ignore la versión actual, la borre y descargue lo más nuevo que encuentre.
+
+En ocasiones, una versión nueva puede romper tu código. Si quieres instalar una versión ESPECÍFICA de un paquete, usas el doble igual (`==`), lo que obliga a PIP a buscar en los repositorios históricos e instalar la versión estricta solicitada: `pip install pandas==1.20.0`. PIP también soporta expresiones matemáticas y operadores relacionales (>=, <=, <) para resolver matemáticamente la mejor versión segura. Por ejemplo, para instalar una versión mayor o igual a 1.0.0 pero menor a 2.0.0, usarías: `pip install "pandas>=1.0.0,<2.0.0"`.
+
+Si al ejecutar un comando de instalación PIP te arroja el error *'Could not find a version that satisfies the requirement'*, significa que no tienes conexión a PyPI, escribiste muy mal el nombre (typo) o la librería simplemente no existe.
+
+**Nota de seguridad:** NUNCA se recomienda instalar librerías globalmente usando permisos de Administrador (ej. `sudo pip install` en Linux/Mac). Hacerlo sobrescribirá o romperá las librerías propias que usa el Sistema Operativo (que muchas veces está escrito en Python), llevando a un daño crítico del sistema. Por esta razón nacieron los Entornos Virtuales.
+
 Esta sección no pretende profundizar en NumPy o Pandas, sino solo mostrar cómo instalar e importar paquetes.
 
 Hay módulos de la librería estándar, por ejemplo _webbrowser_, que permiten abrir sitios web. No necesitan instalación.
@@ -103,7 +117,7 @@ for url in url_lists:
 
 ### Desinstalar paquetes
 
-Para eliminar un paquete instalado:
+Para eliminar un paquete instalado y purgar sus archivos fuente de tu instalación local (liberando espacio y evitando conflictos):
 
 ```sh
 pip uninstall packagename
@@ -111,7 +125,7 @@ pip uninstall packagename
 
 ### Lista de paquetes
 
-Para listar los paquetes instalados en tu entorno:
+Para imprimir en pantalla un reporte en formato lista de TODOS los paquetes actualmente instalados en tu entorno (mostrando el nombre exacto y su versión):
 
 ```sh
 pip list
@@ -122,7 +136,7 @@ pip list
 
 ### Mostrar información del paquete
 
-Para ver información de un paquete:
+Para verificar los metadatos de un paquete instalado (quién lo creó, dónde está instalado en tu disco duro, su licencia, etc.):
 
 ```sh
 pip show packagename
@@ -151,12 +165,14 @@ Required-by:
 
 Si quieres más detalles puedes añadir --verbose.
 
+Históricamente, existía el comando `pip search nombre_paquete` para realizar búsquedas por palabras clave en la base de datos pública y encontrar librerías que no recordabas cómo se llamaban. Sin embargo, debido a bots y scraping masivo, el equipo de PyPI deshabilitó esta función, por lo que ahora debes buscar los paquetes manualmente en la página web pypi.org.
+
 
 ---
 
 ### PIP Freeze
 
-Genera una lista de paquetes instalados y sus versiones (útil para requirements.txt):
+Genera una lista de paquetes instalados EXACTAMENTE en el formato requerido por los archivos de requerimientos (ej. `requests==2.31.0`). A diferencia de `pip list`, exporta con la sintaxis de doble igual:
 
 ```sh
 pip freeze
@@ -171,6 +187,22 @@ MarkupSafe==0.19
 Pygments==1.6
 Sphinx==1.2.2
 ```
+
+La convención mundial para el nombre del archivo de texto que almacena la lista de dependencias de tu proyecto es `requirements.txt`. Cualquier desarrollador que clone tu proyecto de GitHub buscará instintivamente este archivo para saber qué librerías necesita instalar.
+
+Para crear este archivo de dependencias utilizando la salida directa de PIP en la terminal, usamos el operador de redirección `>`:
+
+```sh
+pip freeze > requirements.txt
+```
+
+El operador `>` toma la salida del comando y, en vez de mostrarla en pantalla, la inyecta directamente dentro del archivo de texto. Si tienes un nuevo proyecto y te pasaron el archivo `requirements.txt`, puedes leer el archivo e instalar automáticamente todas las librerías que contiene de un solo golpe usando el flag `-r` (requirement):
+
+```sh
+pip install -r requirements.txt
+```
+
+Para mantener la salud de tu entorno, puedes usar el comando `pip check`. Este comando hace un chequeo de cordura interno para verificar si hay conflictos (librerías que requieren versiones incompatibles de la misma dependencia cruzada, lo que se conoce como Dependency Hell).
 
 
 ---
@@ -294,10 +326,8 @@ print(greet.greet_person('Juan', 'Pérez'))
 - Python tiene paquetes y módulos incorporados; otros deben instalarse.
 - pip es la herramienta recomendada para instalar y gestionar paquetes desde PyPI.
 - Para capturar las dependencias de un proyecto usa pip freeze > requirements.txt.
+- Para instalar dependencias desde un archivo usa pip install -r requirements.txt.
 - Para desinstalar: pip uninstall packagename o pip uninstall -r requirements.txt.
 - Virtualenv (y venv) permiten crear entornos aislados:
   - Instalar virtualenv: pip install virtualenv
   - Crear entornos aislados evita conflictos entre proyectos.
-
-
----

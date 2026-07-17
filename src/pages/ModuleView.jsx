@@ -21,20 +21,22 @@ export default function ModuleView() {
     async function loadData() {
       setLoading(true);
       try {
-        let mdModule;
-        try {
-          mdModule = await import(`../data/${courseId}/module${moduleId}.md?raw`);
-        } catch (e) {
-          mdModule = { default: '# Módulo no disponible por ahora' };
-        }
-        const textContent = mdModule.default;
-        setContent(textContent);
+        const markdownFiles = import.meta.glob('../data/*/*.md', { query: '?raw', import: 'default' });
+        const jsonFiles = import.meta.glob('../data/*/quizzes.json', { import: 'default' });
 
-        let quizModule;
-        try {
-          quizModule = await import(`../data/${courseId}/quizzes.json`);
-          setQuizzes(quizModule.default);
-        } catch (e) {
+        const mdPath = `../data/${courseId}/module${moduleId}.md`;
+        if (markdownFiles[mdPath]) {
+          const textContent = await markdownFiles[mdPath]();
+          setContent(textContent);
+        } else {
+          setContent('# Módulo no disponible por ahora');
+        }
+
+        const jsonPath = `../data/${courseId}/quizzes.json`;
+        if (jsonFiles[jsonPath]) {
+          const quizzesData = await jsonFiles[jsonPath]();
+          setQuizzes(quizzesData);
+        } else {
           console.warn(`No quizzes found for ${courseId}`);
           setQuizzes(null);
         }
@@ -46,7 +48,7 @@ export default function ModuleView() {
       }
     }
     loadData();
-  }, [moduleId]);
+  }, [courseId, moduleId]);
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-[50vh]"><Loader2 className="animate-spin text-primary" size={48}/></div>;

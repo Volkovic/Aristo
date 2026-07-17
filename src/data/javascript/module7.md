@@ -85,7 +85,7 @@ printFullName(); // llamando a una función
 
 ### Función que retorna un valor
 
-La función también puede devolver valores, si una función no devuelve valores, el valor de la función no está definido. Escribamos las funciones anteriores con return. A partir de ahora, retornaremos el valor a una función en lugar de imprimirlo.
+La función también puede devolver valores, si una función no devuelve valores, el valor de la función no está definido (retorna el valor `undefined` de forma implícita). Escribamos las funciones anteriores con return. A partir de ahora, retornaremos el valor a una función en lugar de imprimirlo.
 
 ```js
 function printFullName() {
@@ -168,6 +168,8 @@ function printFullName(firstName, lastName) {
 console.log(printFullName("Asabeneh", "Yetayeh"));
 ```
 
+JavaScript es muy flexible con la cantidad de argumentos que pasas a una función. Si declaras una función con varios parámetros pero al invocarla le pasas menos argumentos, los parámetros faltantes tomarán el valor especial de `undefined`. Por el contrario, si le pasas más argumentos de los esperados (por ejemplo, llamas a `suma(5, 5, 5)` pero solo declaraste dos parámetros), JavaScript ignorará silenciosamente los argumentos sobrantes y solo usará los primeros.
+
 ---
 
 
@@ -211,7 +213,7 @@ A veces no sabemos cuántos argumentos va a pasar el usuario. Por lo tanto, debe
 
 #### Número ilimitado de parámetros en una función regular
 
-Una función declarativa proporciona una función con alcance de argumentos array como objeto. Se puede acceder a cualquier cosa que pasemos como argumento en la función desde el objeto de argumentos dentro de las funciones. Veamos un ejemplo
+Una función declarativa proporciona una función con alcance de argumentos array como objeto. Este objeto especial `arguments` es un objeto similar a un array (array-like) que contiene todos los argumentos pasados a la función, sin importar cuántos parámetros definidos haya, pero no es un Array real nativo. Se puede acceder a cualquier cosa que pasemos como argumento en la función desde el objeto de argumentos dentro de las funciones. Veamos un ejemplo
 
 ```js
 // Accedemos a los argumentos del objeto
@@ -246,8 +248,8 @@ console.log(sumAllNums(15, 20, 30, 25, 10, 33, 40))  // 173
 
 #### Número ilimitado de parámetros en una función flecha
 
-La función flecha no tiene el objeto de alcance de los argumentos
-Para implementar una función que toma un número ilimitado de argumentos en una función de flecha, usamos el operador de propagación seguido de cualquier nombre de parámetro. Se puede acceder a cualquier elemento que hayamos pasado como argumento en la función como array en la función de flecha. Veamos un ejemplo
+La función flecha no tiene el objeto de alcance de los argumentos.
+Para implementar una función que toma un número ilimitado de argumentos en una función de flecha, usamos el operador de propagación seguido de cualquier nombre de parámetro. A esta sintaxis (`...args`) en la definición de una función se le conoce formalmente como **Parámetro Rest** (Operador Rest). A diferencia de `arguments`, el Parámetro Rest sí empaqueta todos los argumentos restantes en un Array real nativo, permitiendo usar métodos como `.map()` o `.filter()`. Veamos un ejemplo:
 
 ```js
 // Accedemos a los argumentos del objeto
@@ -299,6 +301,8 @@ const anonymousFun = function () {
 
 Las funciones de expresión son funciones anónimas. Después creamos una función sin nombre y la asignamos a una variable. Para retornar un valor de la función debemos llamar a la variable. Mira el ejemplo de abajo.
 
+Una de las principales ventajas de utilizar Expresiones de Función asignadas a variables (con `let` o `const`) es que respetan el ámbito de bloque (Block Scope) y no sufren de 'Hoisting' completo como las funciones declarativas. Esto significa que no pueden invocarse antes de la línea donde son declaradas, haciendo que el flujo del código sea más predecible y seguro.
+
 ```js
 // Function expression
 const square = function (n) {
@@ -313,7 +317,7 @@ console.log(square(2)); // -> 4
 
 ### Función de autoinvocación
 
-Las funciones de autoinvocación son funciones anónimas que no necesitan ser llamadas para devolver un valor.
+Las funciones de autoinvocación (IIFE - Immediately Invoked Function Expression) son funciones anónimas que no necesitan ser llamadas posteriormente para devolver un valor, ya que se ejecutan inmediatamente después de ser creadas. Se envuelven en paréntesis para indicar que son una expresión.
 
 ```js
 (function (n) {
@@ -332,7 +336,7 @@ console.log(squaredNum);
 
 ### Función flecha
 
-La función flecha es una alternativa para escribir una función, sin embargo, la función declarativa y la función flecha tienen algunas diferencias menores.
+La función flecha (Arrow Function), introducida en ES6, es una alternativa para escribir una función con una sintaxis más corta. Sin embargo, la función declarativa y la función flecha tienen algunas diferencias menores.
 
 La función flecha usa una flecha en lugar de la palabra clave _function_ para declarar una función. Veamos tanto la función declarativa como la función flecha.
 
@@ -354,6 +358,10 @@ console.log(square(2)); // -> 4
 // si tenemos solo una línea en el bloque de código, se puede escribir de la siguiente manera, return explícito
 const square = (n) => n * n; // -> 4
 ```
+
+Las Arrow Functions permiten omitir los paréntesis si hay un SÓLO parámetro, y omitir las llaves `{}` (y la palabra `return`) si hay una ÚNICA instrucción de retorno implícito.
+
+Otra diferencia fundamental es el manejo del contexto `this`. Las funciones flecha no tienen su propio binding de `this`; en su lugar, heredan el contexto léxico del `this` (su entorno padre). Por esta razón, las funciones flecha son inadecuadas para definir los métodos principales de un Objeto literal, ya que el `this` no apuntará dinámicamente al propio objeto que las contiene.
 
 ---
 
@@ -517,46 +525,14 @@ console.log("Weight of an object in Newton: ", weightOfObject(100, 1.62)); // gr
 
 ---
 
-### Función declarativa versus función flecha
+### Conceptos Avanzados de Funciones
 
-Será cubierto en otra sección.
+**Sobrescritura de Funciones:** JavaScript no soporta la 'Sobrecarga de Métodos' (Method Overloading). Si defines dos funciones con el mismo nombre en el mismo archivo o ámbito global, JavaScript aplicará 'Hoisting' a ambas y la SEGUNDA definición sobrescribirá (machacará) a la primera de forma silenciosa.
 
----
+**Funciones Anidadas y Closures:** JavaScript permite el anidamiento libre de funciones. Puedes declarar una función dentro del cuerpo de otra función, y las funciones interiores pueden acceder a las variables de su función exterior. A este poderoso comportamiento se le conoce como **Clausuras (Closures)**.
 
-## 💻 Ejercicios Prácticos (Funciones)
+**Recursión:** Si una función se devuelve a sí misma invocándose dentro de su propio bloque de código (ej. `return miFuncion();`), a esta técnica se le llama **Recursión** (o llamada recursiva). Es muy útil para resolver problemas iterativos, siempre y cuando se defina una condición de salida para evitar un bucle infinito.
 
-**Consigna 1:** Escribe una función declarada llamada `areaOfCircle` que tome el radio del círculo y retorne su área.
-**[Solución]**
-```javascript
-function areaOfCircle(r) {
-  const PI = Math.PI;
-  return PI * r * r;
-}
-console.log(areaOfCircle(10)); // 314.159...
-```
+**Constructor `new Function`:** Aunque es poco utilizado por razones de seguridad, es posible generar funciones dinámicamente parseando strings mediante el constructor nativo de funciones. Por ejemplo: `const f = new Function('a', 'b', 'return a + b');` es completamente legal en JS.
 
-**Consigna 2:** Escribe una función flecha `checkSeason` que tome un mes como parámetro y retorne la estación correspondiente.
-**[Solución]**
-```javascript
-const checkSeason = (month) => {
-  const m = month.toLowerCase();
-  if (m === 'diciembre' || m === 'enero' || m === 'febrero') return 'Verano';
-  if (m === 'marzo' || m === 'abril' || m === 'mayo') return 'Otoño';
-  if (m === 'junio' || m === 'julio' || m === 'agosto') return 'Invierno';
-  return 'Primavera';
-};
-console.log(checkSeason('enero')); // Verano
-```
-
-**Consigna 3:** Escribe una función anónima asignada a una variable `sumArray` que reciba un array de números como parámetro y retorne la suma de todos sus elementos.
-**[Solución]**
-```javascript
-const sumArray = function(arr) {
-  let sum = 0;
-  for (let num of arr) {
-    sum += num;
-  }
-  return sum;
-};
-console.log(sumArray([1, 2, 3, 4, 5])); // 15
-```
+**Métodos en Objetos y el contexto `this`:** A partir de ES6, existe una sintaxis ac

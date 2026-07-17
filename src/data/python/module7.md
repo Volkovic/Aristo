@@ -15,6 +15,8 @@ Usamos la función incorporada _set()_.
 st = set()
 ```
 
+Es importante destacar que para crear un conjunto vacío se debe usar obligatoriamente `set()`. Si usamos llaves vacías `{}`, Python creará un diccionario vacío, no un conjunto. Además, los elementos internos de un conjunto deben ser inmutables (o *hashables*). Esto significa que puedes guardar números, cadenas de texto o tuplas, pero si intentas añadir una lista o un diccionario (por ejemplo, `s = {1, [2, 3]}`), Python lanzará un `TypeError`.
+
 - Crear un conjunto con elementos iniciales
 
 ```py
@@ -194,7 +196,7 @@ del fruits
 
 ### Convertir lista a conjunto
 
-Podemos convertir una lista en un conjunto y viceversa. Convertir una lista a conjunto elimina duplicados y conserva solo elementos únicos.
+Podemos convertir una lista en un conjunto y viceversa. Convertir una lista a conjunto elimina duplicados y conserva solo elementos únicos. Este es un caso de uso sumamente común en el mundo real: castear una lista a conjunto y luego volverla a castear a lista (`lista_sin_duplicados = list(set(lista_original))`) es el método más idiomático en Python para purgar valores repetidos en una sola línea de código.
 
 ```py
 # Sintaxis
@@ -217,7 +219,7 @@ fruits = set(fruits) # {'mango', 'lemon', 'banana', 'orange'}
 Podemos usar los métodos _union()_ o _update()_ para combinar dos conjuntos.
 
 - Union
-  Este método devuelve un nuevo conjunto
+  Este método devuelve un nuevo conjunto. Alternativamente, puedes usar el operador pipe o barra vertical `|` como un atajo matemático para la unión (ej. `st1 | st2`).
 
 ```py
 # Sintaxis
@@ -261,7 +263,7 @@ print(fruits) # {'lemon', 'carrot', 'tomato', 'banana', 'mango', 'orange', 'cabb
 
 ### Encontrar intersección
 
-La intersección devuelve un conjunto con los elementos que están presentes en ambos conjuntos. Véase el ejemplo.
+La intersección devuelve un conjunto con los elementos que están presentes en ambos conjuntos. También puedes usar el operador `&` como atajo para la intersección (ej. `st1 & st2`). Véase el ejemplo.
 
 ```py
 # Sintaxis
@@ -318,7 +320,7 @@ python.issubset(dragon)     # Falso
 
 ### Comprobar la diferencia entre conjuntos
 
-Devuelve la diferencia entre dos conjuntos.
+Devuelve la diferencia entre dos conjuntos. El operador `-` funciona como un atajo para esta operación (ej. `st1 - st2`).
 
 ```py
 # Sintaxis
@@ -346,7 +348,7 @@ dragon.difference(python)     # {'d', 'r', 'a', 'g'}
 
 ### Encontrar diferencia simétrica
 
-Devuelve la diferencia simétrica entre dos conjuntos. Es decir, devuelve los elementos que pertenecen a uno de los conjuntos pero no a ambos; matemáticamente: (A\B) ∪ (B\A).
+Devuelve la diferencia simétrica entre dos conjuntos. Es decir, devuelve los elementos que pertenecen a uno de los conjuntos pero no a ambos; matemáticamente: (A\B) ∪ (B\A). El operador `^` es el atajo matemático para la diferencia simétrica (ej. `st1 ^ st2`).
 
 ```py
 # Sintaxis

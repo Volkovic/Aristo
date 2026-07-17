@@ -26,6 +26,8 @@ Los operadores de asignación se usan para asignar valores a las variables. Tome
 
 ![Assignment Operators](https://raw.githubusercontent.com/Asabeneh/30-Days-Of-Python/master/images/assignment_operators.png)
 
+Además del operador `=`, existen los **operadores de asignación compuestos**, que son atajos para realizar una operación y reasignar el valor al mismo tiempo. Por ejemplo, la expresión `x += 3` es exactamente lo mismo que escribir `x = x + 3`. Esto aplica también para otros operadores matemáticos como `-=`, `*=`, o `/=`.
+
 ### Operadores aritméticos:
 
 - Suma (+): a + b
@@ -35,6 +37,11 @@ Los operadores de asignación se usan para asignar valores a las variables. Tome
 - Módulo (%): a % b
 - División entera (//): a // b
 - Exponenciación (**): a ** b
+
+**Precedencia de operadores (PEMDAS):**
+Al igual que en las matemáticas tradicionales, Python respeta el orden de las operaciones. La multiplicación (`*`), división (`/`, `//`) y módulo (`%`) tienen mayor prioridad y se ejecutan antes que la suma (`+`) y la resta (`-`). Si hay operaciones del mismo nivel, normalmente se evalúan de izquierda a derecha. Sin embargo, la **exponenciación (`**`) es una excepción y se evalúa de derecha a izquierda**; por ejemplo, `2 ** 3 ** 2` se calcula primero como `3 ** 2` (9) y luego `2 ** 9` (512).
+
+*Nota sobre el módulo:* El operador módulo (`%`) es muy útil para saber si un número es par o impar. Cualquier número par dividido por 2 no deja resto, por lo que `numero % 2` siempre dará `0` si es par.
 
 ![Arithmetic Operators](https://raw.githubusercontent.com/Asabeneh/30-Days-Of-Python/master/images/arithmetic_operators.png)
 
@@ -171,6 +178,10 @@ density = mass / volume # 1000 Kg/m³
 
 En programación usamos operadores de comparación para comparar dos valores. Comprobamos si un valor es mayor, menor o igual a otro. La tabla siguiente muestra los operadores de comparación en Python (tomada de [w3schools](https://www.w3schools.com/python/python_operators.asp)).
 
+Es importante destacar que el operador de igualdad (`==`) en Python compara estrictamente los valores sin hacer conversiones de tipo implícitas agresivas (a diferencia de lenguajes como JavaScript). Por ejemplo, un número entero nunca será igual a una cadena de texto: `3 == '3'` devolverá `False`.
+
+Además, Python permite **encadenar operadores de comparación** de forma muy legible. Una expresión como `3 > 2 > 1` es completamente válida y Python la evalúa internamente como `(3 > 2) and (2 > 1)`, devolviendo `True`.
+
 ![Comparison Operators](https://raw.githubusercontent.com/Asabeneh/30-Days-Of-Python/master/images/comparison_operators.png)
 **Ejemplo: operadores de comparación**
 
@@ -204,6 +215,9 @@ Además de los operadores de comparación anteriores, Python también utiliza：
 - _is not_: devuelve True si los objetos no son idénticos (x is not y)
 - _in_: devuelve True si un elemento está en una secuencia (x in y)
 - _not in_: devuelve True si un elemento no está en una secuencia (x not in y)
+
+**Diferencia entre `==` e `is`:**
+Mientras que `==` compara si dos variables tienen el mismo *valor* (igualdad), el operador `is` comprueba si apuntan exactamente al mismo *objeto en la memoria* (identidad). Por ejemplo, si creamos dos listas separadas con los mismos números: `a = [1, 2, 3]` y `b = [1, 2, 3]`, la comparación `a == b` devolverá `True` (tienen el mismo contenido), pero `a is b` devolverá `False` (son dos objetos diferentes creados independientemente en la memoria).
 
 ```py
 print('1 is 1', 1 is 1)                   # True - porque los objetos son idénticos
@@ -241,6 +255,4 @@ print(not not False) # False
 
 ```
 
-
-
----
+En Python, ciertos valores se evalúan internamente como falsos (conocidos como valores *Falsy*). Un ejemplo clásico es `None`, que representa la ausencia de valor o vacío. Si aplicamos el operador de negación a este valor (`not None`), su valor lógico se invierte y el resultado será `True`.

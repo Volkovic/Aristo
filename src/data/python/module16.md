@@ -77,6 +77,8 @@ Formato uno: 12/05/2019, 01:05:01
 Formato dos: 05/12/2019, 01:05:01
 ```
 
+Además de usar `strftime` con códigos clásicos de POSIX C como `%Y` (año de 4 dígitos), `%m` (mes numérico), `%d` (día numérico), `%H` (hora en formato 24h), `%M` (minutos) y `%S` (segundos), puedes usar el método `.isoformat()`. Este método devuelve la fecha en el estándar mundial ISO 8601 (por ejemplo, `YYYY-MM-DDTHH:MM:SS`), el cual es la regla de oro para transferir fechas a través de APIs JSON sin ambigüedades.
+
 A continuación se muestran los símbolos de _strftime_ usados para formatear tiempos, como se ve en la imagen de referencia.
 
 ![strftime](https://raw.githubusercontent.com/Asabeneh/30-Days-Of-Python/master/images/strftime.png)
@@ -181,6 +183,13 @@ date_object = 2019-12-05 00:00:00
 t3 = 86 days, 22:56:50
 ```
 
+La clase `timedelta` es fundamental porque no representa una fecha en el calendario, sino una **duración** o cantidad abstracta de tiempo transcurrido. Puedes usarla para sumar o restar tiempo a una fecha específica; por ejemplo, para saber qué fecha será en 15 días a partir de hoy, harías `datetime.now() + timedelta(days=15)`. Ten en cuenta un detalle importante: `timedelta` **no soporta parámetros de meses (`months`) ni años (`years`)**, ya que su duración es variable (meses de 28/30/31 días o años bisiestos). Si intentas pasarle `months=1`, Python arrojará un error.
 
 
 ---
+
+### Zonas Horarias (Timezones) y Buenas Prácticas
+
+Por defecto, cuando usas `datetime.now()`, Python genera una fecha y hora **Ingenua (Naive DateTime)**. Esto significa que el objeto sabe la hora exacta, pero no está asociado a ninguna zona horaria, lo que lo hace poco confiable para servidores mundiales. Para solucionar esto, existen las fechas **Despiertas (Aware DateTime)**, las cuales sí contienen información de su huso horario a través del atributo `tzinfo`.
+
+Desde Python 3.9, el módulo integrado `zoneinfo` gestiona modernamente las zonas horarias IANA (ej. `from zoneinfo import ZoneInfo`). Como mejor práctica de arquitectura (la regla de oro del Backend), siempre debes guardar las fechas en tu Base de Datos en Tiempo Universal Coordinado (UTC) usando `datetime.now(timezone.utc)` (requiere importar `timezone` desde `datetime`). De esta forma, mantienes la consistencia global y solo conviertes a la zona local del usuario al mostrar la información en la interfaz.

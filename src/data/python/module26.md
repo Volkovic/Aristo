@@ -2,11 +2,13 @@
 
 ## Programación web con Python
 
-Python es un lenguaje de programación versátil que se puede utilizar para una variedad de propósitos. En esta sección, veremos cómo usar Python para el desarrollo web. Python tiene muchos marcos web disponibles. Django y Flask son los más populares. Hoy, aprenderemos a usar Flask para el desarrollo web.
+El protocolo HTTP (Hypertext Transfer Protocol) es la columna vertebral absoluta de la World Wide Web (WWW) y dicta exactamente cómo se formatean y transmiten los mensajes entre tu Navegador Web (el Cliente) y la computadora remota que aloja el sitio (el Servidor). En el Desarrollo Web tradicional, Python brilla detrás de escena programando el Backend (Lado del Servidor). Mientras que tecnologías como JavaScript dominan el Frontend (lo que ves y tocas), Python maneja la lógica pesada, consultas a la base de datos y la seguridad, devolviendo la información procesada al usuario.
+
+Para facilitar este trabajo, utilizamos un Framework Web de Python, que es una colección de código pre-escrito que provee una arquitectura, herramientas de enrutamiento y utilidades para construir aplicaciones web sin programar todo desde cero (como un servidor HTTP puro). Python tiene muchos marcos web disponibles. Django y Flask son los dos frameworks más legendarios y diametralmente opuestos. Django es el titán "con baterías incluidas" (trae todo pre-hecho, ideal para proyectos grandes), mientras que Flask es un "Micro-framework" minimalista (te da un lienzo en blanco ligero, ideal para APIs y microservicios). Hoy, aprenderemos a usar Flask para el desarrollo web.
 
 ### Flask
 
-Flask es un marco de desarrollo web escrito en Python. Flask utiliza el motor de plantillas Jinja2. Flask también se puede usar con otras bibliotecas modernas de frontend como React.
+Flask es un micro-framework de desarrollo web escrito en Python que es minimalista y extremadamente flexible, ya que no impone una arquitectura estricta ni un ORM por defecto. Flask utiliza el motor de plantillas Jinja2. Flask también se puede usar con otras bibliotecas modernas de frontend como React.
 
 Si aún no has instalado el paquete virtualenv, instálalo primero. Un entorno virtual permitirá aislar las dependencias del proyecto de las dependencias de la máquina local.
 
@@ -97,6 +99,12 @@ if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=port)
 ```
 
+El decorador de ruta (Routing Decorator) como `@app.route('/')` o `@app.route('/about')` colocado justo encima de la función enlaza matemáticamente la URL del navegador con tu código Python. Cuando el servidor detecta que alguien entró a esa ruta, dispara inmediatamente tu función.
+
+También puedes crear Rutas Dinámicas (Dynamic Routing) para construir una URL que acepte variables dinámicas. Por ejemplo, si escribes `@app.route('/usuario/<nombre>')`, Flask le pasará el `<nombre>` como un parámetro a tu función de Python, evitando tener que escribir mil funciones separadas para mil usuarios distintos.
+
+Al final del archivo, el comando `if __name__ == '__main__': app.run(debug=True)` inicia el servidor de desarrollo local. Con `debug=True`, activa el recargo automático ante cambios y muestra una consola de errores en el navegador. Es ideal para codificar y ver resultados en vivo.
+
 Para ejecutar la aplicación flask, ingresa python app.py en el directorio principal de la aplicación flask.
 
 Después de ejecutar _python app.py_, verifica el puerto 5000 de tu localhost.
@@ -131,6 +139,10 @@ Ahora, hemos agregado la ruta acerca de en el código anterior. ¿Pero qué pasa
 ---
 
 ### Crear plantillas
+
+La carpeta obligatoria llamada `templates` sirve para alojar exclusivamente todos tus archivos de interfaz `.html`. Flask buscará automáticamente las páginas web allí adentro cuando uses la función `render_template()`, manteniendo una separación limpia de responsabilidades.
+
+Dentro de estos archivos HTML, el motor de plantillas Jinja2 integrado en Flask permite inyectar variables de Python y usar estructuras de control. La sintaxis mágica de Jinja2 utiliza la doble llave `{{ variable }}` exclusivamente para 'imprimir' el valor de una variable de Python dentro del HTML, y las llaves-porcentaje `{% if condicion %}` o `{% for item in lista %}` para ejecutar lógica de control dentro del HTML.
 
 Crea archivos HTML dentro de la carpeta templates.
 
@@ -348,6 +360,10 @@ post.html
 </html>
 ```
 
+El método HTTP `POST` es crucial porque permite que el usuario envíe datos (como formularios) hacia el servidor para ser procesados, enviando la información en el cuerpo de la petición (a diferencia de GET, que pide información y expone parámetros en la URL). Por seguridad radical, Flask bloquea todas las peticiones POST por defecto. Para que un decorador de ruta acepte envíos de formularios, debes indicarlo explícitamente con el parámetro `methods`, por ejemplo: `@app.route('/login', methods=['GET', 'POST'])`.
+
+En una ruta que acepta ambos métodos, puedes comprobar dentro de la función si el usuario simplemente entró a ver la página o si acaba de enviar el formulario validando `if request.method == 'POST':`. Luego, para extraer de forma segura la información que el usuario tipeó en un input (ej. `<input name='correo'>`), utilizas el diccionario `request.form`, por ejemplo con `request.form.get('correo')` o `request.form['correo']`.
+
 Ahora, agreguemos una ruta que procese los datos del formulario. Usamos el método POST porque recibiremos datos del formulario.
 
 ```py
@@ -444,354 +460,4 @@ layout.html
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link
-      href="https://fonts.googleapis.com/css?family=Lato:300,400|Nunito:300,400|Raleway:300,400&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="{{ url_for('static', filename='css/main.css') }}"
-    />
-    {% if title %}
-    <title>30 Días de Python - {{ title}}</title>
-    {% else %}
-    <title>30 Días de Python</title>
-    {% endif %}
-  </head>
-
-  <body>
-    <header>
-      <div class="menu-container">
-        <div>
-          <a class="brand-name nav-link" href="/">30 Días de Python</a>
-        </div>
-        <ul class="nav-lists">
-          <li class="nav-list">
-            <a class="nav-link active" href="{{ url_for('home') }}">Inicio</a>
-          </li>
-          <li class="nav-list">
-            <a class="nav-link active" href="{{ url_for('about') }}">Acerca</a>
-          </li>
-          <li class="nav-list">
-            <a class="nav-link active" href="{{ url_for('post') }}">Publicaciones</a>
-          </li>
-        </ul>
-      </div>
-    </header>
-    <main>
-      {% block content %} {% endblock %}
-    </main>
-  </body>
-</html>
-```
-
-En el diseño anterior, hemos creado una plantilla común que puede ser utilizada por todas las páginas que heredan de ella. Dentro del diseño, podemos ver los enlaces de navegación. Usamos las etiquetas {% block content %}{% endblock %} para permitir que las subplantillas agreguen contenido.
-
-home.html
-
-```html
-{% extends 'layout.html' %} {% block content %}
-<div class="container">
-  <h1>Bienvenido de vuelta a {{name}}</h1>
-  <p>
-    Este proyecto fue construido usando las siguientes tecnologías:
-    <span class="tech">Flask</span>, <span class="tech">Python</span>
-    y <span class="tech">HTML</span>, <span class="tech">CSS</span>
-  </p>
-  <ul>
-    {% for tech in techs %}
-    <li class="tech">{{tech}}</li>
-
-    {% endfor %}
-  </ul>
-</div>
-
-{% endblock %}
-```
-
-about.html
-
-```html
-{% extends 'layout.html' %} {% block content %}
-<div class="container">
-  <h1>Acerca de {{name}}</h1>
-  <p>
-    Este desafío es un desafío de programación de 30 días diseñado para ayudarte a aprender el lenguaje de programación Python, resolviendo un problema de Python cada día.
-  </p>
-</div>
-{% endblock %}
-```
-
-post.html
-
-```html
-{% extends 'layout.html' %} {% block content %}
-<div class="container">
-  <h1>{{name}}</h1>
-  <p>{{path}}</p>
-  <form action="/result" method="POST">
-    <div>
-      <input type="text" name="first_name" placeholder="Nombre" required />
-    </div>
-    <div>
-      <input type="text" name="last_name" placeholder="Apellido" required />
-    </div>
-    <div>
-      <input type="text" name="old_job" placeholder="Trabajo anterior" />
-    </div>
-    <div>
-      <input type="text" name="current_job" placeholder="Trabajo actual" />
-    </div>
-    <div>
-      <input type="text" name="country" placeholder="País" />
-    </div>
-    <div>
-      <button type="submit">Enviar</button>
-    </div>
-  </form>
-</div>
-
-{% endblock %}
-```
-
-result.html
-
-```html
-{% extends 'layout.html' %} {% block content %}
-<div class="container">
-  <h1>Datos del formulario</h1>
-  <ul>
-    <li>Nombre: {{result_data.first_name}}</li>
-    <li>Apellido: {{result_data.last_name}}</li>
-    <li>Trabajo anterior: {{result_data.old_job}}</li>
-    <li>Trabajo actual: {{result_data.current_job}}</li>
-    <li>País: {{result_data.country}}</li>
-  </ul>
-</div>
-
-{% endblock %}
-```
-
-#### Servir archivos estáticos
-
-A continuación se muestra el archivo main.css, que colocaremos en el directorio static/css:
-
-```css
-/* === GENERAL === */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: "Lato", sans-serif;
-  background-color: #f0f8ea;
-}
-
-.container {
-  max-width: 80%;
-  margin: auto;
-  padding: 30px;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-.tech {
-  color: #5bbc2e;
-}
-
-/* === HEADER === */
-header {
-  background-color: #5bbc2e;
-}
-
-.menu-container {
-  display: flex;
-  justify-content: space-between;
-  padding: 20px 30px;
-}
-
-.brand-name {
-  color: white;
-  font-weight: 800;
-  font-size: 24px;
-}
-
-.nav-lists {
-  display: flex;
-}
-
-.nav-list {
-  margin-right: 15px;
-}
-
-.nav-link {
-  text-decoration: none;
-  color: white;
-  font-weight: 300;
-}
-
-/* === FORM === */
-
-form {
-  margin: 30px 0;
-  border: 1px solid #ddd;
-  padding: 30px;
-  border-radius: 10px;
-}
-
-form > div {
-  margin-bottom: 15px;
-}
-
-input {
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  outline: 0;
-  font-size: 16px;
-  box-sizing: border-box;
-  margin-top: 5px;
-}
-
-button {
-  padding: 12px 24px;
-  border: 0;
-  background-color: #5bbc2e;
-  color: white;
-  border-radius: 10px;
-  font-size: 16px;
-  outline: 0;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #4b9c25;
-}
-```
-
-
----
-
-### Despliegue
-
-#### Crear cuenta en Heroku
-
-Heroku ofrece un servicio de alojamiento gratuito. Si deseas desplegar una aplicación, debes tener una cuenta en Heroku.
-
-#### Iniciar sesión en Heroku
-
-```sh
-asabeneh@Asabeneh:~/Desktop/python_for_web$ heroku login
-heroku: Press any key to open up the browser to login or q to exit:
-Opening browser to https://cli-auth.heroku.com/auth/cli/browser/ec0972d5-d8c6-4adf-b004-a42a22dd09a8
-Logging in... done
-Logged in as asabeneh@gmail.com
-asabeneh@Asabeneh:~/Desktop/python_for_web$
-```
-
-#### Crear requirements y Procfile
-
-Antes de desplegar la aplicación, necesitamos informar a Heroku qué dependencias instalar y cómo ejecutar la aplicación. Heroku utiliza el archivo requirements.txt para obtener información sobre las dependencias de la aplicación. Usa el comando pip freeze para listar todas las dependencias y sus versiones, y escríbelas en requirements.txt.
-
-```sh
-asabeneh@Asabeneh:~/Desktop/python_for_web$ pip freeze
-Click==7.0
-Flask==1.1.1
-itsdangerous==1.1.0
-Jinja2==2.10.3
-MarkupSafe==1.1.1
-Werkzeug==0.16.0
-asabeneh@Asabeneh:~/Desktop/python_for_web$ pip freeze > requirements.txt
-```
-
-Procfile le dice a Heroku cómo ejecutar la aplicación. En este caso, usamos Gunicorn como servidor HTTP WSGI para ejecutar aplicaciones web en Python. Necesitamos agregar Gunicorn a nuestras dependencias.
-
-```sh
-asabeneh@Asabeneh:~/Desktop/python_for_web$ pip install gunicorn
-asabeneh@Asabeneh:~/Desktop/python_for_web$ pip freeze > requirements.txt
-```
-
-Ahora, creemos un Procfile y agreguemos el siguiente contenido:
-
-```sh
-web: gunicorn app:app
-```
-
-#### Enviar el proyecto a Heroku
-
-```sh
-asabeneh@Asabeneh:~/Desktop/python_for_web$ heroku create 30-days-of-python-app
-Creating ⬢ 30-days-of-python-app... done
-https://30-days-of-python-app.herokuapp.com/ | https://git.heroku.com/30-days-of-python-app.git
-asabeneh@Asabeneh:~/Desktop/python_for_web$ git init
-Initialized empty Git repository in /home/asabeneh/Desktop/python_for_web/.git/
-asabeneh@Asabeneh:~/Desktop/python_for_web$ heroku git:remote -a 30-days-of-python-app
-set git remote heroku to https://git.heroku.com/30-days-of-python-app.git
-asabeneh@Asabeneh:~/Desktop/python_for_web$ echo -e "venv\n.vscode" > .gitignore
-asabeneh@Asabeneh:~/Desktop/python_for_web$ git add .
-asabeneh@Asabeneh:~/Desktop/python_for_web$ git commit -m "primer aplicación web en python"
-[master (root-commit) 9dfcc6a] primer aplicación web en python
- 9 files changed, 403 insertions(+)
- create mode 100644 .gitignore
- create mode 100644 Procfile
- create mode 100644 app.py
- create mode 100644 requirements.txt
- create mode 100644 static/css/main.css
- create mode 100644 templates/about.html
- create mode 100644 templates/home.html
- create mode 100644 templates/layout.html
- create mode 100644 templates/post.html
- create mode 100644 templates/result.html
-asabeneh@Asabeneh:~/Desktop/python_for_web$ git push heroku master
-Enumerating objects: 14, done.
-Counting objects: 100% (14/14), done.
-Delta compression using up to 2 threads
-Compressing objects: 100% (12/12), done.
-Writing objects: 100% (14/14), 6.08 KiB | 1.52 MiB/s, done.
-Total 14 (delta 2), reused 0 (delta 0)
-remote: Compressing source files... done.
-remote: Building source:
-remote:
-remote: -----> Python app detected
-remote: -----> Installing python-3.6.10
-remote: -----> Installing pip
-remote: -----> Installing dependencies with Pipenv 2018.5.18…
-remote:        Installing dependencies from Pipfile.lock (872ae5)…
-remote: -----> Installing SQLite3
-remote: -----> $ python manage.py collectstatic --noinput
-remote:        Traceback (most recent call last):
-remote:          File "manage.py", line 10, in <module>
-remote:            from app import app
-remote:        ModuleNotFoundError: No module named 'app'
-remote:
-remote:  !     Error while running '$ python manage.py collectstatic --noinput'.
-remote:        See traceback above for details.
-remote:
-remote:        You may need to update application code to resolve this error.
-remote:        Or, you can disable collectstatic for this application:
-remote:
-remote:           $ heroku config:set DISABLE_COLLECTSTATIC=1
-remote:
-remote:        https://devcenter.heroku.com/articles/django-assets
-remote: -----> Discovering process types
-remote:        Procfile declares types -> web
-remote:
-remote: -----> Compressing...
-remote:        Done: 55.7M
-remote: -----> Launching...
-remote:        Released v3
-remote:        https://30-days-of-python-app.herokuapp.com/ deployed to Heroku
-remote:
-remote: Verifying deploy... done.
-To https://git.heroku.com/30-days-of-python-app.git
- * [new branch]      master -> master
-asabeneh@Asabeneh:~/Desktop/python_for_web$
-```
-
-Como puedes ver, hemos creado con éxito nuestra primera aplicación web, la hemos desplegado y la hemos alojado en Heroku. Puedes probar esta aplicación usando este [enlace](https://30-days-of-python-app.herokuapp.com/).
-
-Sin más preámbulos, realicemos algunos ejercicios para reforzar lo aprendido.
-
-
----
+      href="https://fonts.googleapis.com/css?family=Lato:300,400|Nunito:300,400|Raleway:300,400&display=

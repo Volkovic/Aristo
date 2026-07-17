@@ -4,7 +4,7 @@
 
 Python es un lenguaje orientado a objetos. En Python todo es un objeto con atributos y métodos. Los números, cadenas, listas, diccionarios, tuplas, conjuntos, etc. que usamos en programas son instancias de las clases incorporadas correspondientes. Creamos clases para definir objetos. Una clase es como un constructor de objetos o un "molde" para crear objetos. Instanciamos una clase para crear un objeto. La clase define las propiedades y el comportamiento, mientras que el objeto representa la instancia.
 
-Desde el inicio de este reto hemos estado usando clases y objetos sin darnos cuenta. Cada elemento en un programa Python es un objeto perteneciente a alguna clase. Veamos que todo en Python pertenece a una clase:
+Desde el inicio de este reto hemos estado usando clases y objetos sin darnos cuenta. La Programación Orientada a Objetos (OOP) es un paradigma que modela conceptos del mundo real agrupando Datos (Atributos) y Comportamientos (Métodos) en cápsulas individuales llamadas 'Objetos'. Cada elemento en un programa Python es un objeto perteneciente a alguna clase. Por ejemplo, cuando declaras `x = 10`, internamente estás invocando a la clase primitiva `<class 'int'>` para que instancie un nuevo objeto en memoria, el cual viene con sus propios métodos mágicos incrustados (como `__add__` para poder sumar). Veamos que todo en Python pertenece a una clase:
 
 ```py
 asabeneh@Asabeneh:~$ python
@@ -76,7 +76,7 @@ print(p)
 
 ### Constructor de clase
 
-En el ejemplo anterior creamos un objeto de la clase Person. Sin embargo, una clase sin constructor no es muy útil en la práctica. Usamos el método especial __init__ como constructor en Python. __init__ recibe self, que es la referencia a la instancia actual.
+En el ejemplo anterior creamos un objeto de la clase Person. Sin embargo, una clase sin constructor no es muy útil en la práctica. Usamos el método especial __init__ como constructor en Python. __init__ recibe self, que es la referencia a la instancia actual. Este método se ejecuta automática e instantáneamente cada vez que alguien invoca a la clase para fabricar un objeto nuevo.
 
 **Ejemplo:**
 
@@ -96,6 +96,8 @@ print(p)
 Asabeneh
 <__main__.Person object at 0x2abf46907e80>
 ```
+
+A las variables que viven dentro de un objeto y están amarradas a `self` (como `self.name` o `self.age`) se les conoce como **Atributos de Instancia** (Instance Attributes / Properties), ya que cada objeto creado tendrá su propio universo de atributos independientes en memoria.
 
 Añadamos más parámetros al constructor:
 
@@ -152,6 +154,16 @@ print(p.person_info())
 ```sh
 # salida
 Asabeneh Yetayeh tiene 250 años. Vive en Helsinki, Finland.
+```
+
+Si intentas imprimir un objeto personalizado directamente (ej: `print(p)`), Python devolverá su ubicación genérica en la memoria RAM (algo como `<__main__.Person object at 0x...>`, como vimos en ejemplos anteriores). Para controlar qué texto amigable se devuelve cuando alguien imprime el objeto, debes sobrescribir el método mágico `__str__` (o `__repr__`). Por ejemplo:
+
+```py
+class Person:
+    def __init__(self, name):
+        self.name = name
+    def __str__(self):
+        return f'Persona llamada {self.name}'
 ```
 
 
@@ -302,7 +314,9 @@ Lidiya Teklemariam tiene 28 años. Ella vive en Espoo, Finland.
 ['Organizing', 'Marketing', 'Digital Marketing']
 ```
 
-Podemos usar super() o el nombre de la clase padre para invocar el comportamiento del padre. En el ejemplo anterior sobrescribimos el método person_info en la subclase con una implementación distinta.
+Podemos usar super() o el nombre de la clase padre para invocar el comportamiento del padre. En el ejemplo anterior sobrescribimos el método person_info en la subclase con una implementación distinta. Al usar `super().__init__()`, invocamos delegadamente el constructor de la clase padre para que haga su propia inicialización de atributos antes de continuar.
+
+**Herencia Múltiple:** A diferencia de otros lenguajes, Python soporta Herencia Múltiple de forma nativa. Esto significa que una clase puede tener más de un "Padre" (ej: `class Murcielago(Mamifero, Volador):`), heredando los métodos y atributos de ambas clases simultáneamente. Python resuelve los posibles conflictos de nombres mediante el MRO (Method Resolution Order).
 
 
 ---
@@ -310,6 +324,24 @@ Podemos usar super() o el nombre de la clase padre para invocar el comportamient
 ### Sobrescribir métodos de la clase padre
 
 Como se mostró, podemos sobrescribir un método del padre definiendo en la subclase un método con el mismo nombre.
+
+---
+
+### Polimorfismo y Encapsulamiento
+
+Además de la herencia, la Programación Orientada a Objetos se apoya en otros pilares fundamentales:
+
+- **Polimorfismo (Polymorphism):** Es la cualidad de que diferentes clases hijas implementen el *mismo método* de forma completamente distinta. Esto permite invocar la misma acción sin importar qué objeto sea. Por ejemplo, si tienes un método `hablar()`, en una clase `Vaca` puede hacer "Muu" y en un `Gato` puede hacer "Miau".
+- **Encapsulamiento (Encapsulation):** Consiste en ocultar el estado interno (datos o atributos delicados) de un objeto, forzando a que la modificación de esos datos se haga exclusivamente mediante métodos seguros (Getters y Setters). A diferencia de Java, Python no tiene palabras reservadas como `private` o `public`. Para señalizar que un atributo es "Privado" y no debería tocarse desde afuera, por convención se le pone un guion bajo inicial (ej: `self._saldo`) o dos guiones bajos (`self.__password`) para ofuscar la variable mediante un proceso llamado *Name Mangling*.
+
+---
+
+### Métodos de Clase y Métodos Estáticos
+
+Además de los métodos de instancia normales (que reciben `self`), Python permite definir otros tipos de métodos usando decoradores:
+
+- **Métodos de Clase (`@classmethod`):** En lugar de recibir el objeto `self`, reciben la estructura de la CLASE como primer argumento, comúnmente llamado `cls`. Afectan al estado global del "molde" y no a las instancias aisladas. Son muy útiles como métodos de fábrica (Factory methods).
+- **Métodos Estáticos (`@staticmethod`):** Son funciones ordinarias encapsuladas dentro del paraguas lógico de una clase. No reciben ni `self` ni `cls`, actuando como utilidades puras que no alteran el estado del objeto ni de la clase.
 
 ---
 

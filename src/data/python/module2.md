@@ -14,6 +14,8 @@ Python proporciona muchas funciones integradas (built-in). Están disponibles a 
 
 Algunas de las más comunes son: `print()`, `len()`, `type()`, `int()`, `float()`, `str()`, `input()`, `list()`, `dict()`, `min()`, `max()`, `sum()`.
 
+Otras funciones matemáticas muy útiles son `min()` y `max()`, que sirven para encontrar el valor más pequeño y el más grande en una secuencia de valores, respectivamente. También contamos con `sum()`, que toma un iterable (como una lista) y acumula la suma de todos sus elementos. Si necesitas limitar la cantidad de decimales de un número de coma flotante, puedes usar la función nativa `round(numero, digitos)`.
+
 ---
 
 Veamos algunas de ellas en acción directamente desde el intérprete interactivo. Por ejemplo, imprimiendo textos básicos:
@@ -34,7 +36,7 @@ help(print) # Muestra documentación sobre cómo funciona print
 dir(str) # Lista todos los métodos disponibles para las cadenas
 ```
 
-Como vimos con `help('keywords')`, Python tiene **palabras reservadas**. No podemos usarlas para nombrar nuestras variables o funciones.
+Como vimos con `help('keywords')`, Python tiene **palabras reservadas** estrictas. No podemos usarlas para nombrar nuestras variables o funciones. Por otro lado, aunque es posible nombrar una variable igual que una función integrada (por ejemplo, `print = 'Hola'`), esto es una mala práctica: sobrescribirá la función nativa localmente y, si intentas usarla después como función (`print('Adiós')`), ocurrirá un `TypeError`.
 
 ---
 
@@ -98,11 +100,15 @@ first_name, last_name, country, age = 'Asabeneh', 'Yetayeh', 'Finland', 250
 print(first_name, last_name, country, age)
 ```
 
+Al hacer esta asignación múltiple (desempaquetado), el número de variables a la izquierda debe coincidir exactamente con el número de valores a la derecha; de lo contrario, Python arrojará un `ValueError` por tener demasiados o muy pocos valores para descomprimir.
+
+Además, cabe destacar que Python es un lenguaje de **tipado dinámico**. Esto significa que el tipo de dato se asocia con el valor y no con el nombre de la variable, permitiendo que una variable se sobrescriba dinámicamente con distintos tipos de datos en cualquier momento (por ejemplo, `x = 5` y luego `x = 'hola'`).
+
 ---
 
 ### Función Input
 
-Usa la función integrada `input()` para obtener entrada directamente del usuario mediante el teclado.
+Usa la función integrada `input()` para obtener entrada directamente del usuario mediante el teclado. Esta función pausa el programa y espera a que el usuario introduzca datos.
 
 ```py
 first_name = input('What is your name: ') 
@@ -131,6 +137,8 @@ print(type([1, 2, 3]))      # list (Lista)
 ## Conversión de tipos de datos
 
 A veces necesitamos convertir un dato de un tipo a otro (Casting). Usamos funciones como `int()`, `float()`, `str()`, `list()`.
+
+Hay que tener cuidado con ciertas conversiones. Por ejemplo, la función `int()` no puede parsear directamente cadenas que representan decimales; intentar `int('10.5')` arrojará un `ValueError`. Para lograrlo, primero habría que convertirlo a float: `int(float('10.5'))`. También podemos convertir booleanos a texto usando `str(False)`, lo que nos devolverá la cadena `'False'`. En cuanto a la función `bool()`, en Python el número `0` es evaluado como `False`, pero cualquier cadena de texto que no esté vacía (incluso `'0'`) es evaluada como verdadera (`True`).
 
 ```py
 # De entero a float

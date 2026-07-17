@@ -18,6 +18,7 @@ open('filename', mode) # mode(r, a, w, x, t, b) puede ser lectura, escritura o a
 - "t" - texto - valor por defecto. Modo texto.
 - "b" - binario - modo binario (por ejemplo para imágenes).
 
+Al trabajar con archivos de texto, también es fundamental entender la **codificación (Encoding)**. La codificación es el mapa que le indica al sistema cómo traducir los ceros y unos binarios del disco en caracteres legibles por humanos (como letras con tildes o la 'ñ'). Para evitar que estos caracteres se vean como "basura", es una buena práctica especificar siempre la codificación al abrir un archivo, por ejemplo: `open('archivo.txt', 'r', encoding='utf-8')`.
 
 ---
 
@@ -113,6 +114,10 @@ f.close()
 ['This is an example to show how to open a file and read.', 'This is the second line of the text.']
 ```
 
+Además de estos métodos, la forma más "pytónica" y eficiente en consumo de memoria (RAM) para leer un archivo inmenso es iterar directamente sobre el objeto archivo con un bucle `for`. Al hacer `for linea in f:`, Python lee y descarta de la memoria una sola línea a la vez (es un iterable perezoso o *lazy*).
+
+Los archivos funcionan internamente como cintas magnéticas con un cursor de lectura/escritura. Podemos saber la posición exacta (en bytes) de este cursor usando el método `f.tell()`. Si hemos leído todo el archivo y queremos volver a leerlo sin cerrarlo, el cursor estará al final. Para "rebobinar" o mover el cursor a un byte específico, utilizamos el método `f.seek(posicion)` (por ejemplo, `f.seek(0)` vuelve al inicio del archivo).
+
 Debemos cerrar los archivos después de abrirlos. Es fácil olvidarse; por eso existe la construcción _with_ que cierra automáticamente:
 
 ```py
@@ -144,6 +149,8 @@ Añadamos texto al archivo que hemos estado leyendo:
 with open('./files/reading_file_example.txt','a') as f:
     f.write('Este texto debe añadirse al final')
 ```
+
+Es importante destacar que, a diferencia de la función `print()`, el método `write()` es literal y **no añade un salto de línea automático** al final del texto introducido. Si deseas que el siguiente texto aparezca en una nueva línea, debes incluir explícitamente el carácter de salto de línea (`\n`) en tu cadena.
 
 Si el archivo no existe, el siguiente ejemplo creará uno nuevo:
 
@@ -323,6 +330,8 @@ with open('./files/json_example.json', 'r', encoding='utf-8') as f:
 {'name': 'Mark Firenze', 'country': 'Spain', 'city': 'Madrid', 'skills': ['JavaScript', 'React', 'Python']}
 ```
 
+*Nota técnica:* La diferencia principal entre `json.dump()` y `json.dumps()` radica en su destino. `json.dump()` escribe los datos directamente en un **Objeto Archivo** (guardando en disco), mientras que `json.dumps()` (con 's' al final, de *String*) convierte los datos a un **String** en la memoria RAM. La misma lógica aplica para la lectura: `json.load(archivo)` lee de un archivo, y `json.loads(string_json)` lee de una cadena de texto.
+
 
 ---
 
@@ -464,6 +473,3 @@ JavaScript
 React
 Python
 ```
-
-
----

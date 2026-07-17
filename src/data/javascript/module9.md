@@ -6,6 +6,8 @@ Las funciones de orden superior son funciones que toman otra función como pará
 
 Un callback es una función que puede ser pasada como parámetro a otra función. Véase el ejemplo siguiente.
 
+Todo el ecosistema de JavaScript se basa fuertemente en las Funciones de Orden Superior. Conceptos clave como el **manejo asíncrono y los Callbacks** (Event Listeners del DOM, Timers como setTimeout, o Promesas) son posibles gracias a que podemos pasar funciones como parámetros para que se ejecuten cuando un evento ocurra o una tarea termine.
+
 ```js
 // una función callback, el nombre de la función puede ser cualquier nombre
 const callback = (n) => {
@@ -147,9 +149,11 @@ En lugar de escribir un bucle regular, la última versión de JavaScript introdu
 
 Instead of writing regular loop, latest version of JavaScript introduced lots of built in methods which can help us to solve complicated problems. Todos los métodos incorporados toman la función callback. En esta sección, veremos _forEach_, _map_, _filter_, _reduce_, _find_, _every_, _some_, y _sort_.
 
+El uso de estos métodos promueve un estilo de programación **declarativa e inmutable**. A diferencia de los bucles `for` tradicionales (imperativos), donde manejamos contadores y mutamos estados, las funciones de orden superior nos permiten enfocarnos en el "qué" hacer y no en el "cómo". Además, métodos como `map` o `filter` nunca modifican (mutan) el array original, sino que generan y devuelven un array completamente nuevo en memoria, lo cual es una ventaja clave para evitar bugs en frameworks modernos como React.
+
 ### forEach
 
-_forEach_: Iterar los elementos de un array. Utilizamos _forEach_ sólo con arrays. Toma una función callback con elementos, parámetro de índice y el propio array. El índice y el array son opcionales.
+_forEach_: Iterar los elementos de un array. Utilizamos _forEach_ sólo con arrays. Toma una función callback con elementos, parámetro de índice y el propio array. El índice y el array son opcionales. A diferencia de `map`, `forEach` no retorna nada (devuelve `undefined`) y se utiliza principalmente para ejecutar efectos secundarios.
 
 ```js
 arr.forEach(function (element, index, arr) {
@@ -209,6 +213,7 @@ NORWAY
 ICELAND
 ```
 
+Es importante destacar que dentro de un `forEach` **no se puede usar `break` ni `continue`**. Si deseas saltar a la siguiente iteración (simulando un `continue`), puedes usar la sentencia `return`. Esto simplemente termina la ejecución de esa instancia del callback en particular, pero no detiene el bucle completo.
 
 ---
 
@@ -294,6 +299,7 @@ const countriesFirstThreeLetters = countries.map((country) =>
  ["ALB", "BOL", "CAN", "DEN", "ETH", "FIN", "GER", "HUN", "IRE", "JAP", "KEN"]
 ```
 
+⚠️ **Precaución con `map` y funciones nativas:** Dado que el callback de `map` recibe 3 argumentos (valor, índice, array), pasar funciones nativas directamente puede causar resultados inesperados. El ejemplo clásico es `[10, 20].map(parseInt)`. En lugar de devolver `[10, 20]`, devuelve `[10, NaN]`. Esto ocurre porque `parseInt` recibe el valor como primer argumento y el **índice** de la iteración (0, 1) como segundo argumento (la base numérica o *radix*), rompiendo la conversión matemática en la segunda vuelta.
 
 ---
 
@@ -357,9 +363,17 @@ console.log(scoresGreaterEighty);
 [{name: 'Asabeneh', score: 95}, { name: 'Lidiya', score: 98 },{name: 'Martha', score: 85},{name: 'John', score: 100}]
 ```
 
+El callback que pasamos a `filter` es obligatorio y típicamente debe devolver un valor booleano (o evaluable como *truthy/falsy*). Un truco muy común y limpio para eliminar todos los valores *falsy* nativos de JavaScript (`0`, `""`, `null`, `undefined`, `false`, `NaN`) de un array es pasar el constructor primitivo directamente: `arr.filter(Boolean)`.
+
+Hablando de valores *falsy*, es común usar operadores lógicos dentro de estos métodos iterativos. Por ejemplo, si aplicas `arr.map(x => x || 'Vacio')` a un array que contiene los 6 valores *falsy* mencionados, el operador `||` evaluará consistentemente a `'Vacio'` en todos los casos.
+
+### Method Chaining (Encadenamiento de Métodos)
+
+Como métodos como `map` y `filter` retornan nuevos arrays, podemos llamar inmediatamente a otro método sobre ese resultado. A este patrón se le conoce como **Method Chaining** (Encadenamiento de Métodos). Permite crear conductos (*pipelines*) declarativos de manipulación de datos de forma muy legible, por ejemplo: `arr.filter(...).map(...).reduce(...)`.
+
 ### reduce
 
-_reduce_: Reduce toma una función callback. La función callback toma como parámetro el acumulador, el valor actual y opcional el valor inicial y retorna un único valor. Es una buena práctica definir un valor inicial para el valor del acumulador. Si no especificamos este parámetro, por defecto el acumulador obtendrá el `primer valor` del array. Si nuestro array es un _array vacío_, entonces `Javascript` lanzará un error.
+_reduce_: Reduce toma una función callback. La función callback toma como parámetro el acumulador, el valor actual y opcional el valor inicial y retorna un único valor. Es una buena práctica definir un valor inicial para el valor del acumulador. Si no especificamos este parámetro, por defecto el acumulador obtendrá el `primer valor` del array y comenzará la iteración desde el segundo elemento. Si nuestro array es un _array vacío_, entonces `Javascript` lanzará un error.
 
 ```js
 arr.reduce((acc, cur) => {
@@ -462,7 +476,7 @@ console.log(score);
 
 ### findIndex
 
-_findIndex_: Retorna la posición del primer elemento que cumple la condición
+_findIndex_: Retorna la posición del primer elemento que cumple la condición. Es el equivalente directo a `indexOf()`, pero en vez de recibir un valor estático, recibe una función condicional (callback) para evaluar, lo cual es ideal para arreglos de objetos.
 
 ```js
 const names = ["Asabeneh", "Mathias", "Elias", "Brook"];
@@ -478,9 +492,15 @@ console.log(age); // 5
 
 ---
 
+### flat y flatMap
+
+_flat_: El método `flat()` aplana estructuras de arrays anidados (bidimensionales o multidimensionales). Por defecto, su nivel de profundidad es 1. Por ejemplo, si queremos transformar un array bidimensional plano como `[[1,2], [3,4]]` en `[1, 2, 3, 4]`, simplemente usamos `arr.flat()`. Existe también `flatMap()`, que combina un `map()` seguido de un `flat()` de profundidad 1.
+
+---
+
 ### some
 
-_some_: Comprueba si algunos de los elementos son similares en un aspecto. Retorna un booleano
+_some_: Comprueba si algunos de los elementos son similares en un aspecto. Retorna un booleano. A diferencia de `every`, `some` verifica si al menos un elemento pasa la prueba y devuelve `true` de inmediato.
 
 ```js
 const names = ["Asabeneh", "Mathias", "Elias", "Brook"];
@@ -491,82 +511,4 @@ const areSomeTrue = bools.some((b) => b === true);
 console.log(areSomeTrue); //true
 ```
 
-```js
-const areAllStr = names.some((name) => typeof name === "number"); // ¿Son todas strings ?
-console.log(areAllStr); // false
-```
-
-
----
-
-### sort
-
-_sort_: El método "sort" ordena los elementos del array de forma ascendente o descendente. Por defecto, el método **_sort()_** ordena los valores como strings. Esto funciona bien para los elementos del array de strings pero no para los números. Si los valores numéricos se ordenan como strings y nos da un resultado erróneo. El método de Sort modifica el array original. Se recomienda copiar los datos originales antes de empezar a utilizar el método _sort_.
-
-#### Ordenar los valores strings
-
-```js
-const products = ["Milk", "Coffee", "Sugar", "Honey", "Apple", "Carrot"];
-console.log(products.sort()); // ['Apple', 'Carrot', 'Coffee', 'Honey', 'Milk', 'Sugar']
-//Ahora la matriz original de productos también está ordenada
-```
-
-
----
-
-#### Ordenar valores numéricos
-
-Como puede ver en el ejemplo de abajo, el 100 fue el primero después de ser clasificado en orden ascendente. Ordenar convierte los elementos en string , ya que '100' y otros números comparados, 1 que el principio del string '100' se convirtió en el más pequeño. Para evitar esto, utilizamos una función de callback de comparación dentro del método sort, que devuelve un negativo, un cero o un positivo.
-
-```js
-const numbers = [9.81, 3.14, 100, 37];
-// El uso del método sort para ordenar los elementos numéricos proporciona un resultado erróneo.
-console.log(numbers.sort()); //[100, 3.14, 37, 9.81]
-numbers.sort(function (a, b) {
-  return a - b;
-});
-
-console.log(numbers); // [3.14, 9.81, 37, 100]
-
-numbers.sort(function (a, b) {
-  return b - a;
-});
-console.log(numbers); //[100, 37, 9.81, 3.14]
-```
-
-
----
-
-#### Ordenar arrays de objetos
-
-Siempre que ordenamos objetos en un array, utilizamos la clave del objeto para comparar. Veamos el siguiente ejemplo.
-
-```js
-objArr.sort(function (a, b) {
-  if (a.key < b.key) return -1;
-  if (a.key > b.key) return 1;
-  return 0;
-});
-
-// o
-
-objArr.sort(function (a, b) {
-  if (a["key"] < b["key"]) return -1;
-  if (a["key"] > b["key"]) return 1;
-  return 0;
-});
-
-const users = [
-  { name: "Asabeneh", age: 150 },
-  { name: "Brook", age: 50 },
-  { name: "Eyob", age: 100 },
-  { name: "Elias", age: 22 },
-];
-users.sort((a, b) => {
-  if (a.age < b.age) return -1;
-  if (a.age > b.age) return 1;
-  return 0;
-});
-console.log(users); // ordenados de forma ascendente
-// [{…}, {…}, {…}, {…}]
 ```

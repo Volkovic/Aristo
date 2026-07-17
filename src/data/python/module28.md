@@ -17,7 +17,11 @@ Con las APIs, el contenido creado en un lugar puede publicarse y actualizarse di
 
 Por ejemplo, la REST API de Twitter permite a los desarrolladores acceder a los datos principales de Twitter, mientras que la Search API ofrece formas de interactuar con los datos de búsqueda y tendencias de Twitter.
 
-Muchas aplicaciones exponen endpoints de API. Algunos ejemplos de APIs son la [API de países](https://restcountries.eu/rest/v2/all) y la [API de razas de gatos](https://api.thecatapi.com/v1/breeds).
+Muchas aplicaciones exponen endpoints de API. Un Endpoint (Punto de terminación) es una URL específica de la API que representa un recurso o funcionalidad particular (por ejemplo, `/v1/usuarios` para gestionar usuarios). Algunos ejemplos de APIs son la [API de países](https://restcountries.eu/rest/v2/all) y la [API de razas de gatos](https://api.thecatapi.com/v1/breeds).
+
+Consumir una API oficial es la vía profesional, ética y estable de obtener datos. A diferencia del Web Scraping (usando herramientas como BeautifulSoup), que extrae código HTML propenso a romperse ante cambios de diseño, las APIs entregan datos crudos y estructurados. El Scraping suele ser un recurso de emergencia cuando un sitio no ofrece una API. Al hacer peticiones a estos endpoints, el servidor suele devolver los datos casi por unanimidad global en formato JSON (JavaScript Object Notation). JSON ganó la guerra de formatos por su inmensa ligereza y porque su sintaxis se traduce de forma nativa a Listas y Diccionarios en lenguajes de programación modernos.
+
+Además, la mayoría de las APIs modernas siguen el estándar REST (Representational State Transfer). REST no es un protocolo, sino un conjunto de principios arquitectónicos. Una "API RESTful" sigue estas normas, siendo "stateless" (sin estado) y utilizando los métodos HTTP estándar, lo que permite que cualquier desarrollador del mundo sepa instintivamente cómo interactuar con ella.
 
 En esta sección presentaremos una API RESTful que utiliza métodos de solicitud HTTP como GET, PUT, POST y DELETE para manejar datos.
 
@@ -84,9 +88,11 @@ La línea inicial de la respuesta, llamada línea de estado, también tiene tres
   HTTP/1.0 404 Not Found
   **Nota:**
 
-Los códigos de estado más comunes son:
-200 OK: la solicitud fue exitosa y el recurso generado (por ejemplo un archivo o la salida de un script) se devuelve en el cuerpo del mensaje.
-500 Error del servidor
+Los códigos de estado se agrupan por familias para indicar el resultado:
+- **2XX (Éxito / Success):** Indican que el servidor recibió, entendió y procesó correctamente la petición. Ejemplos: 200 (OK) y 201 (Created), este último devuelto tras un POST exitoso para confirmar que el registro fue grabado en disco.
+- **4XX (Error del Cliente / Client Error):** Indican que la petición contiene sintaxis incorrecta, falta de autenticación o solicita un recurso inexistente. Ejemplos: 400 (Bad Request), 401 (Unauthorized) o 403 (Forbidden) si no enviaste un token válido, y 404 (Not Found).
+- **5XX (Error del Servidor / Server Error):** El servidor falló al cumplir una solicitud aparentemente válida debido a un problema interno o sobrecarga. Ejemplos: 500 (Internal Server Error) o 503 (Service Unavailable). Si recibes un 5XX, el problema está en los servidores de la API, no en tu código.
+
 La lista completa de códigos de estado HTTP puede encontrarse [aquí](https://httpstatuses.com/). También puedes verla [aquí](https://httpstatusdogs.com/).
 
 
@@ -94,7 +100,7 @@ La lista completa de códigos de estado HTTP puede encontrarse [aquí](https://h
 
 ### Campos de cabecera
 
-Como se observa en la captura anterior, las líneas de cabecera proporcionan información sobre la solicitud o la respuesta, o sobre el objeto enviado en el cuerpo del mensaje.
+Como se observa en la captura anterior, las líneas de cabecera proporcionan información sobre la solicitud o la respuesta, o sobre el objeto enviado en el cuerpo del mensaje. Tienen una función vital: transmitir metadatos de la petición. Aquí es donde se envían los tokens de autenticación (ej. `Authorization: Bearer 12345`), se define el tipo de contenido enviado (`Content-Type`) o el formato esperado (`Accept`). El flujo profesional avanzado con APIs implica siempre configurar correctamente estas cabeceras.
 
 ```sh
 GET / HTTP/1.1
@@ -131,8 +137,26 @@ GET, POST, PUT y DELETE son los métodos HTTP que usaremos para implementar la A
 
 1. GET: el método GET se usa para recuperar y obtener información desde el servidor dado un URI. Las solicitudes GET deben únicamente recuperar datos y no producir otros efectos.
 2. POST: las solicitudes POST se usan para crear datos y enviar datos al servidor, por ejemplo al crear una nueva entrada con un formulario HTML o subir archivos.
-3. PUT: reemplaza la representación actual completa del recurso objetivo con la carga enviada; lo usamos para modificar o actualizar datos.
+3. PUT / PATCH: PUT reemplaza la representación actual completa del recurso objetivo con la carga enviada. A menudo se acompaña de PATCH, que se utiliza para modificar solo una parte del recurso (por ejemplo, cambiar solo el avatar). En conjunto, PUT y PATCH se usan para Actualizar (Update) registros.
 4. DELETE: elimina datos.
 
 
 ---
+
+### Consumo de APIs con Python (Librería requests)
+
+Para interactuar con APIs en Python, el estándar de la industria es la librería `requests`. Por ejemplo, al hacer una petición GET (`r = requests.get('https://api.github.com/users/octocat')`), puedes usar el método especial `r.json()`. Este método parsea y traduce automáticamente la respuesta JSON del servidor directamente a un Diccionario de Python interactivo, ahorrándote conversiones manuales.
+
+A menudo, las URLs incluyen Parámetros de Consulta (Query Parameters), que son pares clave-valor añadidos al final de la URL tras un `?` (ej. `api.com/clima?ciudad=lima&unidades=metric`). Se usan principalmente en peticiones GET para filtrar, ordenar o paginar resultados. En `requests`, esto se maneja pasando un diccionario al argumento `params` (`requests.get(url, params={'ciudad': 'lima'})`).
+
+Hablando de paginación (Pagination), esta es una técnica donde la API devuelve los resultados en bloques o "páginas" limitadas (ej. 50 registros por petición) para evitar sobrecargar la memoria del servidor y del cliente al transmitir grandes volúmenes de datos. Además, casi todas las APIs mundiales imponen un "Rate Limiting" (Límite de Tasa), una restricción que limita la cantidad de peticiones que un cliente puede hacer en un periodo de tiempo. Si lo excedes, recibirás un Error 429, lo que obliga a implementar pausas en tu código usando `time.sleep()`.
+
+Para enviar Datos de Carga Útil (Payload) en un método POST (como registrar un nuevo usuario), normalmente pasas un diccionario al argumento `json=` (o `data=`) en `requests.post(url, json=mi_diccionario)`. Esto serializa silenciosamente los datos y los envía en el cuerpo (body) de la petición HTTP.
+
+### Autenticación y Seguridad: API Keys
+
+Muchas APIs que manejan datos sensibles o servicios de pago no son públicas y requieren un API Key (Llave) o Access Token. Esta es una cadena de caracteres única que se envía en las peticiones (usualmente en los Headers) para autenticar al cliente y autorizar el acceso. 
+
+NUNCA, bajo ningún concepto, debes escribir tu API Key secreta visiblemente (en crudo / hardcodeada) dentro de tus scripts subidos a GitHub. Bots maliciosos escanean repositorios públicos constantemente y, si exponen tu llave, podrían consumir tu cuota, acceder a datos sensibles o generar cargos económicos masivos a tu cuenta.
+
+La forma moderna e impenetrable de proteger tus llaves en proyectos locales de Python es usar Variables de Entorno. Almacenas las llaves en un archivo `.env` (ignorado en git) y las lees en Python usando `os.getenv()` o librerías como `python-dotenv`. Esto asegura que tu código base sea puramente genérico y pueda publicarse en internet, mientras que los secretos vitales permanecen encerrados físicamente en tu disco duro.

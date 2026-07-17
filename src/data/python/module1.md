@@ -88,7 +88,7 @@ El proceso de encontrar y corregir errores se llama depuración (debugging). Ree
 
 ![Corrigiendo Error de sintaxis](https://raw.githubusercontent.com/Asabeneh/30-Days-Of-Python/master/images/fixing_syntax_error.png)
 
-El error se corrige y el código produce el resultado esperado. Verás errores así a diario; aprender a depurar es esencial. Para depurar bien debes reconocer los tipos de errores: SyntaxError, IndexError, NameError, ModuleNotFoundError, KeyError, ImportError, AttributeError, TypeError, ValueError, ZeroDivisionError, etc. Los explicaremos más adelante.
+El error se corrige y el código produce el resultado esperado. Verás errores así a diario; aprender a depurar es esencial. Para depurar bien debes reconocer los tipos de errores: SyntaxError, IndexError, NameError, ModuleNotFoundError, KeyError, ImportError, AttributeError, TypeError, ValueError, ZeroDivisionError, etc. Por ejemplo, si intentas realizar una operación matemática no definida como dividir un número entre cero (ej. `10 / 0`), Python lo detectará en tiempo de ejecución y lanzará un `ZeroDivisionError`. Explicaremos el resto de errores más adelante.
 
 Practiquemos más en el Python Shell. Abre la terminal y escribe python.
 
@@ -102,11 +102,11 @@ Antes de programar, hagamos algunos cálculos:
 - 3 - 2 = 1
 - 3 * 2 = 6
 - 3 / 2 = 1.5
-- 3 ** 2 = 9
+- 3 ** 2 = 9 (Nota: A diferencia de las matemáticas tradicionales o calculadoras que usan el circunflejo `^`, en Python la exponenciación se realiza con el doble asterisco `**`).
 
 En Python también tenemos:
 
-- 3 % 2 = 1 => resto de la división
+- 3 % 2 = 1 => resto de la división (el operador módulo `%` es muy útil, por ejemplo, para saber si un número es par o impar).
 - 3 // 2 = 1 => división entera (sin resto)
 
 Conviértelo a código Python en el Shell. Primero escribe un comentario.
@@ -183,7 +183,7 @@ Python tiene varios tipos de datos. Empecemos por los más comunes. Veremos otro
 
 #### Cadenas
 
-Texto entre comillas simples o dobles; para multilínea se usan comillas triples.
+Texto entre comillas simples o dobles; para multilínea se usan comillas triples. Es importante destacar que si usas el operador de suma (`+`) entre dos cadenas, Python las unirá (concatenará). Por ejemplo, si ejecutas `'3' + '4'`, el resultado será la cadena `'34'` y no el número 7, ya que no realiza una suma matemática.
 
 **Ejemplos:**
 
@@ -313,6 +313,3 @@ Para ejecutar el archivo: en tu editor usa el botón verde o en la terminal escr
 ![Ejecutando script Python](https://raw.githubusercontent.com/Asabeneh/30-Days-Of-Python/master/images/running_python_script.png)
 
 Genial. Completaste el Día 1. Practica con los ejercicios siguientes.
-
-
----

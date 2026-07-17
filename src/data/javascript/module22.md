@@ -27,6 +27,10 @@ document.createElement("tagname");
 </html>
 ```
 
+Al manipular elementos recién creados o ya existentes, es crucial entender cómo gestionar sus atributos y estilos. Para las clases, aunque podemos usar `className`, la forma más segura y moderna es utilizar la propiedad `classList`, que provee una excelente API con métodos como `.add()`, `.remove()` y `.toggle()` para manejar las clases de forma segura sin borrar las ya existentes. En cuanto a los estilos en línea dinámicos, JavaScript prohíbe sintácticamente el uso de guiones (ya que es el operador de resta), por lo que todas las propiedades CSS que lleven guion se escriben forzosamente en notación CamelCase (por ejemplo, `elemento.style.fontSize` en lugar de `font-size`).
+
+Para otros atributos, podemos usar el método genérico `elemento.setAttribute('nombre', 'valor')` (útil para inyectar en el HTML subyacente) o acceder directamente a la propiedad del objeto para atributos estándar (ej. `img.src = 'foto.jpg'`). Es importante notar la diferencia fundamental: `setAttribute` modifica el HTML original puro, mientras que la propiedad directa (como `elemento.value` en un input) vive en la memoria viva de JS y lee el estado interactivo real, evitando desincronizaciones. Además, HTML5 introdujo los atributos `data-*` (ej. `data-info="..."`), diseñados estrictamente para darnos una forma legal y limpia de esconder variables secretas o datos serializados en la propia etiqueta, los cuales luego leemos en JS usando la propiedad `dataset`.
+
 ---
 
 
@@ -62,7 +66,7 @@ Después de crear el elemento podemos asignar valor a las diferentes propiedades
 
 ### Añadir un hijo a un elemento padre
 
-Para ver un elemento creado en el documento HTML debemos añadirlo al padre como elemento hijo. Podemos acceder al cuerpo del documento HTML utilizando _document.body_. El _document.body_ soporta el método _appendChild()_. Vea el ejemplo siguiente.
+Para ver un elemento creado en el documento HTML debemos añadirlo al padre como elemento hijo. Podemos acceder al cuerpo del documento HTML utilizando _document.body_. El _document.body_ soporta el método _appendChild()_. Vea el ejemplo siguiente. El método `appendChild()` toma el nuevo nodo y lo coloca al final de la lista de hijos del nodo padre especificado.
 
 ```html
 <!DOCTYPE html>
@@ -86,6 +90,8 @@ Para ver un elemento creado en el documento HTML debemos añadirlo al padre como
   </body>
 </html>
 ```
+
+Cuando tu script crea una interfaz gigantesca e inserta una estructura con miles de elementos, hacer `appendChild` uno por uno directamente al DOM es muy lento. Para optimizar esto y hacerlo 100 veces más veloz, puedes armar el árbol de JS y configurar un `document.createDocumentFragment()`. Esto permite hacer todas las operaciones de ensamblaje "Off-Screen" (fuera de la pantalla). Cuando finalmente anclas el fragmento al DOM principal, el navegador invoca un único paso de repintado (Reflow) masivo en vez de miles de repintados separados.
 
 ---
 
@@ -130,10 +136,14 @@ Después de crear un HTML, es posible que queramos eliminar uno o varios element
 </html>
 ```
 
+En el pasado debías hacer `padre.removeChild(hijo)` obligatoriamente. Hoy en día, en los navegadores modernos, la API del DOM es más amigable y permite llamar directamente al método `.remove()` sobre el propio elemento que quieres destruir (por ejemplo, `elemento.remove()`).
+
+Al seleccionar elementos para eliminarlos o modificarlos, es vital conocer qué tipo de colección nos devuelve el DOM. Métodos antiguos como `document.getElementsByTagName` o `document.getElementsByClassName` devuelven "Arrays en vivo" (Live Collections) que mutan mágicamente a medida que el DOM cambia por detrás, lo que puede causar bucles infinitos. Por el contrario, `document.querySelectorAll` devuelve una lista estática y predecible (un Snapshot) de los nodos que encontró en ese preciso instante.
+
 ---
 
 
-Como hemos visto en la sección anterior hay una forma mejor de eliminar todos los elementos HTML internos o hijos de un elemento padre utilizando el método _innerHTML_ propiedades.
+Como hemos visto en la sección anterior hay una forma mejor de eliminar todos los elementos HTML internos o hijos de un elemento padre utilizando el método _innerHTML_ propiedades. Asignar un string vacío a `innerHTML` es una técnica brutal y rapidísima aceptada para destripar (purgar) visual y estructuralmente miles de hijos de un contenedor simultáneamente.
 
 ```html
 <!DOCTYPE html>
@@ -171,3 +181,19 @@ Como hemos visto en la sección anterior hay una forma mejor de eliminar todos l
 El fragmento de código anterior borró todos los elementos hijos.
 
 ---
+
+### Conceptos Avanzados del DOM, BOM y Eventos
+
+El punto de entrada global y oficial (la raíz) para acceder a todas las funcionalidades del navegador es el objeto `window`. Este engloba desde el DOM (`window.document`) hasta APIs del Browser Object Model (BOM). Por ejemplo, si queremos redirigir a los usuarios a otra URL por código en la misma ventana, mutamos la propiedad `window.location.href`. Es importante saber que una redirección real aniquila por completo el contexto de ejecución de JavaScript; si el usuario cambia el href o hace click en "Volver Atrás", el navegador aborta y destruye la ejecución en curso de manera catastrófica, por lo que cualquier Promesa HTTP (`fetch`) que estuvieras esperando morirá colgada sin resolverse.
+
+Otra API moderna muy útil del navegador es la del portapapeles. La forma más compatible de copiar texto al portapapeles (Clipboard) del sistema operativo es usando la API asíncrona `navigator.clipboard.writeText('Texto')`, la cual devuelve una Promesa y reemplaza comandos obsoletos.
+
+En cuanto a la geometría de los elementos y animaciones, existe un método mágico llamado `elemento.getBoundingClientRect()`. Este retorna un objeto con datos geométricos milimétricos en vivo (x, y, width, height, top, left) indicando el tamaño real y la posición exacta del elemento en la ventana actual (Viewport), siendo la llave maestra para efectos de scroll o Drag&Drop.
+
+**Manejo de Eventos y Temporizadores**
+
+Cuando trabajamos con eventos en elementos anidados, ocurre un fenómeno conocido como fase de "Bubbling" (Burbujeo). Si tienes varios elementos apilados con eventos de click y haces click en el del centro, los eventos se disparan por defecto desde el origen profundo (el que clickeaste) hacia los contenedores padres (hacia afuera). Aprovechando esto, podemos usar la "Delegación de Eventos": en lugar de asignar un evento distinto a cada elemento de una lista infinita, atamos UN SOLO oyente (EventListener) en el padre supremo para que atrape y gestione todas las burbujas que vienen de sus miles de hijos, ahorrando una cantidad colosal de memoria RAM.
+
+Además de los eventos nativos, podemos utilizar `Custom Events` (Eventos Personalizados). Estos te permiten inventar eventos ficticios (ej: `new CustomEvent('usuarioLogueado')`) y dispararlos (`dispatchEvent`) tú mismo, permitiendo que diferentes partes aisladas de tu código se escuchen y se comuniquen entre sí mediante el patrón Pub/Sub.
+
+Finalmente, al usar temporizadores asíncronos como `setTimeout` o `setInterval`, es crítico saber que estos devuelven un ID numérico. Este ID es la única "llave" que te permite luego cancelar, destruir o borrar ese temporizador (usando `clearTimeout(id)` o `clearInterval(id)`) para que no se ejecute eternamente como un virus zombi en memoria, previniendo fugas de memoria cuando la interfaz cambia o se desmonta.

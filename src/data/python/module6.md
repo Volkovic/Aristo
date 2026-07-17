@@ -4,7 +4,7 @@ Una tupla es una colección ordenada e inmutable que puede contener distintos ti
 
 - tuple(): crea una tupla vacía
 - count(): cuenta cuántas veces aparece un elemento en la tupla
-- index(): busca el índice de un elemento en la tupla
+- index(): busca el índice de la primera aparición de un elemento en la tupla
 - Operador +: concatena dos o más tuplas creando una nueva tupla
 
 
@@ -31,6 +31,9 @@ Una tupla es una colección ordenada e inmutable que puede contener distintos ti
   ```py
   fruits = ('banana', 'orange', 'mango', 'lemon')
   ```
+
+**Nota sobre la sintaxis y eficiencia:** Aunque solemos usar paréntesis, en Python lo que realmente define a una tupla son las comas. Escribir `mi_tupla = 1, 2, 3` es perfectamente válido y se conoce como *tuple packing* (empaquetado de tuplas). Sin embargo, si deseas crear una tupla de un solo elemento, **debes** incluir una coma al final, por ejemplo `t = (5,)`; de lo contrario, Python interpretará `(5)` como un simple número entero (`<class 'int'>`). 
+Además, ¿por qué usar una tupla en lugar de una lista? Al ser inmutables, las tuplas son más eficientes en memoria, más rápidas de iterar y previenen modificaciones accidentales, haciéndolas ideales para datos constantes.
 
 ---
 
@@ -89,6 +92,28 @@ len(tpl)
 
 ---
 
+### Desempaquetado de tuplas (Tuple Unpacking)
+
+Podemos extraer los valores de una tupla y asignarlos a variables individuales posicionales en una sola línea, lo que se conoce como *Tuple Unpacking*.
+
+```py
+fruits = ('manzana', 'banana', 'naranja')
+f1, f2, f3 = fruits 
+# f1 será 'manzana', f2 será 'banana' y f3 será 'naranja'
+```
+
+Si el número de variables es menor que el de elementos, podemos usar un asterisco (`*`) para que actúe como colector (gather). La variable con el asterisco atrapará los elementos sobrantes y se convertirá en una lista:
+
+```py
+numeros = (1, 2, 3, 4)
+a, *b = numeros 
+# a toma el valor 1, y b se convierte en la lista [2, 3, 4]
+```
+
+*Nota:* Cuando una función en Python necesita retornar múltiples valores simultáneos separados por comas (ej. `return a, b`), implícitamente está aplicando *tuple packing* y devolviendo una única tupla.
+
+---
+
 ### Slicing de tuplas
 
 Podemos extraer subtuplas especificando un rango de índices de inicio y fin; el resultado es una nueva tupla con los elementos seleccionados.
@@ -133,7 +158,7 @@ Podemos extraer subtuplas especificando un rango de índices de inicio y fin; el
 
 ### Convertir tupla a lista
 
-Podemos convertir una tupla en una lista y viceversa. Si queremos modificar una tupla, conviene convertirla primero en lista.
+Podemos convertir una tupla en una lista y viceversa. Si queremos modificar una tupla forzosamente, el único enfoque posible es convertirla primero en lista mediante casting, realizar la modificación y volver a convertirla a tupla.
 
 ```py
 # Sintaxis
@@ -170,14 +195,39 @@ print('apple' in fruits) # False
 fruits[0] = 'apple' # TypeError: 'tuple' object does not support item assignment
 ```
 
+De igual manera, podemos usar el operador negativo `not in` para verificar si un elemento NO está en la tupla.
 
+```py
+print('apple' not in fruits) # True
+```
 
+---
+
+### Iteración, Comparación y Tuplas Anidadas
+
+**Iteración:** Al igual que las listas, las tuplas son objetos iterables. Podemos recorrerlas fácilmente usando un bucle `for`:
+```py
+for fruit in fruits:
+    print(fruit)
+```
+
+**Comparación:** Podemos comparar tuplas directamente con el operador `==`. Esto devolverá `True` si ambas tuplas tienen los mismos elementos en el mismo orden, ya que compara su contenido elemento a elemento.
+```py
+print((1, 2) == (1, 2)) # True
+```
+
+**Tuplas anidadas y mutabilidad:** Aunque las tuplas son inmutables, si contienen un objeto mutable (como una lista), la tupla solo almacena la referencia a ese objeto. Esto significa que puedes modificar los elementos internos de esa lista sin generar un error, ya que no estás cambiando a qué objeto apunta la tupla:
+```py
+t = (1, 2, [3, 4])
+t[2][0] = 99
+print(t) # (1, 2, [99, 4])
+```
 
 ---
 
 ### Unir tuplas
 
-Podemos concatenar dos o más tuplas usando el operador +.
+Podemos concatenar dos o más tuplas usando el operador +. Esto es válido y no viola la inmutabilidad, ya que genera una nueva tupla en memoria con los elementos combinados.
 
 ```py
 # Sintaxis
@@ -197,7 +247,7 @@ fruits_and_vegetables = fruits + vegetables
 
 ### Eliminar tupla
 
-No se pueden eliminar elementos individuales de una tupla, pero sí se puede eliminar la tupla completa con la palabra clave _del_.
+No se pueden eliminar elementos individuales de una tupla, pero sí se puede eliminar la tupla completa con la palabra clave _del_. Esto elimina la variable y su referencia completamente del espacio de nombres actual.
 
 ```py
 # Sintaxis

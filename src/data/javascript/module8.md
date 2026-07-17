@@ -150,6 +150,34 @@ El ámbito _let_ y _const_ es el mismo. La diferencia es sólo la reasignación.
 
 ---
 
+## Objetos en JavaScript
+
+Además del alcance de las variables, es fundamental entender cómo funcionan los **Objetos** en JavaScript, ya que son la estructura de datos más utilizada. Un objeto literal vacío se define simplemente con llaves: `const obj = {};`. 
+
+Los objetos son estructuras totalmente dinámicas. Esto significa que puedes agregar nuevas propiedades al vuelo (por ejemplo, `obj.edad = 25;`) sin que lance ningún error. Si deseas ELIMINAR definitivamente una propiedad (y no solo vaciar su valor), debes usar la palabra reservada `delete`, por ejemplo: `delete obj.edad;`. Por otro lado, si intentas acceder a una propiedad inexistente como `obj.inexistente`, JavaScript no lanzará un error fatal, sino que retornará `undefined` silenciosamente.
+
+**Acceso a propiedades y coerción:**
+Normalmente accedemos a las propiedades con la notación de punto (`car.brand`). Sin embargo, si la clave tiene caracteres especiales, guiones o espacios (ej. `'nombre-completo'`), debes usar la notación de corchetes con un string: `mascota['nombre-completo']`. Esta notación de corchetes también es obligatoria si quieres acceder a una propiedad dinámicamente usando una variable (ej. `let prop = 'brand'; console.log(car[prop]);`). Además, es importante saber que internamente, todas las claves de los objetos normales se convierten (coerción) a Strings de forma transparente; si escribes `{ 1: 'A' }`, el motor lo almacena como la cadena `'1'`.
+
+**Shorthand, Referencias y `this`:**
+En ES6, existe una forma abreviada (Object Property Shorthand): si tienes una variable y quieres asignarla a una clave con el mismo nombre, puedes omitir la redundancia. Es decir, `let x = 5; let obj = { x };` equivale exactamente a `let obj = { x: x };`. 
+Cuando comparas dos objetos, debes recordar que se comparan por REFERENCIA de memoria. Si tienes `const o1 = { x: 1 };` y `const o2 = { x: 1 };`, la evaluación `o1 === o2` será `false` porque ocupan distintos lugares en la RAM.
+Dentro de los objetos, podemos definir funciones llamadas métodos. En una función tradicional usada como método, la palabra clave `this` tiene un comportamiento especial: hace referencia al objeto mismo desde el cual se llamó al método.
+
+**Métodos útiles de la clase Object:**
+Todos los objetos literales heredan secretamente de un objeto "maestro" por defecto llamado `Object.prototype`. Para trabajar con ellos, la clase `Object` nos provee varias herramientas:
+- `Object.keys(obj)`: Devuelve un array de strings que contiene todas las propiedades (claves) enumerables. (Tip: para evitar que falle si el objeto es `null`, puedes usar un fallback: `Object.keys(obj || {})`).
+- `Object.values(obj)`: Retorna un array con todos los valores del objeto.
+- `Object.entries(obj)`: Retorna un array de arrays bidimensionales, donde cada sub-array es un par `[clave, valor]`.
+- `Object.assign(target, source)`: Se utiliza para combinar o "fusionar" múltiples objetos en uno solo.
+- `obj.hasOwnProperty('prop')`: Se utiliza para comprobar estrictamente si un objeto tiene una propiedad específica PROPIA, sin buscar en su cadena de prototipos.
+
+**Congelación e Iteración:**
+Si deseas proteger tu objeto, puedes usar `Object.freeze(obj)`, lo cual congela el objeto bloqueando todo (no puedes agregar, eliminar ni modificar valores; si intentas reasignar, fallará silenciosamente o lanzará error en modo estricto). La diferencia con `Object.seal(obj)` es que `seal()` no permite agregar o quitar propiedades, pero SÍ permite modificar los valores de las propiedades que ya existían.
+Finalmente, ten en cuenta que los objetos literales no implementan el protocolo iterable. Por lo tanto, NO es posible iterar un objeto literal usando el bucle `for...of` (lanzará un TypeError). Para recorrerlos, debes usar `for...in` o iterar sobre el array generado por `Object.keys()`.
+
+---
+
 ## 💻 Ejercicios Prácticos (Objetos)
 
 **Consigna 1:** Crea un objeto vacío llamado `dog` y agrégale las propiedades `name`, `legs`, `color` y `age`.

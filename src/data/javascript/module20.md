@@ -53,6 +53,7 @@ Las convenciones de codificación incluyen
 - Reglas para el uso de espacios en blanco, sangría y comentarios
 - Prácticas y principios de programación
 
+Al hablar de código limpio y principios de programación, es fundamental mencionar dos conceptos clave. Primero, el principio **DRY (Don't Repeat Yourself)**, que establece que debemos evitar duplicar la misma lógica en múltiples lugares del proyecto; si un bloque de código se repite, debe extraerse a una función, módulo o clase reutilizable. Segundo, la **Cohesión**, que se refiere al grado en el que los elementos dentro de una función o componente pertenecen al mismo propósito. Una alta cohesión significa que la función hace UNA sola cosa muy bien (Single Responsibility Principle), trabajando hacia un objetivo único y específico.
 
 ---
 
@@ -75,6 +76,8 @@ En este reto seguimos la convención habitual de JavaScript pero he añadido tam
 ---
 
 #### Variables
+
+La comunidad y las guías de estilo modernas insisten en usar SÓLO `const` y `let`, abandonando por completo `var`. Esto se debe a que `var` no tiene ámbito de bloque (sino ámbito de función), se ve afectado por el 'hoisting' (elevación) en todo el archivo y permite re-declaraciones accidentales peligrosas que causan muchísimos bugs silenciosos. `const` y `let` se crearon explícitamente para solucionar esto introduciendo el Block Scope (ámbito de bloque).
 
 ```js
 let firstName = "Asabeneh";
@@ -344,7 +347,7 @@ isRaining
 
 #### Clases
 
-Declaramos la clase con CamelCase que empieza con mayúscula.
+Declaramos la clase con **PascalCase** (también conocido como UpperCamelCase), es decir, CamelCase que empieza con mayúscula. Esta convención alerta al desarrollador de que la clase o constructor debe instanciarse utilizando la palabra clave `new`.
 
 ```js
 // sintaxis
@@ -366,5 +369,28 @@ class Person {
 
 ---
 
+### Manipulación del DOM (Document Object Model)
+
+El **Document Object Model (DOM)** no es JavaScript en sí, sino una API Web externa. Es un árbol estructural (Tree) vivo de objetos en memoria generado por el navegador que representa todo el documento HTML, donde cada etiqueta es un nodo (Node). JavaScript se comunica directamente con esta estructura viva para alterar la página 'al vuelo'.
+
+#### Selección de Elementos
+Para seleccionar elementos, la API moderna nos ofrece `document.querySelector()`, que a diferencia del clásico `getElementById`, acepta cualquier sintaxis compleja de selectores CSS (clases, IDs, atributos, pseudoclases) para encontrar elementos, dándole infinita flexibilidad. Si necesitas seleccionar varios elementos, usas `document.querySelectorAll()`. Es importante notar que este último devuelve una **`NodeList` estática**, una colección que se asemeja a un array pero que NO tiene métodos iterativos funcionales modernos como `.map` o `.filter`, obligándote a convertirla primero (por ejemplo, usando `Array.from` o el operador Spread `[...]`).
+
+#### Manipulación de Contenido, Estilos y Clases
+Para cambiar el texto visible de un elemento de manera segura y evitar inyecciones de código malicioso (XSS), debes usar la propiedad `.textContent`, la cual inserta y escapa todo como texto plano seguro (sanitizado). Evita usar `.innerHTML` si el contenido proviene del usuario.
+Si necesitas leer exactamente el texto que un usuario tipeó en un campo interactivo de formulario (como un `<input type="text">`), debes acceder a su propiedad `.value`, ya que estos elementos mantienen su estado atado estrictamente a esta propiedad nativa.
+Para aplicar estilos en línea (Inline Styles) directamente con JavaScript, las propiedades CSS se mapean siempre al formato camelCase para evitar errores de sintaxis. Por ejemplo, para un fondo azul usarías `elemento.style.backgroundColor = 'blue'`. Sin embargo, la forma más profesional e indolora (clean way) de alternar (encender/apagar) una clase CSS es usando la API `classList`. Su método `elemento.classList.toggle('activo')` detecta si la clase existe y la quita, y si no existe, la añade automáticamente en un solo paso brillante.
+Además, HTML5 introdujo los atributos de datos personalizados (`data-*`). Para acceder a un atributo como `data-id` usando JavaScript limpio, utilizas la interfaz `dataset`, que parsea mágicamente estos atributos y los convierte en un objeto manipulable en camelCase (ej. `elemento.dataset.id`).
+
+#### Creación, Movimiento y Eliminación de Nodos
+Para crear un elemento HTML desde cero (completamente nuevo y que aún no existe en el documento), utilizas `document.createElement('div')`. Este nodo existe virtualmente huérfano en memoria. Para que aparezca visualmente en la página, debes insertarlo explícitamente en el DOM, por ejemplo, al final del cuerpo usando `document.body.appendChild(nuevoDiv)`.
+Un detalle fascinante de `.appendChild()` es que si lo usas para mover un elemento que *ya existía* visible en el DOM hacia un nuevo padre, el navegador desconecta el nodo silenciosamente de su lugar de origen y lo mueve enteramente al nuevo destino sin necesidad de clonarlo.
+Si lo que deseas es borrar por completo de la pantalla y la memoria el propio elemento que tienes seleccionado, la API moderna te permite usar el método `elemento.remove()`, el cual suicida y desaparece al elemento directamente.
+
+#### Eventos y Rendimiento
+Al trabajar con interactividad, asignar eventos directamente con el atributo HTML como `onclick="miFuncion()"` se considera una terrible práctica (Anti-patrón). Esto viola el principio de Separación de Responsabilidades (SOC), enreda la lógica de JS pura con el Markup (HTML) y expone la aplicación a contaminación global.
+Finalmente, debes saber que manipular el DOM es costosísimo en términos de repintado del navegador y memoria. Invocar métodos del DOM dentro de un bucle grande (ej. 10.000 iteraciones) genera un cuello de botella masivo que 'congelará' por completo (Jank/Lag) los frames de la pantalla. Para solucionar este problema de rendimiento, HTML5 introdujo el **`DocumentFragment`**, una estructura invisible en memoria (un minúsculo DOM imaginario) que te permite ensamblar miles de nodos offline y luego insertarlos TODOS de golpe al DOM real con un solo repintado.
+
+---
 
 Sea cual sea la guía de estilo que sigas, sé coherente. Sigue algunos paradigmas de programación y patrones de diseño. Recuerda que si no escribes tu código en cierto orden o forma, será difícil leerlo. Así que hazte un favor a ti mismo o a alguien que vaya a leer tu código escribiendo código legible.

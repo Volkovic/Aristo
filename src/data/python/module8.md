@@ -4,6 +4,8 @@
 
 Un diccionario es un tipo de datos compuesto por pares clave-valor desordenados y modificables (mutables).
 
+*Nota importante:* A partir de Python 3.7, los diccionarios **mantienen el orden de inserción** de las claves. Además, es fundamental destacar que las **claves** de un diccionario deben ser estrictamente de un tipo de dato inmutable (hashable), como cadenas de texto (Strings), números enteros o tuplas. Si intentas usar una lista u otro diccionario como clave, Python arrojará un error (`TypeError: unhashable type`). Por otro lado, los diccionarios no permiten claves repetidas; si defines la misma clave múltiples veces al inicializarlo (ej: `{'a': 1, 'a': 2}`), el último valor proporcionado sobrescribirá a todos los anteriores.
+
 ### Crear diccionarios
 
 Para crear diccionarios, usamos llaves {} o la función incorporada _dict()_.
@@ -32,14 +34,14 @@ person = {
     }
 ```
 
-El diccionario anterior muestra que los valores pueden ser de cualquier tipo de datos: cadenas, booleanos, listas, tuplas, conjuntos o diccionarios.
+El diccionario anterior muestra que los valores pueden ser de cualquier tipo de datos: cadenas, booleanos, listas, tuplas, conjuntos o diccionarios. Anidar diccionarios (diccionarios dentro de diccionarios) es la forma estándar de modelar estructuras de datos complejas.
 
 
 ---
 
 ### Longitud del diccionario
 
-Esta función comprueba la cantidad de pares clave-valor en el diccionario.
+Esta función comprueba la cantidad de pares clave-valor en el diccionario. Al usar `len()`, se evalúa el diccionario tomando cada par Clave-Valor como una única entidad.
 
 ```py
 # Sintaxis
@@ -71,7 +73,7 @@ print(len(person)) # 7
 
 ### Acceder a elementos del diccionario
 
-Podemos acceder a los elementos del diccionario referenciando sus claves.
+Podemos acceder a los elementos del diccionario referenciando sus claves exactas entre corchetes rectos.
 
 ```py
 # Sintaxis
@@ -103,7 +105,7 @@ print(person['address']['street']) # Space street
 print(person['city'])       # Error
 ```
 
-Cuando se accede a un elemento por clave, si la clave no existe se lanzará un error. Para evitarlo, primero compruebe si existe la clave o use el método _get_. El método get devuelve None si la clave no existe (que es un objeto de tipo NoneType).
+Cuando se accede a un elemento por clave directamente con corchetes, si la clave no existe Python detendrá la ejecución y lanzará un **KeyError**. Para evitar que el programa crashee, la forma segura es primero comprobar si existe la clave o usar el método _get_. El método get devuelve None si la clave no existe (que es un objeto de tipo NoneType). Además, el método `.get(key, default)` acepta un segundo parámetro opcional que especifica el valor que debe devolverse si la clave NO se encuentra, proveyendo un fallback de forma elegante en lugar de retornar `None`.
 
 ```py
 person = {
@@ -122,6 +124,7 @@ print(person.get('first_name')) # Asabeneh
 print(person.get('country'))    # Finland
 print(person.get('skills')) #['HTML','CSS','JavaScript', 'React', 'Node', 'MongoDB', 'Python']
 print(person.get('city'))   # None
+print(person.get('city', 'Unknown')) # Unknown
 ```
 
 
@@ -129,13 +132,15 @@ print(person.get('city'))   # None
 
 ### Añadir elementos al diccionario
 
-Podemos añadir nuevos pares clave-valor al diccionario
+Podemos añadir nuevos pares clave-valor al diccionario usando la notación de asignación. Si la clave no existe, se creará. Si ya existía, su valor será sobrescrito permanentemente.
 
 ```py
 # Sintaxis
 dct = {'key1':'value1', 'key2':'value2', 'key3':'value3', 'key4':'value4'}
 dct['key5'] = 'value5'
 ```
+
+Otra herramienta muy útil para poblar diccionarios dinámicamente es el método `setdefault(key, value)`. Este método retorna el valor de la clave si ya existe; pero si la clave NO existe, la crea automáticamente con el valor por defecto proporcionado y luego lo retorna.
 
 **Ejemplo:**
 
@@ -154,6 +159,7 @@ person = {
 }
 person['job_title'] = 'Instructor'
 person['skills'].append('HTML')
+person.setdefault('hobby', 'Reading')
 print(person)
 ```
 
@@ -194,7 +200,7 @@ person['age'] = 252
 
 ### Comprobar claves en el diccionario
 
-Usamos el operador _in_ para comprobar si una clave existe en el diccionario
+Usamos el operador _in_ para comprobar si una clave específica existe dentro del diccionario. Es rápido y legible.
 
 ```py
 # Sintaxis
@@ -208,9 +214,9 @@ print('key5' in dct) # False
 
 ### Eliminar pares clave-valor del diccionario
 
-- _pop(key)_: elimina el elemento con la clave especificada
-- _popitem()_: elimina el último elemento
-- _del_: elimina el elemento con la clave especificada
+- _pop(key)_: elimina el elemento con la clave especificada y retorna el valor justo antes de borrarlo.
+- _popitem()_: elimina y retorna el último par clave-valor insertado en el diccionario (actuando bajo la lógica LIFO - Último en Entrar, Primero en Salir).
+- _del_: instrucción global que borra la clave de memoria.
 
 ```py
 # Sintaxis
@@ -246,7 +252,7 @@ del person['is_married']  # elimina el elemento is_married
 
 ### Convertir diccionario a lista de tuplas
 
-El método _items()_ convierte el diccionario en una lista de tuplas.
+El método _items()_ convierte el diccionario en una lista de tuplas. Específicamente, devuelve una vista de tuplas formadas por `(clave, valor)`, lo cual es ideal para iterar ambos datos a la vez de forma limpia (ej: `for clave, valor in dct.items():`).
 
 ```py
 # Sintaxis
@@ -259,7 +265,7 @@ print(dct.items()) # dict_items([('key1', 'value1'), ('key2', 'value2'), ('key3'
 
 ### Vaciar diccionario
 
-Si no necesitamos los elementos del diccionario, podemos usar el método _clear()_ para vaciarlo
+Si no necesitamos los elementos del diccionario, podemos usar el método _clear()_ para vaciarlo entero, eliminando todas sus claves a la vez y dejando el objeto vivo pero vacío `{}`.
 
 ```py
 # Sintaxis
@@ -298,7 +304,7 @@ dct_copy = dct.copy() # {'key1':'value1', 'key2':'value2', 'key3':'value3', 'key
 
 ### Obtener lista de claves del diccionario
 
-El método keys() nos da una lista con todas las claves del diccionario.
+El método keys() nos da una lista con todas las claves del diccionario. En realidad, devuelve una **vista iterable** (`dict_keys`) de todas las claves presentes, la cual se puede usar directamente en bucles `for` o convertir a una lista estándar usando `list()`.
 
 ```py
 # Sintaxis
@@ -312,7 +318,7 @@ print(keys) # dict_keys(['key1', 'key2', 'key3', 'key4'])
 
 ### Obtener lista de valores del diccionario
 
-El método values() nos da una lista con todos los valores del diccionario.
+El método values() nos da una lista con todos los valores del diccionario, extrayendo únicamente la segunda parte de todos los pares e ignorando sus claves.
 
 ```py
 # Sintaxis
@@ -321,6 +327,20 @@ values = dct.values()
 print(values) # dict_values(['value1', 'value2', 'value3', 'value4'])
 ```
 
+
+---
+
+### Fusionar diccionarios
+
+A partir de Python 3.9, la forma más limpia y moderna de fusionar dos diccionarios es utilizando el operador de unión o Merge (`|`). Este operador crea un nuevo diccionario combinando las claves de ambos. Si existe un conflicto con claves repetidas, el valor del diccionario de la derecha sobrescribirá al de la izquierda.
+
+```py
+# Sintaxis
+d1 = {'a': 1, 'b': 2}
+d2 = {'b': 3, 'c': 4}
+d3 = d1 | d2
+print(d3) # {'a': 1, 'b': 3, 'c': 4}
+```
 
 
 ---

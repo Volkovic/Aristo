@@ -9,6 +9,7 @@ JavaScript puede ser añadido a una página web de tres maneras diferentes:
 
 Las siguientes secciones muestran diferentes formas de añadir código JavaScript a nuestra página web.
 
+JavaScript es un lenguaje interpretado (compilado Just-In-Time) por el motor nativo del navegador (como V8 en Chrome), lo que permite que se ejecute sin necesidad de instalar un compilador externo. Además, por naturaleza, JavaScript es de un solo hilo (single-threaded), lo que significa que ejecuta una tarea a la vez en su hilo principal (Call Stack). Para manejar operaciones asíncronas sin bloquear la ejecución, utiliza un mecanismo conocido como Event Loop.
 
 ---
 
@@ -27,7 +28,7 @@ Crea una carpeta en tu escritorio y llámala 30DíasDeJS o en cualquier lugar y 
        </body>
     </html>
 
-Ahora, escribiste tu primer inline script. Podemos crear un mensaje de alerta emergente usando la función integrada _alert()_.
+Ahora, escribiste tu primer inline script. Podemos crear un mensaje de alerta emergente usando la función integrada _alert()_. Además de `alert()`, que solo muestra un mensaje, podemos usar el método `prompt('Mensaje')` para interactuar con el usuario abriendo una pequeña ventana emergente en el navegador que le permite introducir un texto, retornándolo como una cadena (string).
 
 
 ---
@@ -49,6 +50,8 @@ El Script interno puede ser escrito en la cabecera del código _('head')_ o en e
     </html>
 
 Así es como escribimos el guión interno la mayor parte del tiempo. Escribir el código de JavaScript en la sección del body es el lugar más recomendado. Abre la consola del navegador para ver la respuesta del console.log()
+
+Mientras que `console.log()` se usa para imprimir mensajes informativos, también disponemos de `console.error()`. La diferencia principal es que `console.error()` aplica un formato visual de error (generalmente texto en rojo en la consola del navegador), lo que facilita la identificación de fallos en el código.
 
     <!DOCTYPE html>
     <html>
@@ -135,7 +138,7 @@ Tu archivo main.js debería estar por debajo de todos los otros scripts. Ten cui
 
 ## Introducción a los tipos de datos
 
-En JavaScript y también en otros lenguajes de programación, hay diferentes tipos de datos. Los siguientes son los tipos de datos primitivos de JavaScript: _Cadenas de texto ('string'), Números, Booleanos, undefined, Null_ y _Symbol_.
+En JavaScript y también en otros lenguajes de programación, hay diferentes tipos de datos. JavaScript es un lenguaje de tipado dinámico y débil. Esto significa que el tipo de dato se asocia al valor y no a la variable (no usamos palabras reservadas de tipos como `int` o `string` para declarar variables), y permite la coerción implícita de tipos. Los siguientes son los 7 tipos de datos primitivos de JavaScript: _Cadenas de texto ('string'), Números, BigInt, Booleanos, undefined, Null_ y _Symbol_. Cualquier otro tipo de dato (como objetos, arrays o funciones) no es primitivo, sino que hereda del tipo compuesto `Object`.
 
 ### Números
 
@@ -199,6 +202,7 @@ Para comprobar el tipo de datos de un determinado valor, utilizamos el operador 
     console.log(typeof null) // tipo de objeto
     console.log(typeof undefined) // undefined
 
+Notarás que `typeof null` devuelve `'object'`. Aunque `null` es su propio tipo de dato primitivo, esto ocurre debido a un error histórico (bug) en la implementación inicial de JavaScript que nunca se corrigió para no romper aplicaciones antiguas.
 
 ---
 
@@ -230,6 +234,12 @@ Comentario multilineal:
 Las variables son contenedores de datos. Las variables se utilizan para almacenar datos en una ubicación de memoria. Cuando se declara una variable, se reserva una ubicación de memoria. Cuando se asigna una variable a un valor (data), el espacio de memoria se llena con esos datos. Para declarar una variable, usamos palabras clave _var_, _let_ o _const_. Hablaremos más sobre var, let y const en detalle en otras secciones (ámbito). Por ahora, la explicación anterior es suficiente.
 
 Para una variable que cambia en un momento diferente, usamos _let_. Si los datos no cambian en absoluto, usamos _const_. Por ejemplo, PI, nombre del país, gravedad no cambian, y podemos usar _const._
+
+Es importante destacar que las variables en JavaScript son 'case-sensitive', lo que significa que distinguen entre mayúsculas y minúsculas (por ejemplo, `Variable` es distinta a `variable`). Además, si omites la palabra clave (`var`, `let` o `const`) al asignar una variable dentro de una función en modo estricto (`'use strict'`), el motor generará un `ReferenceError`.
+
+El comportamiento de estas palabras clave varía debido al concepto de 'Hoisting' (elevación). Cuando usas `var`, el motor de JavaScript mueve la declaración de la variable al principio de su ámbito antes de ejecutar el código. Por lo tanto, puedes acceder a ella antes de declararla, pero retornará `undefined` hasta que se ejecute su inicialización. A diferencia de `var`, si intentas acceder a una variable declarada con `let` o `const` ANTES de su línea de declaración, se lanzará un `ReferenceError` porque se encuentran en la 'Temporal Dead Zone' (Zona Muerta Temporal).
+
+Finalmente, aunque `const` es la forma recomendada moderna de declarar variables cuyo valor no va a cambiar y bloquea la reasignación de la variable, NO hace que el contenido interno de un objeto sea inmutable. Por ejemplo, si tienes `const obj = { id: 1 }`, es perfectamente válido ejecutar luego `obj.id = 2`.
 
 - El nombre de una variable en JavaScript no debe comenzar con un número.
 - Un nombre de variable JavaScript no permite caracteres especiales excepto el signo de dólar y el guión bajo.
