@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
 import { MessageSquare, X, Send, Settings, Sparkles, Trash2, ChevronDown } from 'lucide-react';
@@ -26,9 +26,10 @@ function setStoredConfig(config) {
   localStorage.setItem('vitka_ai_config', JSON.stringify(config));
 }
 
-export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId }) {
+export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId, slideIndex = 0 }) {
   const { user } = useAuth();
-  const [messages, setMessages] = useState([]);
+  const [allMessages, setAllMessages] = useState([]);
+  const messages = useMemo(() => allMessages.filter(m => m.slideIndex === slideIndex), [allMessages, slideIndex]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
@@ -36,6 +37,7 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
   const [apiKey, setApiKey] = useState('');
   const [hasConfig, setHasConfig] = useState(false);
   const [streamingText, setStreamingText] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const messagesEndRef = useRef(null);
   const desktopInputRef = useRef(null);
   const mobileInputRef = useRef(null);
@@ -69,14 +71,21 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
     async function loadHistory() {
       const { data, error } = await supabase
         .from('ai_chat_messages')
-        .select('role, content, created_at')
+        .select('id, role, content, created_at')
         .eq('user_id', user.id)
         .eq('course_id', courseId)
         .eq('day_id', parseInt(dayId))
         .order('created_at', { ascending: true });
 
       if (!error && data) {
-        setMessages(data.map(m => ({ role: m.role, content: m.content })));
+        const parsed = data.map(m => {
+          const match = m.content.match(/^:::SLIDE:::(\d+)::: ([\s\S]*)$/);
+          if (match) {
+            return { role: m.role, content: match[2], slideIndex: parseInt(match[1]), id: m.id };
+          }
+          return { role: m.role, content: m.content, slideIndex: 0, id: m.id };
+        });
+        setAllMessages(parsed);
       }
     }
     loadHistory();
@@ -84,8 +93,13 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
 
   // Auto-scroll to bottom
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, streamingText]);
+    // Only scroll if chat is open, use timeout to ensure render is complete
+    if (isOpen) {
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+      }, 50);
+    }
+  }, [isOpen, messages, streamingText]);
 
   // Focus input when chat opens
   useEffect(() => {
@@ -101,40 +115,46 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
     setIsConfigOpen(false);
   };
 
-  const saveMessage = async (role, content) => {
-    if (!user) return;
-    await supabase.from('ai_chat_messages').insert({
+  const saveMessage = async (role, content, index) => {
+    if (!user) return null;
+    const { data } = await supabase.from('ai_chat_messages').insert({
       user_id: user.id,
       course_id: courseId,
       day_id: parseInt(dayId),
       role,
-      content,
-    });
+      content: `:::SLIDE:::${index}::: ${content}`,
+    }).select('id');
+    return data && data.length > 0 ? data[0].id : null;
   };
 
   const clearHistory = async () => {
     if (!user) return;
-    await supabase
-      .from('ai_chat_messages')
-      .delete()
-      .eq('user_id', user.id)
-      .eq('course_id', courseId)
-      .eq('day_id', parseInt(dayId));
-    setMessages([]);
+    const idsToDelete = messages.filter(m => m.id).map(m => m.id);
+    
+    if (idsToDelete.length > 0) {
+      await supabase
+        .from('ai_chat_messages')
+        .delete()
+        .in('id', idsToDelete);
+    }
+    setAllMessages(prev => prev.filter(m => m.slideIndex !== slideIndex));
+    setShowDeleteModal(false);
   };
 
   const sendMessage = useCallback(async (text) => {
     if (!text.trim() || isLoading || !hasConfig) return;
 
-    const userMessage = { role: 'user', content: text.trim() };
-    const newMessages = [...messages, userMessage];
-    setMessages(newMessages);
+    const userMessage = { role: 'user', content: text.trim(), slideIndex };
+    setAllMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
     setStreamingText('');
 
     // Save user message to DB
-    await saveMessage('user', userMessage.content);
+    const userId = await saveMessage('user', userMessage.content, slideIndex);
+    if (userId) {
+      setAllMessages(prev => prev.map(m => m === userMessage ? { ...m, id: userId } : m));
+    }
 
     // Build the system prompt with slide context
     const systemMessage = {
@@ -142,7 +162,10 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
       content: `Eres un asistente de IA tutor para un curso de programación. El estudiante está viendo actualmente el siguiente contenido de la lección:\n\n---\n${slideContent || 'No hay contenido de diapositiva disponible.'}\n---\n\nAyuda al estudiante a entender este material. Responde preguntas de forma clara y concisa. Usa ejemplos de código cuando sea útil. Responde siempre en español.`,
     };
 
-    const apiMessages = [systemMessage, ...newMessages];
+    const apiMessages = [systemMessage, ...messages, userMessage].map(m => ({
+      role: m.role,
+      content: m.content
+    }));
 
     try {
       const session = await supabase.auth.getSession();
@@ -204,21 +227,24 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
       }
 
       if (fullText) {
-        const assistantMessage = { role: 'assistant', content: fullText };
-        setMessages(prev => [...prev, assistantMessage]);
-        await saveMessage('assistant', fullText);
+        const assistantMessage = { role: 'assistant', content: fullText, slideIndex };
+        setAllMessages(prev => [...prev, assistantMessage]);
+        const asstId = await saveMessage('assistant', fullText, slideIndex);
+        if (asstId) {
+          setAllMessages(prev => prev.map(m => m === assistantMessage ? { ...m, id: asstId } : m));
+        }
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
-        const errorMsg = { role: 'assistant', content: `⚠️ Error: ${err.message}. Verifica tu API key e intenta de nuevo.` };
-        setMessages(prev => [...prev, errorMsg]);
+        const errorMsg = { role: 'assistant', content: `⚠️ Error: ${err.message}. Verifica tu API key e intenta de nuevo.`, slideIndex };
+        setAllMessages(prev => [...prev, errorMsg]);
       }
     } finally {
       setIsLoading(false);
       setStreamingText('');
       abortRef.current = null;
     }
-  }, [messages, isLoading, hasConfig, slideContent, provider, apiKey, user, courseId, dayId]);
+  }, [messages, isLoading, hasConfig, slideContent, provider, apiKey, user, courseId, dayId, slideIndex]);
 
   const handleSubmit = (e) => {
     if (e) e.preventDefault();
@@ -317,12 +343,12 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 flex-shrink-0 bg-gray-800/50">
           <div className="flex items-center gap-2">
             <Sparkles size={16} className="text-primary" />
-            <span className="font-bold text-sm text-white">Asistente IA</span>
+            <span className="font-bold text-sm text-white">Asistente IA (Diap. {slideIndex + 1})</span>
           </div>
           <div className="flex items-center gap-1">
             {hasConfig && (
               <>
-                <button onClick={clearHistory} className="p-1.5 text-gray-500 hover:text-red-400 transition-colors rounded-lg" title="Limpiar chat">
+                <button onClick={() => setShowDeleteModal(true)} className="p-1.5 text-gray-500 hover:text-red-400 transition-colors rounded-lg" title="Limpiar chat">
                   <Trash2 size={14} />
                 </button>
                 <button onClick={() => setIsConfigOpen(!isConfigOpen)} className="p-1.5 text-gray-500 hover:text-primary transition-colors rounded-lg" title="Configuración">
@@ -428,6 +454,34 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
         )}
       </div>
 
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-gray-900 border border-gray-700 rounded-xl shadow-2xl w-full max-w-sm overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="p-5">
+              <h3 className="text-lg font-bold text-white mb-2">¿Borrar chat?</h3>
+              <p className="text-sm text-gray-300">
+                Estás a punto de borrar todo el historial de conversación de esta diapositiva. Esta acción no se puede deshacer.
+              </p>
+            </div>
+            <div className="bg-gray-800/50 px-5 py-3 flex justify-end gap-3 border-t border-gray-800">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => { clearHistory(); setShowDeleteModal(false); }}
+                className="px-4 py-2 bg-red-500/10 text-red-400 hover:bg-red-500 hover:text-white text-sm font-bold rounded-lg transition-colors border border-red-500/20"
+              >
+                Sí, borrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Bottom Sheet */}
       <div className="ai-chat-bottomsheet lg:hidden">
         <div className="ai-chat-bottomsheet-overlay" onClick={onToggle}></div>
@@ -446,8 +500,8 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
             <div className="flex items-center gap-1">
               {hasConfig && (
                 <>
-                  <button onClick={clearHistory} className="p-1.5 text-gray-500 hover:text-red-400 transition-colors rounded-lg" title="Limpiar chat">
-                    <Trash2 size={14} />
+                  <button onClick={() => setShowDeleteModal(true)} className="p-1.5 text-gray-500 hover:text-red-400 transition-colors rounded-lg" title="Limpiar chat">
+                    <Trash2 size={16} />
                   </button>
                   <button onClick={() => setIsConfigOpen(!isConfigOpen)} className="p-1.5 text-gray-500 hover:text-primary transition-colors rounded-lg" title="Configuración">
                     <Settings size={14} />

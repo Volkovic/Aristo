@@ -1,316 +1,239 @@
-# Día 14 - Funciones de orden superior
+# Día 14 - Funciones Avanzadas (El Restaurante de Python)
 
-## Funciones de orden superior
+A partir de hoy, vamos a pensar en las funciones como **ingredientes o herramientas de cocina**. En Python, las funciones son "ciudadanos de primera clase", lo que significa que puedes tratarlas exactamente igual que a un número o una cadena de texto: puedes guardarlas en variables, pasarlas como argumentos o hacer que otra función las devuelva.
 
-En Python, las funciones son tratadas como ciudadanos de primera clase; se pueden hacer las siguientes operaciones con funciones:
+Para entender estos conceptos avanzados (Funciones de orden superior, Closures y Decoradores), usaremos el hilo conductor de **"El Restaurante de Python"**.
 
-- Una función puede recibir una o más funciones como parámetros
-- Una función puede ser el valor de retorno de otra función
-- Una función puede ser modificada
-- Una función puede asignarse a una variable
-
-En esta sección discutiremos:
-
-1. Pasar funciones como parámetros
-2. Devolver funciones como valores de retorno
-3. Usar closures y decoradores en Python
-
+En esta sección dominaremos:
+1. Funciones de orden superior (Pasar y devolver funciones)
+2. Closures (Funciones con memoria)
+3. Decoradores (Envoltorios mágicos)
+4. Map, Filter y Reduce (Procesamiento de pedidos)
 
 ---
 
-### Funciones como parámetros
+## 1. Funciones de Orden Superior: Pasando herramientas al Chef
 
-```py
-def sum_numbers(nums):  # función normal
-    return sum(nums)    # usa la función incorporada sum
+Imagina que tienes un Chef (una función) que sabe preparar ingredientes, pero necesita que le digas **cómo** cocinarlos. Para esto, le pasamos "el método de cocción" (otra función) como parámetro.
 
-def higher_order_function(f, lst):  # pasar función como argumento
-    summation = f(lst)
-    return summation
-result = higher_order_function(sum_numbers, [1, 2, 3, 4, 5])
-print(result)       # 15
+Una función que recibe a otra función como parámetro se llama **Función de Orden Superior**.
+
+```python
+# Nuestras funciones "herramienta" (métodos de cocción)
+def hornear(ingrediente):
+    return f"{ingrediente} horneado a la perfección"
+
+def freir(ingrediente):
+    return f"{ingrediente} frito y muy crujiente"
+
+# Nuestra Función de Orden Superior (El Chef)
+def chef_prepara(metodo_de_coccion, ingrediente):
+    print("Chef: Preparando el ingrediente...")
+    # Aquí el chef USA la función que le pasamos
+    resultado = metodo_de_coccion(ingrediente)
+    print(f"Chef: ¡Listo! Tenemos un {resultado}")
+
+# Usando el código
+chef_prepara(hornear, "Pollo") 
+# Output: Chef: ¡Listo! Tenemos un Pollo horneado a la perfección
+
+chef_prepara(freir, "Pescado")
+# Output: Chef: ¡Listo! Tenemos un Pescado frito y muy crujiente
 ```
 
+Fíjate que pasamos `hornear` y `freir` **sin paréntesis**. No las estamos ejecutando nosotros, se las estamos entregando al Chef para que él las ejecute cuando sea el momento adecuado.
 
 ---
 
-### Funciones como valor de retorno
+## 2. Funciones de Orden Superior: La fábrica de máquinas
 
-```py
-def square(x):          # función que devuelve el cuadrado
-    return x ** 2
+Otra característica de las funciones de orden superior es que pueden **devolver (retornar) funciones**. 
 
-def cube(x):            # función que devuelve el cubo
-    return x ** 3
+Imagina una fábrica de máquinas de restaurante. Tú le dices qué tipo de comida quieres vender, y la fábrica construye y te entrega una máquina (función) especializada para eso.
 
-def absolute(x):        # función que devuelve el valor absoluto
-    if x >= 0:
-        return x
-    else:
-        return -(x)
+```python
+def fabrica_de_maquinas(tipo_comida):
+    
+    # La fábrica tiene planos para construir diferentes máquinas
+    def maquina_pizzas(cantidad):
+        return f"🍕 Saliendo {cantidad} pizzas calientes!"
+        
+    def maquina_helados(cantidad):
+        return f"🍦 Sirviendo {cantidad} helados fríos!"
+        
+    # Dependiendo de lo que pidas, te devuelve la máquina correcta (SIN EJECUTARLA)
+    if tipo_comida == "pizza":
+        return maquina_pizzas
+    elif tipo_comida == "helado":
+        return maquina_helados
 
-def higher_order_function(type): # función de orden superior que devuelve una función
-    if type == 'square':
-        return square
-    elif type == 'cube':
-        return cube
-    elif type == 'absolute':
-        return absolute
+# 1. Compramos la máquina (guardamos la función retornada en una variable)
+mi_pizzeria = fabrica_de_maquinas("pizza")
+mi_heladeria = fabrica_de_maquinas("helado")
 
-result = higher_order_function('square')
-print(result(3))       # 9
-result = higher_order_function('cube')
-print(result(3))       # 27
-result = higher_order_function('absolute')
-print(result(-3))      # 3
+# 2. Ahora usamos nuestras máquinas
+print(mi_pizzeria(5))   # 🍕 Saliendo 5 pizzas calientes!
+print(mi_heladeria(3))  # 🍦 Sirviendo 3 helados fríos!
 ```
 
-En los ejemplos anteriores se observa que la función de orden superior devuelve distintas funciones según el parámetro pasado.
-
-
 ---
 
-## Closures en Python
+## 3. Closures: Funciones con Memoria (La tarjeta VIP)
 
-Python permite que una función anidada acceda al ámbito de su función envolvente externa. Esto se conoce como closure. Un closure en Python se crea al anidar una función dentro de otra función envolvente y devolver la función interna. Veamos un ejemplo.
+Un **Closure** es simplemente una función interna que "recuerda" las variables de su entorno, incluso después de que la función externa haya terminado de ejecutarse. 
 
-**Ejemplo:**
+Piénsalo como una **Tarjeta VIP de cliente**. Cuando creas la tarjeta, le asignas un nombre de cliente y un descuento fijo. Cada vez que el cliente usa su tarjeta para comprar, la tarjeta *recuerda* quién es y qué descuento tiene.
 
-```py
-def add_ten():
-    ten = 10
-    def add(num):
-        return num + ten
-    return add
+```python
+def crear_tarjeta_vip(nombre_cliente, porcentaje_descuento):
+    # Estas variables son la "memoria" del closure
+    
+    def comprar(monto_factura):
+        # Esta función interna RECUERDA a 'nombre_cliente' y 'porcentaje_descuento'
+        descuento = monto_factura * (porcentaje_descuento / 100)
+        total = monto_factura - descuento
+        return f"Hola {nombre_cliente}, tu total con {porcentaje_descuento}% de descuento es ${total}"
+        
+    # Devolvemos la función interna (la tarjeta lista para usar)
+    return comprar
 
-closure_result = add_ten()
-print(closure_result(5))  # 15
-print(closure_result(10))  # 20
+# Creamos dos closures distintos (dos tarjetas VIP con memorias distintas)
+tarjeta_dano = crear_tarjeta_vip("Dano", 20)
+tarjeta_ana = crear_tarjeta_vip("Ana", 50)
+
+# Al usarlas, mágicamente recuerdan de quién son
+print(tarjeta_dano(100))  # Hola Dano, tu total con 20% de descuento es $80.0
+print(tarjeta_ana(100))   # Hola Ana, tu total con 50% de descuento es $50.0
 ```
 
+¡El closure encierra (encapsula) datos locales para que vivan dentro de la función!
 
 ---
 
-## Decoradores en Python
+## 4. Decoradores: Empaquetando para Regalo (Wrappers)
 
-Un decorador es un patrón de diseño que permite añadir nueva funcionalidad a un objeto sin modificar su estructura. Los decoradores normalmente se usan aplicándolos antes de la definición de la función que se desea decorar.
+Un **Decorador** (`@decorador`) usa todo lo que aprendimos antes para **añadir funcionalidad a una función sin modificar su código original**. 
 
-### Crear decoradores
+Imagina que tienes un cocinero que hace hamburguesas (tu función original). Quieres empezar a ofrecer "Empaquetado para Regalo". En lugar de enseñarle al cocinero a hacer cajas de regalo (modificar la función), contratas a un empaquetador (el decorador) que se pone al final de la línea. El cocinero hace la hamburguesa, se la pasa al empaquetador, y este le pone un lazo.
 
-Para crear un decorador necesitamos una función externa que contenga una función envoltura interna.
-
-**Ejemplo:**
-
-```py
-# función normal
-def greeting():
-    return 'Welcome to Python'
-
-def uppercase_decorator(function):
-    def wrapper():
-        func = function()
-        make_uppercase = func.upper()
-        return make_uppercase
+```python
+# 1. Creamos al decorador (el Empaquetador)
+def empaquetado_regalo(funcion_cocinero):
+    
+    def wrapper(): # Wrapper significa "Envoltorio"
+        print("🎁 Preparando caja de regalo...")
+        # El empaquetador llama al cocinero para que haga su trabajo
+        comida = funcion_cocinero() 
+        print("🎀 Poniendo un lazo rojo y tarjeta de felicidades!")
+        return comida
+        
     return wrapper
 
-g = uppercase_decorator(greeting)
-print(g())          # WELCOME TO PYTHON
+# 2. Aplicamos el decorador usando la sintaxis @
+@empaquetado_regalo
+def preparar_hamburguesa():
+    print("🍔 Cocinando carne, poniendo queso y pan...")
+    return "Hamburguesa lista"
 
-# Implementando lo anterior con sintaxis de decorador
+# Cuando llamamos a la función, el envoltorio actúa automáticamente
+resultado = preparar_hamburguesa()
+```
 
-'''Esta función decoradora es una función de orden superior que acepta una función como argumento'''
-def uppercase_decorator(function):
-    def wrapper():
-        func = function()
-        make_uppercase = func.upper()
-        return make_uppercase
+**Output:**
+```text
+🎁 Preparando caja de regalo...
+🍔 Cocinando carne, poniendo queso y pan...
+🎀 Poniendo un lazo rojo y tarjeta de felicidades!
+```
+
+Como ves, ¡añadimos funcionalidad "alrededor" de la hamburguesa sin tocar la receta!
+
+---
+
+## 5. Decoradores que reciben parámetros (El Cajero)
+
+¿Qué pasa si la función que queremos decorar recibe argumentos? (Por ejemplo, pedir una hamburguesa con ingredientes específicos). En ese caso, nuestro `wrapper` (envoltorio) también debe aceptar esos argumentos `(*args, **kwargs)`.
+
+```python
+# El decorador del cajero (Revisa si pagaste antes de cocinar)
+def verificar_pago(funcion_cocinero):
+    
+    # El wrapper recibe *args (cualquier cantidad de argumentos posicionales)
+    # y **kwargs (cualquier cantidad de argumentos nombrados)
+    def wrapper(*args, **kwargs):
+        print("💳 Cajero: Verificando pago...")
+        print("✅ Pago aprobado. Enviando orden a la cocina.")
+        
+        # Le pasamos los argumentos intactos a la función original
+        return funcion_cocinero(*args, **kwargs)
+        
     return wrapper
 
-@uppercase_decorator
-def greeting():
-    return 'Welcome to Python'
-print(greeting())   # WELCOME TO PYTHON
+@verificar_pago
+def preparar_orden(plato, mesa, extra=None):
+    if extra:
+        return f"Cocinando {plato} con {extra} para la mesa {mesa}"
+    return f"Cocinando {plato} para la mesa {mesa}"
+
+# Usamos la función normalmente
+print(preparar_orden("Ravioles", mesa=4, extra="Queso extra"))
 ```
 
+Al usar `*args` y `**kwargs`, nos aseguramos de que el decorador funcione con **cualquier** función, sin importar cuántos parámetros tenga.
 
 ---
 
-### Aplicar varios decoradores a una función
+## 6. Funciones integradas (Procesando el inventario)
 
-```py
-'''Estas funciones decoradoras son funciones de orden superior que reciben funciones como argumento'''
+Python ya trae de fábrica algunas funciones de orden superior muy útiles que operan sobre listas. Son las famosas `map`, `filter` y `reduce`.
 
-# primer decorador
-def uppercase_decorator(function):
-    def wrapper():
-        func = function()
-        make_uppercase = func.upper()
-        return make_uppercase
-    return wrapper
+Imagina que estamos revisando el inventario y los pedidos de nuestro restaurante.
 
-# segundo decorador
-def split_string_decorator(function):
-    def wrapper():
-        func = function()
-        splitted_string = func.split()
-        return splitted_string
-    return wrapper
+### MAP (Transformar todo)
+Aplica una función a **cada elemento** de una lista y devuelve una lista nueva.
+*Ejemplo: Convertir precios en dólares a moneda local.*
 
-@split_string_decorator
-@uppercase_decorator     # en este caso el orden importa, ya que .upper() no funciona sobre una lista
-def greeting():
-    return 'Welcome to Python'
-print(greeting())   # ['WELCOME', 'TO', 'PYTHON']
+```python
+precios_usd = [10, 15, 20]
+
+# Multiplicamos cada precio por 1000 usando map y lambda
+precios_locales = map(lambda precio: precio * 1000, precios_usd)
+
+print(list(precios_locales))  # [10000, 15000, 20000]
 ```
 
+### FILTER (Filtrar lo que sirve)
+Filtra una lista, manteniendo solo los elementos que devuelven `True` en la condición.
+*Ejemplo: El mesero anota pedidos, pero el chef rechaza los que tienen "piña" (ananá).*
+
+```python
+pedidos = ["Pizza Pepperoni", "Pizza con Piña", "Hamburguesa", "Tacos con Piña"]
+
+# Filtramos usando una función que revisa si 'Piña' NO está en el texto
+pedidos_aceptados = filter(lambda p: "Piña" not in p, pedidos)
+
+print(list(pedidos_aceptados))  # ['Pizza Pepperoni', 'Hamburguesa']
+```
 
 ---
 
-### Aceptar parámetros en decoradores
+## 7. REDUCE (Acumular un resultado)
 
-A menudo necesitamos que nuestras funciones acepten parámetros; por eso definimos decoradores que también los aceptan.
+### REDUCE (El cajero haciendo el cierre)
+A diferencia de `map` o `filter` que devuelven listas, `reduce` agarra la lista entera y la "reduce" a **un solo valor final** acumulando los resultados. Se debe importar del módulo `functools`.
 
-```py
-def decorator_with_parameters(function):
-    def wrapper_accepting_parameters(para1, para2, para3):
-        function(para1, para2, para3)
-        print("I live in {}".format(para3))
-    return wrapper_accepting_parameters
+*Ejemplo: Sumar toda la ganancia del día.*
 
-@decorator_with_parameters
-def print_full_name(first_name, last_name, country):
-    print("I am {} {}. I love to teach.".format(
-        first_name, last_name, country))
+```python
+from functools import reduce
 
-print_full_name("Asabeneh", "Yetayeh",'Finland')
+ganancias_por_mesa = [1500, 3200, 800, 4100]
+
+# reduce toma los 2 primeros valores (1500, 3200), los suma.
+# luego toma el resultado y lo suma con el siguiente (800)...
+total_dia = reduce(lambda acumulador, valor_actual: acumulador + valor_actual, ganancias_por_mesa)
+
+print(total_dia)  # 9600
 ```
 
-
----
-
-## Funciones integradas de orden superior
-
-En esta sección veremos algunas funciones integradas de orden superior como map(), filter() y reduce().
-Las funciones lambda se pueden pasar como argumentos; su caso de uso ideal es con map, filter y reduce.
-
-### Python - función map
-
-map() es una función integrada que recibe una función y un iterable como parámetros.
-
-```py
-    # sintaxis
-    map(function, iterable)
-```
-
-**Ejemplo 1**
-
-```py
-numbers = [1, 2, 3, 4, 5] # iterable
-def square(x):
-    return x ** 2
-numbers_squared = map(square, numbers)
-print(list(numbers_squared))    # [1, 4, 9, 16, 25]
-# Usemos lambda
-numbers_squared = map(lambda x : x ** 2, numbers)
-print(list(numbers_squared))    # [1, 4, 9, 16, 25]
-```
-
-**Ejemplo 2**
-
-```py
-numbers_str = ['1', '2', '3', '4', '5']  # iterable
-numbers_int = map(int, numbers_str)
-print(list(numbers_int))    # [1, 2, 3, 4, 5]
-```
-
-**Ejemplo 3**
-
-```py
-names = ['Asabeneh', 'Lidiya', 'Ermias', 'Abraham']  # iterable
-
-def change_to_upper(name):
-    return name.upper()
-
-names_upper_cased = map(change_to_upper, names)
-print(list(names_upper_cased))    # ['ASABENEH', 'LIDIYA', 'ERMIAS', 'ABRAHAM']
-
-# Usemos lambda
-names_upper_cased = map(lambda name: name.upper(), names)
-print(list(names_upper_cased))    # ['ASABENEH', 'LIDIYA', 'ERMIAS', 'ABRAHAM']
-```
-
-map itera sobre el iterable y devuelve un nuevo iterable transformado.
-
-
----
-
-### Python - función filter
-
-filter() llama a la función especificada que retorna un valor booleano para cada elemento del iterable y filtra los elementos que cumplen la condición.
-
-```py
-    # sintaxis
-    filter(function, iterable)
-```
-
-**Ejemplo 1**
-
-```py
-# filtremos solo los pares
-numbers = [1, 2, 3, 4, 5]  # iterable
-
-def is_even(num):
-    if num % 2 == 0:
-        return True
-    return False
-
-even_numbers = filter(is_even, numbers)
-print(list(even_numbers))       # [2, 4]
-```
-
-**Ejemplo 2**
-
-```py
-numbers = [1, 2, 3, 4, 5]  # iterable
-
-def is_odd(num):
-    if num % 2 != 0:
-        return True
-    return False
-
-odd_numbers = filter(is_odd, numbers)
-print(list(odd_numbers))       # [1, 3, 5]
-```
-
-```py
-# filtrar nombres largos
-names = ['Asabeneh', 'Lidiya', 'Ermias', 'Abraham']  # iterable
-def is_name_long(name):
-    if len(name) > 7:
-        return True
-    return False
-
-long_names = filter(is_name_long, names)
-print(list(long_names))         # ['Asabeneh']
-```
-
-
----
-
-### Python - función reduce
-
-reduce() se define en el módulo functools; es necesario importarla desde allí. Al igual que map y filter, recibe una función y un iterable. Sin embargo, no devuelve otro iterable sino un único valor acumulado.
-
-**Ejemplo 1**
-
-```py
-numbers_str = ['1', '2', '3', '4', '5']  # iterable
-def add_two_nums(x, y):
-    return int(x) + int(y)
-
-total = reduce(add_two_nums, numbers_str)
-print(total)    # 15
-```
-
-
----
+Con estas herramientas, tienes el poder de crear código altamente reutilizable y elegante. Los decoradores en particular los verás muchísimo cuando empieces a usar frameworks web como Flask o Django (por ejemplo, `@login_required` para verificar si un usuario inició sesión antes de mostrarle una página).

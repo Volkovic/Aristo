@@ -62,6 +62,13 @@ export default function SlideView({ content, dayQuiz, dayId, courseId, onSlideCh
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
+      if (
+        e.target.tagName === 'INPUT' || 
+        e.target.tagName === 'TEXTAREA' || 
+        e.target.isContentEditable
+      ) {
+        return;
+      }
       if (e.key === 'ArrowRight') handleNext();
       if (e.key === 'ArrowLeft') handlePrev();
     };
@@ -74,7 +81,7 @@ export default function SlideView({ content, dayQuiz, dayId, courseId, onSlideCh
   // Notify parent of slide changes for AI chat context
   useEffect(() => {
     if (onSlideChange) {
-      onSlideChange(isQuizSlide ? '' : slides[currentSlide] || '', isQuizSlide);
+      onSlideChange(isQuizSlide ? '' : slides[currentSlide] || '', isQuizSlide, currentSlide);
     }
   }, [currentSlide, totalSlides]);
 

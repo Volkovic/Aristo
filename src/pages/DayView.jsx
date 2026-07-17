@@ -15,6 +15,7 @@ export default function DayView() {
   const [currentSlideContent, setCurrentSlideContent] = useState('');
   const [isQuizActive, setIsQuizActive] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
+  const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
 
   useEffect(() => {
     async function loadData() {
@@ -60,9 +61,10 @@ export default function DayView() {
     }
   }
 
-  const handleSlideChange = (slideText, isQuiz) => {
+  const handleSlideChange = (slideText, isQuiz, index) => {
     setCurrentSlideContent(slideText);
     setIsQuizActive(isQuiz);
+    setCurrentSlideIndex(index);
     // Auto-close chat when entering quiz
     if (isQuiz && isChatOpen) {
       setIsChatOpen(false);
@@ -87,6 +89,7 @@ export default function DayView() {
           slideContent={currentSlideContent}
           courseId={courseId}
           dayId={dayId}
+          slideIndex={currentSlideIndex}
         />
       )}
     </div>
