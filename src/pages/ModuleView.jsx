@@ -7,8 +7,8 @@ import Quiz from '../components/Quiz';
 import SlideView from '../components/SlideView';
 import AiChat from '../components/AiChat';
 
-export default function DayView() {
-  const { courseId, dayId } = useParams();
+export default function ModuleView() {
+  const { courseId, moduleId } = useParams();
   const [content, setContent] = useState('');
   const [quizzes, setQuizzes] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -23,9 +23,9 @@ export default function DayView() {
       try {
         let mdModule;
         try {
-          mdModule = await import(`../data/${courseId}/day${dayId}.md?raw`);
+          mdModule = await import(`../data/${courseId}/module${moduleId}.md?raw`);
         } catch (e) {
-          mdModule = { default: '# Día no disponible por ahora' };
+          mdModule = { default: '# Módulo no disponible por ahora' };
         }
         const textContent = mdModule.default;
         setContent(textContent);
@@ -40,24 +40,24 @@ export default function DayView() {
         }
       } catch (err) {
         console.error("Error loading data:", err);
-        setContent('# Error cargando el contenido del día.');
+        setContent('# Error cargando el contenido del módulo.');
       } finally {
         setLoading(false);
       }
     }
     loadData();
-  }, [dayId]);
+  }, [moduleId]);
 
   if (loading) {
     return <div className="flex items-center justify-center min-h-[50vh]"><Loader2 className="animate-spin text-primary" size={48}/></div>;
   }
 
-  let dayQuiz = null;
+  let moduleQuiz = null;
   if (quizzes) {
-    if (dayId === '30') {
-      dayQuiz = Object.values(quizzes).flat();
+    if (moduleId === '30') {
+      moduleQuiz = Object.values(quizzes).flat();
     } else {
-      dayQuiz = quizzes[`day${dayId}`];
+      moduleQuiz = quizzes[`module${moduleId}`];
     }
   }
 
@@ -75,8 +75,8 @@ export default function DayView() {
     <div className="max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500 pb-20 relative pt-4">
       <SlideView 
         content={content} 
-        dayQuiz={dayQuiz} 
-        dayId={dayId} 
+        moduleQuiz={moduleQuiz} 
+        moduleId={moduleId} 
         courseId={courseId} 
         onSlideChange={handleSlideChange}
       />
@@ -88,7 +88,7 @@ export default function DayView() {
           onToggle={() => setIsChatOpen(!isChatOpen)}
           slideContent={currentSlideContent}
           courseId={courseId}
-          dayId={dayId}
+          moduleId={moduleId}
           slideIndex={currentSlideIndex}
         />
       )}

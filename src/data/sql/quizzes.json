@@ -1,5 +1,5 @@
 {
-  "day1": [
+  "module1": [
     {
       "id": 101,
       "question": "¿Cuál es la función principal del lenguaje SQL?",
@@ -241,7 +241,7 @@
       "justification": "Es el nombre técnico del software (como PostgreSQL o MySQL) que administra la base de datos y provee el intérprete SQL."
     }
   ],
-  "day2": [
+  "module2": [
     {
       "id": 201,
       "question": "¿Qué función cumple la cláusula `WHERE` en SQL?",
@@ -483,7 +483,7 @@
       "justification": "NULL es el vacío, la nada cósmica. Si le preguntas a SQL '¿Es la nada mayor que 100?', responderá 'No lo sé (Falso)', e ignorará el registro."
     }
   ],
-  "day3": [
+  "module3": [
     {
       "id": 301,
       "question": "En bases de datos relacionales, ¿cuál es el orden natural predeterminado en el que se devuelven los registros de un `SELECT` si no hay cláusula ORDER BY?",
@@ -725,7 +725,7 @@
       "justification": "El estándar de paginación estuvo roto por décadas entre compañías competidoras. FETCH FIRST es el verdadero estándar ISO actual, aunque la industria Open Source adoptó fuertemente LIMIT."
     }
   ],
-  "day4": [
+  "module4": [
     {
       "id": 401,
       "question": "¿Cuál es la misión principal de las 'Funciones de Agregación' (Aggregate Functions) en SQL?",
@@ -967,7 +967,7 @@
       "justification": "Este orden natural de SQL protege tu CPU. Siempre restringe con WHERE tus fechas, antes de mandar a la base de datos a sumar 100 millones de dólares."
     }
   ],
-  "day5": [
+  "module5": [
     {
       "id": 501,
       "question": "¿Cuál es la función mágica y principal de la cláusula `GROUP BY`?",
@@ -1209,7 +1209,7 @@
       "justification": "El HAVING se comporta como el WHERE. Puedes encadenar tantas compuertas lógicas como soporte tu CPU para aislar a los grupos perfectos."
     }
   ],
-  "day6": [
+  "module6": [
     {
       "id": 601,
       "question": "¿Qué utilidad tienen las Funciones Integradas (Built-in Functions) o Funciones Escalares en SQL?",
@@ -1451,7 +1451,7 @@
       "justification": "Aunque un carácter Emoji se vea como 1 sola figura en el string humano `LENGTH()`, en almacenamiento profundo gasta 4 sólidos Bytes en UTF-8 `OCTET_LENGTH()`."
     }
   ],
-  "day7": [
+  "module7": [
     {
       "id": 701,
       "question": "¿Cuál es el propósito fundamental de los comandos JOIN en SQL?",
@@ -1693,7 +1693,7 @@
       "justification": "Antes del glorioso SQL-92, la gente ponía todas las tablas amontonadas en el FROM (`FROM A,B,C`) y hacía las mezclas sucias abajo en la parte del WHERE. Fue un caos de lectura que el JOIN arregló para siempre."
     }
   ],
-  "day8": [
+  "module8": [
     {
       "id": 801,
       "question": "¿Cuál es la principal diferencia conceptual entre un INNER JOIN y un LEFT JOIN?",
@@ -1935,7 +1935,7 @@
       "justification": "EXPLAIN ANALYZE es el estetoscopio del cirujano SQL. Sin él, andas a ciegas en el tuning de rendimiento."
     }
   ],
-  "day9": [
+  "module9": [
     {
       "id": 901,
       "question": "¿Qué función cumple el desquiciado comando `CROSS JOIN` en el mundo de las bases de datos?",
@@ -2177,7 +2177,7 @@
       "justification": "Históricamente, la Coma se usaba para cruzar copias de sí misma, filtrándolas abajo (Implícito). En código moderno, escribe `INNER JOIN jefes j2 ON...` siempre."
     }
   ],
-  "day10": [
+  "module10": [
     {
       "id": 1001,
       "question": "¿En qué se diferencian fundamentalmente las Operaciones de Conjuntos (`UNION`) de las operaciones relacionales de los `JOIN`?",
@@ -2419,7 +2419,7 @@
       "justification": "Por legibilidad y salud mental en refactors, se recomienda englobar `(SELECT ...) UNION (SELECT ...) ORDER BY 1;`."
     }
   ],
-  "day11": [
+  "module11": [
     {
       "id": 1101,
       "question": "¿Qué es conceptualmente una Subconsulta (Subquery)?",
@@ -2661,7 +2661,7 @@
       "justification": "Siempre que te enfrentes a lentitud de consultas hijas, tu mejor amigo y salvador arquitectónico será hacer un Refactor hacia JOIN."
     }
   ],
-  "day12": [
+  "module12": [
     {
       "id": 1201,
       "question": "¿Qué significan las siglas 'CTE' y qué introdujeron en el panorama moderno de SQL?",
@@ -2903,7 +2903,7 @@
       "justification": "CTEs son la madurez definitiva y obligatoria para que pases de escribir SQL de Academia novato a SQL Industrial Corporativo legible."
     }
   ],
-  "day13": [
+  "module13": [
     {
       "id": 1301,
       "question": "¿Qué significan las siglas DDL y para qué sirve esa rama de comandos en SQL?",
@@ -3145,7 +3145,7 @@
       "justification": "Postgres (y otros modernos) integraron JSON para matar la necesidad pura de usar MongoDB para datos no estructurados. (Documentos + Relacional = SQL Moderno)."
     }
   ],
-  "day14": [
+  "module14": [
     {
       "id": 1401,
       "question": "¿Qué significan las siglas DML y qué controlan en tu flujo de Base de Datos?",
@@ -3387,7 +3387,7 @@
       "justification": "Tu Frontend siempre atacará Tablas (o APIs de Mappers) para inyectar realidades (DML), y Vistas abstractas para leer análisis agregados y complejos."
     }
   ],
-  "day15": [
+  "module15": [
     {
       "id": 1501,
       "question": "¿Qué problema revolucionario vinieron a solucionar las 'Funciones Analíticas o de Ventana' (Window Functions)?",

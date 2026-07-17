@@ -1,5 +1,5 @@
 {
-  "day1": [
+  "module1": [
     {
       "id": 101,
       "question": "¿Cuál es la diferencia principal entre ejecutar código en el Python Shell y en un archivo .py?",
@@ -241,7 +241,7 @@
       "justification": "Los floats o números de punto flotante son el tipo de dato que Python usa para almacenar números racionales o decimales (ej: 3.14)."
     }
   ],
-  "day2": [
+  "module2": [
     {
       "id": 201,
       "question": "Según el concepto de funciones integradas, ¿qué hace `len('Python')`?",
@@ -483,7 +483,7 @@
       "justification": "En Python, el número 0 es evaluado como `False`, pero cualquier cadena de texto que no esté vacía (incluso si contiene el carácter '0') es evaluada como verdadera (`True`)."
     }
   ],
-  "day3": [
+  "module3": [
     {
       "id": 301,
       "question": "Analiza `print(3 == '3')`. ¿Cuál es el resultado y por qué?",
@@ -725,7 +725,7 @@
       "justification": "La exponenciación `**` se evalúa de derecha a izquierda. Primero `3 ** 2` (9), y luego `2 ** 9` (512)."
     }
   ],
-  "day4": [
+  "module4": [
     {
       "id": 401,
       "question": "¿Qué método usarías para convertir toda la cadena 'HoLa' a minúsculas?",
@@ -967,7 +967,7 @@
       "justification": "Como la barra invertida es el carácter de escape base (ej `\\n`), si el usuario realmente necesita imprimir una barra invertida literal, debe escaparla consigo misma: `\\\\`."
     }
   ],
-  "day5": [
+  "module5": [
     {
       "id": 501,
       "question": "¿Qué es una Lista en Python y cómo se define sintácticamente?",
@@ -1209,7 +1209,7 @@
       "justification": "La longitud (`len()`) cuenta cuántos elementos directos tiene la lista principal. En este caso: el 1, el 2, y la sub-lista. Son 3 elementos totales."
     }
   ],
-  "day6": [
+  "module6": [
     {
       "id": 601,
       "question": "¿Qué es una Tupla (Tuple) en Python y cómo se diferencia principalmente de una Lista?",
@@ -1451,7 +1451,7 @@
       "justification": "La inmutabilidad evita cambiar los datos *dentro* de la tupla. Sin embargo, borrar la variable completa de la RAM con `del` siempre es posible sin importar el tipo."
     }
   ],
-  "day7": [
+  "module7": [
     {
       "id": 701,
       "question": "¿Qué es un Set (conjunto) en Python?",
@@ -1693,7 +1693,7 @@
       "justification": "Al ser colecciones desordenadas basadas en hashes, Python no asegura ni mantiene un orden de recorrido consistente."
     }
   ],
-  "day8": [
+  "module8": [
     {
       "id": 801,
       "question": "¿Qué es un Diccionario (Dictionary) en Python?",
@@ -1935,7 +1935,7 @@
       "justification": "Desde Python 3.9, se introdujo el operador Pipe `|` para diccionarios, que crea un nuevo diccionario fusionando las claves. Si hay conflicto de claves, el valor de `d2` sobrescribe al de `d1`."
     }
   ],
-  "day9": [
+  "module9": [
     {
       "id": 901,
       "question": "¿Para qué sirve una declaración `if` en Python?",
@@ -2177,7 +2177,7 @@
       "justification": "El intérprete ignora totalmente las líneas comentadas antes de evaluar la lógica o la indentación de un bloque de código activo."
     }
   ],
-  "day10": [
+  "module10": [
     {
       "id": 1001,
       "question": "¿Para qué se utilizan los bucles (loops) en Python?",
@@ -2419,7 +2419,7 @@
       "justification": "Evitar copiar y pegar el mismo bloque de código es la esencia de la programación imperativa y estructurada. Los bucles y funciones garantizan la reutilización de código."
     }
   ],
-  "day11": [
+  "module11": [
     {
       "id": 1101,
       "question": "¿Qué es una Función en Python?",
@@ -2661,7 +2661,7 @@
       "justification": "Al igual que con los condicionales o bucles, `pass` es un comodín perfecto (placeholder) para mantener el esqueleto del código funcionando temporalmente."
     }
   ],
-  "day12": [
+  "module12": [
     {
       "id": 1201,
       "question": "¿Qué es un Módulo (Module) en Python?",
@@ -2903,7 +2903,7 @@
       "justification": "Poner los imports al tope del archivo mejora drásticamente la legibilidad. Cualquiera que abra el código sabrá instantáneamente de qué dependencias externas requiere este archivo para funcionar adecuadamente."
     }
   ],
-  "day13": [
+  "module13": [
     {
       "id": 1301,
       "question": "¿Qué es la List Comprehension (Comprensión de Listas) en Python?",
@@ -3145,7 +3145,7 @@
       "justification": "Las List Comprehension son ansiosas (Eager). Si les pides un millón, crean una lista masiva en la memoria RAM que persistirá allí. Si el set de datos es infernal, se prefiere siempre una Generador con paréntesis (Lazy Evaluation)."
     }
   ],
-  "day14": [
+  "module14": [
     {
       "id": 1401,
       "question": "¿Qué es una Función de Orden Superior (Higher Order Function) en Python?",
@@ -3387,7 +3387,7 @@
       "justification": "Las lambdas comparten los mismos privilegios que cualquier objeto (First-class). Devolverlas directamente es un patrón muy común para fábricas de cierres simples."
     }
   ],
-  "day15": [
+  "module15": [
     {
       "id": 1501,
       "question": "¿Qué significa que Python tiene un sistema de Tipado Dinámico pero Fuerte (Dynamic but Strong Typing)?",
@@ -3629,7 +3629,7 @@
       "justification": "`isinstance('Hola', str)` devolverá `True`. Es la forma segura y oficial de la comunidad de Python para hacer comprobaciones de tipos (duck typing preventivo) en la lógica del código."
     }
   ],
-  "day16": [
+  "module16": [
     {
       "id": 1601,
       "question": "¿Qué módulo de la Librería Estándar de Python proporciona clases para manipular fechas y horas?",
@@ -3871,7 +3871,7 @@
       "justification": "Guardar en UTC es el mandamiento sagrado número 1 del Backend. Si todo está estandarizado en UTC en la DB, el sistema es inmune a problemas por mudanzas de servidores o clientes internacionales."
     }
   ],
-  "day17": [
+  "module17": [
     {
       "id": 1701,
       "question": "¿Qué es el Manejo de Excepciones (Exception Handling) en Python?",
@@ -4113,7 +4113,7 @@
       "justification": "Esta es la regla de oro del Manejo de Excepciones Web. Jamás se debe filtrar un Stack Trace (Código crudo, credenciales o paths de carpetas) a la vista de un cliente o atacante. Siempre debe ser atrapado en la última red global y maquillado."
     }
   ],
-  "day18": [
+  "module18": [
     {
       "id": 1801,
       "question": "¿Qué es una Expresión Regular (Regex)?",
@@ -4355,7 +4355,7 @@
       "justification": "Si no usaras paréntesis, `ab+` solo repetiría la letra 'b'. Con paréntesis, repite 'ababab'. Además, la información encerrada queda accesible para extraerla más tarde."
     }
   ],
-  "day19": [
+  "module19": [
     {
       "id": 1901,
       "question": "¿Qué función integrada (built-in) de Python se utiliza para abrir un archivo del disco duro?",
@@ -4597,7 +4597,7 @@
       "justification": "Si lees el archivo entero, el cursor quedará al final. Si intentas leerlo de nuevo sin cerrarlo, no obtendrás nada. Debes usar `.seek(0)` para 'rebobinar la cinta' al inicio."
     }
   ],
-  "day20": [
+  "module20": [
     {
       "id": 2001,
       "question": "¿Qué significan las siglas PIP en el ecosistema de Python?",
@@ -4839,7 +4839,7 @@
       "justification": "Debido a bots y scraping masivo, el equipo de PyPI deshabilitó la API XML-RPC de `pip search`. Ahora debes buscar los paquetes manualmente en la página web pypi.org."
     }
   ],
-  "day21": [
+  "module21": [
     {
       "id": 2101,
       "question": "¿Qué es la Programación Orientada a Objetos (OOP)?",
@@ -5081,7 +5081,7 @@
       "justification": "No existen los tipos primitivos desnudos estilo 'C' en Python. Un simple entero es un objeto complejo con decenas de métodos (`print(dir(10))`) que posibilitan el tipado dinámico."
     }
   ],
-  "day22": [
+  "module22": [
     {
       "id": 2201,
       "question": "¿Qué es el Web Scraping?",
@@ -5323,7 +5323,7 @@
       "justification": "Es vital cuando la web no tiene buenas Clases CSS. Si logras encontrar la etiqueta con la palabra 'Email:', su 'hermano siguiente' (sibling) probablemente sea la etiqueta que contiene el email real."
     }
   ],
-  "day23": [
+  "module23": [
     {
       "id": 2301,
       "question": "¿Qué es un Entorno Virtual (Virtual Environment) en Python?",
@@ -5565,7 +5565,7 @@
       "justification": "Ese es el mecanismo de aislamiento de PATH. La consola reescribe sus atajos y le da prioridad absoluta a la carpeta reducida del proyecto sobre el sistema inmenso."
     }
   ],
-  "day24": [
+  "module24": [
     {
       "id": 2401,
       "question": "¿Qué es la Estadística Descriptiva (Descriptive Statistics)?",
@@ -5807,7 +5807,7 @@
       "justification": "Es la técnica madre para buscar Relaciones Bivariadas. Si los puntos se aglomeran formando una especie de tubo ascendente estrecho, el humano detecta visualmente una Correlación Positiva brutal."
     }
   ],
-  "day25": [
+  "module25": [
     {
       "id": 2501,
       "question": "¿Qué es la librería Pandas y para qué se usa en el mundo de Python?",
@@ -6049,7 +6049,7 @@
       "justification": "El comando `.to_csv()` emite la información. Pasar la bandera `index=False` es una convención imperativa que evita que Pandas añada una columna superflua inyectando los índices numéricos puros (0,1,2,3) permanentemente al archivo plano de texto, arruinando su formato."
     }
   ],
-  "day26": [
+  "module26": [
     {
       "id": 2601,
       "question": "¿Qué protocolo es la columna vertebral absoluta de la World Wide Web (WWW) y del intercambio de datos cliente-servidor?",
@@ -6291,7 +6291,7 @@
       "justification": "El propio texto rojo de advertencia en la consola de Flask te lo dirá: 'Do not use it in a production deployment'. Usar Gunicorn (Ej: `gunicorn app:app`) es el paso obligatorio para ser profesional."
     }
   ],
-  "day27": [
+  "module27": [
     {
       "id": 2701,
       "question": "¿Qué es MongoDB?",
@@ -6533,7 +6533,7 @@
       "justification": "Atlas democratizó el desarrollo Backend. Ya no tienes que pelear con puertos, firewalls de Linux o backups rotos. Simplemente copias la URI de conexión de Atlas, la pegas en tu código Python y ya estás mundial."
     }
   ],
-  "day28": [
+  "module28": [
     {
       "id": 2801,
       "question": "¿Qué significan las siglas API?",
@@ -6775,7 +6775,7 @@
       "justification": "El flujo profesional avanzado con `requests` implica siempre enviar cabeceras: `requests.get(url, headers={'Authorization': 'Bearer 12345'})`. Sin Headers, estás ciego en la Web."
     }
   ],
-  "day29": [
+  "module29": [
     {
       "id": 2901,
       "question": "¿Qué es FastAPI y por qué ha revolucionado el desarrollo de APIs en Python en los últimos años?",
@@ -7017,7 +7017,7 @@
       "justification": "FastAPI produce un contrato JSON puro de OpenAPI en tiempo real. Otras corporaciones consumen ese JSON para generar su lado del código, asegurando cero fallos de comunicación."
     }
   ],
-  "day30": [
+  "module30": [
     {
       "id": 3001,
       "question": "¿Has logrado culminar con orgullo y éxito absoluto esta travesía monumental (Bootcamp de 30 Días de Python), forjando disciplina y expandiendo irremediablemente las fronteras de tu entendimiento arquitectónico en la Ingeniería de Software moderna?",

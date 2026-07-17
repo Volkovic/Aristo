@@ -4,6 +4,12 @@ import { Terminal, Code2, Database, BookOpen, GitBranch, FileCode2, Atom, Palett
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 
+const TOTAL_MODULES = {
+  python: 30,
+  javascript: 23,
+  sql: 15
+};
+
 export default function Dashboard() {
   const { user } = useAuth();
   const [progress, setProgress] = useState({
@@ -11,12 +17,6 @@ export default function Dashboard() {
     javascript: 0,
     sql: 0
   });
-
-  const TOTAL_DAYS = {
-    python: 30,
-    javascript: 23,
-    sql: 15
-  };
 
   useEffect(() => {
     if (!user) return;
@@ -41,9 +41,9 @@ export default function Dashboard() {
         });
 
         setProgress({
-          python: Math.round((maxDays.python / TOTAL_DAYS.python) * 100),
-          javascript: Math.round((maxDays.javascript / TOTAL_DAYS.javascript) * 100),
-          sql: Math.round((maxDays.sql / TOTAL_DAYS.sql) * 100)
+          python: Math.round((maxDays.python / TOTAL_MODULES.python) * 100),
+          javascript: Math.round((maxDays.javascript / TOTAL_MODULES.javascript) * 100),
+          sql: Math.round((maxDays.sql / TOTAL_MODULES.sql) * 100)
         });
       }
     }
@@ -65,7 +65,7 @@ export default function Dashboard() {
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <CourseCard 
           title="Python" 
-          badge="30 Días"
+          badge="30 Módulos"
           description="Aprende los fundamentos de Python, estructuras de datos y lógica de programación desde cero." 
           icon={Terminal} 
           to="/python" 
@@ -73,7 +73,7 @@ export default function Dashboard() {
         />
         <CourseCard 
           title="JavaScript"
-          badge="23 Días" 
+          badge="23 Módulos" 
           description="Domina el lenguaje de la web, asincronía y el ecosistema de JS." 
           icon={Code2} 
           to="/javascript"
@@ -81,7 +81,7 @@ export default function Dashboard() {
         />
         <CourseCard 
           title="SQL" 
-          badge="15 Días"
+          badge="15 Módulos"
           description="Bases de datos relacionales, consultas complejas y modelado de datos." 
           icon={Database} 
           to="/sql"

@@ -33,17 +33,6 @@ export default function CoursePath() {
     'DDL (Definición)', 'DML (Manipulación)', 'Funciones de Ventana'
   ];
 
-  if (courseId !== 'python' && courseId !== 'javascript' && courseId !== 'sql') {
-    return <Navigate to="/" />;
-  }
-
-  const isPython = courseId === 'python';
-  const isSql = courseId === 'sql';
-  
-  const dayTitles = isPython ? pythonTitles : (isSql ? sqlTitles : javascriptTitles);
-  const courseName = isPython ? 'Python' : (isSql ? 'SQL' : 'JavaScript');
-  const Icon = isPython ? Terminal : (isSql ? Database : Code2);
-
   const { user, loading: authLoading } = useAuth();
   const [currentCompletedDays, setCurrentCompletedDays] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -71,6 +60,17 @@ export default function CoursePath() {
     }
     loadProgress();
   }, [user, courseId]);
+
+  if (courseId !== 'python' && courseId !== 'javascript' && courseId !== 'sql') {
+    return <Navigate to="/" />;
+  }
+
+  const isPython = courseId === 'python';
+  const isSql = courseId === 'sql';
+  
+  const dayTitles = isPython ? pythonTitles : (isSql ? sqlTitles : javascriptTitles);
+  const courseName = isPython ? 'Python' : (isSql ? 'SQL' : 'JavaScript');
+  const Icon = isPython ? Terminal : (isSql ? Database : Code2);
 
   if (authLoading || loading) {
     return <div className="flex items-center justify-center min-h-[50vh]"><Loader2 className="animate-spin text-primary" size={48}/></div>;
@@ -106,7 +106,7 @@ export default function CoursePath() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <h1 className="text-4xl sm:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary to-green-400">Ruta de {courseName}</h1>
-            <span className="px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-bold border border-primary/20 shadow-[0_0_15px_rgba(209,254,23,0.2)]">{dayTitles.length} Días</span>
+            <span className="px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-bold border border-primary/20 shadow-[0_0_15px_rgba(209,254,23,0.2)]">{dayTitles.length} Módulos</span>
           </div>
           <Icon size={48} className="text-gray-800 hidden sm:block" />
         </div>
@@ -142,7 +142,7 @@ export default function CoursePath() {
           return (
             <Link 
               key={day.id} 
-              to={`/${courseId}/day/${day.id}`}
+              to={`/${courseId}/module/${day.id}`}
               className={cardClasses}
             >
               {/* Resplandor de fondo al hacer hover en cards interactivos */}

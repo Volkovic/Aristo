@@ -10,8 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google/genai": "^2.12.0",
     "@supabase/supabase-js": "^2.110.0",
     "@tailwindcss/typography": "^0.5.20",
+    "dotenv": "^17.4.2",
     "github-slugger": "^2.0.0",
     "lucide-react": "^1.23.0",
     "react": "^19.2.7",

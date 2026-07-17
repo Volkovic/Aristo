@@ -4,7 +4,7 @@ import { CheckCircle, XCircle, Clock, X, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 
-export default function Quiz({ questions, dayId, courseId }) {
+export default function Quiz({ questions, moduleId, courseId }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [quizKey, setQuizKey] = useState(0);
@@ -15,7 +15,7 @@ export default function Quiz({ questions, dayId, courseId }) {
   const [score, setScore] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
   const [showExitConfirm, setShowExitConfirm] = useState(false);
-  const isFinalExam = dayId === '30';
+  const isFinalExam = moduleId === '30';
   const totalQuestions = isFinalExam ? 30 : 10;
   const passingScore = isFinalExam ? 24 : 8;
   const initialTime = isFinalExam ? 900 : 300;
@@ -50,7 +50,7 @@ export default function Quiz({ questions, dayId, courseId }) {
           .upsert({
             user_id: user.id,
             course_id: courseId,
-            day_id: parseInt(dayId),
+            day_id: parseInt(moduleId),
             score: score
           }, { onConflict: 'user_id, course_id, day_id' });
           
@@ -60,7 +60,7 @@ export default function Quiz({ questions, dayId, courseId }) {
       }
     }
     saveProgress();
-  }, [isFinished, user, score, passingScore, courseId, dayId]);
+  }, [isFinished, user, score, passingScore, courseId, moduleId]);
 
   useEffect(() => {
     let timer;

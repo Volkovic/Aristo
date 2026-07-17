@@ -26,7 +26,7 @@ function setStoredConfig(config) {
   localStorage.setItem('vitka_ai_config', JSON.stringify(config));
 }
 
-export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId, slideIndex = 0 }) {
+export default function AiChat({ isOpen, onToggle, slideContent, courseId, moduleId, slideIndex = 0 }) {
   const { user } = useAuth();
   const [allMessages, setAllMessages] = useState([]);
   const messages = useMemo(() => allMessages.filter(m => m.slideIndex === slideIndex), [allMessages, slideIndex]);
@@ -66,7 +66,7 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
 
   // Load chat history from Supabase
   useEffect(() => {
-    if (!user || !courseId || !dayId) return;
+    if (!user || !courseId || !moduleId) return;
     
     async function loadHistory() {
       const { data, error } = await supabase
@@ -74,7 +74,7 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
         .select('id, role, content, created_at')
         .eq('user_id', user.id)
         .eq('course_id', courseId)
-        .eq('day_id', parseInt(dayId))
+        .eq('day_id', parseInt(moduleId))
         .order('created_at', { ascending: true });
 
       if (!error && data) {
@@ -89,7 +89,7 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
       }
     }
     loadHistory();
-  }, [user, courseId, dayId]);
+  }, [user, courseId, moduleId]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -120,7 +120,7 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, dayId
     const { data } = await supabase.from('ai_chat_messages').insert({
       user_id: user.id,
       course_id: courseId,
-      day_id: parseInt(dayId),
+      day_id: parseInt(moduleId),
       role,
       content: `:::SLIDE:::${index}::: ${content}`,
     }).select('id');

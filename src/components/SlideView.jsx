@@ -29,13 +29,13 @@ function preprocessSolutions(markdown) {
   );
 }
 
-export default function SlideView({ content, dayQuiz, dayId, courseId, onSlideChange }) {
+export default function SlideView({ content, moduleQuiz, moduleId, courseId, onSlideChange }) {
   // Split markdown by horizontal rule (---)
   // We use regex to match lines that are exactly '---'
   const slides = content.split(/^---\s*$/m).filter(s => s.trim().length > 0);
   
   // Add a final slide for the Quiz
-  const totalSlides = dayQuiz ? slides.length + 1 : slides.length;
+  const totalSlides = moduleQuiz ? slides.length + 1 : slides.length;
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const scrollRef = useRef(null);
@@ -76,7 +76,7 @@ export default function SlideView({ content, dayQuiz, dayId, courseId, onSlideCh
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentSlide, totalSlides]);
 
-  const isQuizSlide = dayQuiz && currentSlide === totalSlides - 1;
+  const isQuizSlide = moduleQuiz && currentSlide === totalSlides - 1;
 
   // Notify parent of slide changes for AI chat context
   useEffect(() => {
@@ -111,7 +111,7 @@ export default function SlideView({ content, dayQuiz, dayId, courseId, onSlideCh
       <div ref={scrollRef} className="flex-1 flex flex-col justify-center p-8 lg:p-12 relative overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent bg-background-dark/30">
         {isQuizSlide ? (
           <div id="quiz-container" className="h-full flex items-center justify-center">
-            <Quiz questions={dayQuiz} dayId={dayId} courseId={courseId} />
+            <Quiz questions={moduleQuiz} moduleId={moduleId} courseId={courseId} />
           </div>
         ) : (
           <article className="prose prose-invert prose-p:text-gray-300 prose-p:text-lg prose-headings:text-white prose-a:text-primary hover:prose-a:text-primary/80 prose-pre:bg-gray-950 prose-pre:border prose-pre:border-gray-800 prose-pre:whitespace-pre-wrap prose-pre:break-words max-w-none w-full mx-auto flex flex-col justify-center min-h-full">

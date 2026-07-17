@@ -1,5 +1,5 @@
 {
-  "day1": [
+  "module1": [
     {
       "id": 101,
       "question": "¿Cómo se vincula correctamente un archivo JavaScript externo llamado 'script.js' en un documento HTML?",
@@ -241,7 +241,7 @@
       "justification": "prompt('Mensaje') despliega una ventana de diálogo nativa que permite al usuario ingresar texto y lo retorna como un string."
     }
   ],
-  "day2": [
+  "module2": [
     {
       "id": 201,
       "question": "¿Qué resultado arroja la expresión: `\"11\" + 1` en JavaScript?",
@@ -483,7 +483,7 @@
       "justification": "Los tipos primitivos (como los números) se asignan 'por valor'. Cuando haces `b = a`, b recibe una copia independiente del valor 1. Modificar 'a' después no altera a 'b'."
     }
   ],
-  "day3": [
+  "module3": [
     {
       "id": 301,
       "question": "Analiza la siguiente comparación: `[] == ![]`. ¿Cuál es el resultado de evaluar esta expresión booleana?",
@@ -725,7 +725,7 @@
       "justification": "El operador de asignación de suma `+=` es una abreviatura (shorthand) de `num = num + 5`."
     }
   ],
-  "day4": [
+  "module4": [
     {
       "id": 401,
       "question": "En una declaración `if / else if / else`, ¿qué sucede si se cumplen múltiples condiciones en diferentes ramas?",
@@ -967,7 +967,7 @@
       "justification": "El string literal 'false' no está vacío, por ende es Truthy. Al aplicarle el operador de negación NOT (!), invierte ese Truthy convirtiéndolo en el booleano `false`."
     }
   ],
-  "day5": [
+  "module5": [
     {
       "id": 501,
       "question": "Dado el array `let arr = [10, 20, 30]`, ¿qué sucede si ejecutas `arr[10] = 100`?",
@@ -1209,7 +1209,7 @@
       "justification": "En JavaScript, la propiedad length no solo lee, sino que se puede establecer (setear). Asignarle 0 es el truco más rápido para vaciar mutativamente un array existente."
     }
   ],
-  "day6": [
+  "module6": [
     {
       "id": 601,
       "question": "En un bucle `for (let i = 0; i < 5; i++)`, ¿cuándo se ejecuta la instrucción `i++`?",
@@ -1451,7 +1451,7 @@
       "justification": "La sintaxis del bucle for es sumamente expresiva. Puedes inicializar múltiples punteros y mutarlos al unísono, lo cual es útil en algoritmos de dos punteros (Two-Pointer)."
     }
   ],
-  "day7": [
+  "module7": [
     {
       "id": 701,
       "question": "¿Cuál de estas opciones NO es una forma válida de crear una función en JavaScript moderno?",
@@ -1693,7 +1693,7 @@
       "justification": "El método `.bind(contexto)` crea y devuelve una NUEVA función que está 'atada' (bound) de por vida al contexto (this) que le especificaste, resolviendo el problema de la pérdida de referencia."
     }
   ],
-  "day8": [
+  "module8": [
     {
       "id": 801,
       "question": "¿Cómo se define un objeto literal vacío en JavaScript?",
@@ -1935,7 +1935,7 @@
       "justification": "Intentar usar `for (const x of {})` causará un TypeError ('no es iterable'). Para recorrer objetos planos debes usar for...in, Object.keys(), o usar Map() en su lugar."
     }
   ],
-  "day9": [
+  "module9": [
     {
       "id": 901,
       "question": "¿Qué es exactamente una 'Higher Order Function' (Función de Orden Superior)?",
@@ -2177,7 +2177,7 @@
       "justification": "Todos son valores falsy en la tabla de evaluación lógica de JS. El operador OR evaluará falsy || 'Vacio' en los 6 casos de manera consistente."
     }
   ],
-  "day10": [
+  "module10": [
     {
       "id": 1001,
       "question": "¿Cuál es la principal característica de un `Set` en JavaScript?",
@@ -2419,7 +2419,7 @@
       "justification": "A diferencia de los lenguajes clásicos donde los diccionarios (HashMaps) son desordenados, JS especifica que Map y Set deben recordar y respetar el orden original de inserción al ser iterados."
     }
   ],
-  "day11": [
+  "module11": [
     {
       "id": 1101,
       "question": "Tienes un array `const arr = [1, 2, 3]`. ¿Cuál es la sintaxis correcta para desestructurar (destructuring) el primer y tercer elemento y omitir el segundo?",
@@ -2661,7 +2661,7 @@
       "justification": "Aunque inusual, es sintácticamente válido en JS. Puedes extraer la misma propiedad origen y asignarla a múltiples constantes/variables de destino simultáneamente."
     }
   ],
-  "day12": [
+  "module12": [
     {
       "id": 1201,
       "question": "¿Cuál es la sintaxis literal para definir una Expresión Regular (RegEx) en JavaScript?",
@@ -2903,7 +2903,7 @@
       "justification": "Aunque recibe una expresión regular como primer argumento, métodos como `.replace()`, `.match()` y `.search()` son métodos ejecutados directamente sobre objetos String."
     }
   ],
-  "day13": [
+  "module13": [
     {
       "id": 1301,
       "question": "Quieres medir exactamente cuántos milisegundos tarda en ejecutarse un bucle for. ¿Qué par de métodos del objeto console puedes utilizar?",
@@ -3145,7 +3145,7 @@
       "justification": "Para objetos y arrays grandes de datos, console.table() dibuja matrices visuales, mientras que dir() asegura que puedas colapsar y expandir los nodos anidados limpiamente."
     }
   ],
-  "day14": [
+  "module14": [
     {
       "id": 1401,
       "question": "¿Cuál es la estructura correcta para manejar errores asíncronos o síncronos y evitar que el programa colapse?",
@@ -3387,7 +3387,7 @@
       "justification": "Si omites hacer console.error(e) o enviar telemetría en tu catch, la aplicación podría tener un bug catastrófico y actuar extraño, sin que nadie jamás lo sepa (ni tú)."
     }
   ],
-  "day15": [
+  "module15": [
     {
       "id": 1501,
       "question": "¿Qué es una Clase (Class) introducida en ES6 en JavaScript?",
@@ -3629,7 +3629,7 @@
       "justification": "Antes de la sintaxis `class`, los desarrolladores usaban `function Animal() {}` y `Animal.prototype.correr = function(){}`. La sintaxis actual de clases oculta e implementa exactamente esta misma mecánica."
     }
   ],
-  "day16": [
+  "module16": [
     {
       "id": 1601,
       "question": "¿Cuál es la sintaxis correcta para convertir un objeto JavaScript literal a un string en formato JSON?",
@@ -3871,7 +3871,7 @@
       "justification": "Esta es la causa número uno de errores en proyectos nuevos. Si te falta una coma, o pones una coma 'sobrante' (trailing comma) al final de la última propiedad, tu servidor React no encenderá."
     }
   ],
-  "day17": [
+  "module17": [
     {
       "id": 1701,
       "question": "¿Cuál es la principal diferencia entre `localStorage` y `sessionStorage` en el navegador web?",
@@ -4113,7 +4113,7 @@
       "justification": "La API carece de TTL (Time To Live). El patrón usual es guardar un objeto serializado con el dato y un timestamp: `{ data: 'token', expiry: 178000213 }` y hacer la matemática en el `.getItem()`."
     }
   ],
-  "day18": [
+  "module18": [
     {
       "id": 1801,
       "question": "¿Cuál es el concepto principal detrás de una 'Promesa' en JavaScript?",
@@ -4355,7 +4355,7 @@
       "justification": "Antes los desarrolladores necesitaban usar librerías externas o verboso AJAX (XMLHttpRequest). Fetch trajo las Promesas HTTP de forma limpia, elegante y de primera mano a todos los navegadores modernos."
     }
   ],
-  "day19": [
+  "module19": [
     {
       "id": 1901,
       "question": "¿Qué es exactamente una clausura (Closure) en JavaScript?",
@@ -4597,7 +4597,7 @@
       "justification": "Las variables de un closure son verdaderamente fantasmas privadas a los ojos del código exterior. Ofrecen el blindaje más absoluto disponible en el lenguaje."
     }
   ],
-  "day20": [
+  "module20": [
     {
       "id": 2001,
       "question": "Hablando de código limpio, ¿qué es la 'Cohesión' dentro de una función o componente?",
@@ -4839,7 +4839,7 @@
       "justification": "El `DocumentFragment` es un minúsculo DOM imaginario en memoria viva. Le adjuntas 10.000 hijos pesados y luego se lo agregas a tu Body de una sola vez, optimizando dramáticamente el rendimiento."
     }
   ],
-  "day21": [
+  "module21": [
     {
       "id": 2101,
       "question": "¿Qué significan las siglas DOM en el desarrollo web?",
@@ -5081,7 +5081,7 @@
       "justification": "Debounce es una de las preguntas de entrevista más cruciales para Frontend Senior. Al usar timers (setTimeout) manejando cancelaciones (clearTimeout) basadas en Closures vivos, frenas las funciones pesadas (búsqueda, redimensionamiento, scrolling infinito)."
     }
   ],
-  "day22": [
+  "module22": [
     {
       "id": 2201,
       "question": "¿Qué método utilizas para crear una nueva y limpia etiqueta HTML `<div>` desde cero mediante JavaScript (antes de insertarla en la página)?",
@@ -5323,7 +5323,7 @@
       "justification": "En arquitecturas como React (o SPA Vanilla), si desmontas un componente, DEBES tener el ID de sus temporizadores para limpiarlos. Si olvidas llamar a `clearInterval()`, ese bucle seguirá corriendo silenciosamente para siempre intentando modificar una UI que ya no existe, causando la fuga de memoria más frecuente en la web."
     }
   ],
-  "day23": [
+  "module23": [
     {
       "id": 2301,
       "question": "¿Qué método es el estándar actual para 'escuchar' e invocar funciones cuando ocurre un evento en un elemento HTML?",
