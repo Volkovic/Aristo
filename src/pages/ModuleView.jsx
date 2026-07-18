@@ -83,8 +83,8 @@ export default function ModuleView() {
         onSlideChange={handleSlideChange}
       />
 
-      {/* AI Chat — hidden during quiz */}
-      {!isQuizActive && (
+      {/* AI Chat — hidden during quiz but kept mounted to preserve state */}
+      <div className={isQuizActive ? 'hidden' : 'block'}>
         <AiChat
           isOpen={isChatOpen}
           onToggle={() => setIsChatOpen(!isChatOpen)}
@@ -93,7 +93,7 @@ export default function ModuleView() {
           moduleId={moduleId}
           slideIndex={currentSlideIndex}
         />
-      )}
+      </div>
     </div>
   );
 }

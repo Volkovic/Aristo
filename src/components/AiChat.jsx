@@ -36,7 +36,6 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
   const [provider, setProvider] = useState('openai');
   const [apiKey, setApiKey] = useState('');
   const [hasConfig, setHasConfig] = useState(false);
-  const [streamingText, setStreamingText] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const messagesEndRef = useRef(null);
   const desktopInputRef = useRef(null);
@@ -85,7 +84,12 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
           }
           return { role: m.role, content: m.content, slideIndex: 0, id: m.id };
         });
-        setAllMessages(parsed);
+        
+        setAllMessages(prev => {
+          // Preserve any actively streaming messages (which have a temp- ID)
+          const tempMessages = prev.filter(m => typeof m.id === 'string' && m.id.startsWith('temp-'));
+          return [...parsed, ...tempMessages];
+        });
       }
     }
     loadHistory();
@@ -99,7 +103,7 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
         messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
       }, 50);
     }
-  }, [isOpen, messages, streamingText]);
+  }, [isOpen, messages]);
 
   // Focus input when chat opens
   useEffect(() => {
@@ -145,10 +149,12 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
     if (!text.trim() || isLoading || !hasConfig) return;
 
     const userMessage = { role: 'user', content: text.trim(), slideIndex };
-    setAllMessages(prev => [...prev, userMessage]);
+    const tempId = 'temp-' + Date.now();
+    const tempAssistantMessage = { id: tempId, role: 'assistant', content: '', slideIndex };
+    
+    setAllMessages(prev => [...prev, userMessage, tempAssistantMessage]);
     setInput('');
     setIsLoading(true);
-    setStreamingText('');
 
     // Save user message to DB
     const userId = await saveMessage('user', userMessage.content, slideIndex);
@@ -162,6 +168,7 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
       content: `Eres un asistente de IA tutor para un curso de programación. El estudiante está viendo actualmente el siguiente contenido de la lección:\n\n---\n${slideContent || 'No hay contenido de diapositiva disponible.'}\n---\n\nAyuda al estudiante a entender este material. Responde preguntas de forma clara y concisa. Usa ejemplos de código cuando sea útil. Responde siempre en español.`,
     };
 
+    // Filter out the temp message for the API request
     const apiMessages = [systemMessage, ...messages, userMessage].map(m => ({
       role: m.role,
       content: m.content
@@ -220,28 +227,27 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
             const parsed = JSON.parse(line.slice(6));
             if (parsed.text) {
               fullText += parsed.text;
-              setStreamingText(fullText);
+              setAllMessages(prev => prev.map(m => m.id === tempId ? { ...m, content: fullText + ' ▊' } : m));
             }
           } catch {}
         }
       }
 
+      // Remove cursor and save final message
+      setAllMessages(prev => prev.map(m => m.id === tempId ? { ...m, content: fullText } : m));
+      
       if (fullText) {
-        const assistantMessage = { role: 'assistant', content: fullText, slideIndex };
-        setAllMessages(prev => [...prev, assistantMessage]);
         const asstId = await saveMessage('assistant', fullText, slideIndex);
         if (asstId) {
-          setAllMessages(prev => prev.map(m => m === assistantMessage ? { ...m, id: asstId } : m));
+          setAllMessages(prev => prev.map(m => m.id === tempId ? { ...m, id: asstId } : m));
         }
       }
     } catch (err) {
       if (err.name !== 'AbortError') {
-        const errorMsg = { role: 'assistant', content: `⚠️ Error: ${err.message}. Verifica tu API key e intenta de nuevo.`, slideIndex };
-        setAllMessages(prev => [...prev, errorMsg]);
+        setAllMessages(prev => prev.map(m => m.id === tempId ? { ...m, content: `⚠️ Error: ${err.message}. Verifica tu API key e intenta de nuevo.` } : m));
       }
     } finally {
       setIsLoading(false);
-      setStreamingText('');
       abortRef.current = null;
     }
   }, [messages, isLoading, hasConfig, slideContent, provider, apiKey, user, courseId, moduleId, slideIndex]);
@@ -392,38 +398,28 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
               )}
               
               {messages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div key={msg.id || i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed overflow-hidden break-words ${
                     msg.role === 'user'
                       ? 'bg-primary/20 text-white rounded-br-md whitespace-pre-wrap'
                       : 'bg-gray-800 text-gray-200 rounded-bl-md border border-gray-700 prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:p-2 prose-pre:bg-black/50 prose-pre:border prose-pre:border-gray-700 prose-pre:whitespace-pre-wrap prose-pre:break-words'
                   }`}>
-                    {msg.role === 'user' ? msg.content : <ReactMarkdown>{msg.content}</ReactMarkdown>}
+                    {msg.role === 'user' ? (
+                      msg.content
+                    ) : (
+                      msg.content === '' ? (
+                        <div className="flex gap-1 py-1 px-2">
+                          <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                          <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                          <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                        </div>
+                      ) : (
+                        <ReactMarkdown>{msg.content}</ReactMarkdown>
+                      )
+                    )}
                   </div>
                 </div>
               ))}
-
-              {/* Streaming message */}
-              {isLoading && streamingText && (
-                <div className="flex justify-start">
-                  <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-bl-md text-sm leading-relaxed overflow-hidden break-words bg-gray-800 text-gray-200 border border-gray-700 prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:p-2 prose-pre:bg-black/50 prose-pre:border prose-pre:border-gray-700 prose-pre:whitespace-pre-wrap prose-pre:break-words">
-                    <ReactMarkdown>{streamingText + ' ▊'}</ReactMarkdown>
-                  </div>
-                </div>
-              )}
-
-              {/* Loading dots */}
-              {isLoading && !streamingText && (
-                <div className="flex justify-start">
-                  <div className="px-4 py-3 rounded-2xl rounded-bl-md bg-gray-800 border border-gray-700">
-                    <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                      <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-                      <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               <div ref={messagesEndRef} />
             </div>
@@ -544,36 +540,28 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
                 )}
 
                 {messages.map((msg, i) => (
-                  <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div key={msg.id || i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                     <div className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed overflow-hidden break-words ${
                       msg.role === 'user'
                         ? 'bg-primary/20 text-white rounded-br-md whitespace-pre-wrap'
                         : 'bg-gray-800 text-gray-200 rounded-bl-md border border-gray-700 prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:p-2 prose-pre:bg-black/50 prose-pre:border prose-pre:border-gray-700 prose-pre:whitespace-pre-wrap prose-pre:break-words'
                     }`}>
-                      {msg.role === 'user' ? msg.content : <ReactMarkdown>{msg.content}</ReactMarkdown>}
+                      {msg.role === 'user' ? (
+                        msg.content
+                      ) : (
+                        msg.content === '' ? (
+                          <div className="flex gap-1 py-1 px-2">
+                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                          </div>
+                        ) : (
+                          <ReactMarkdown>{msg.content}</ReactMarkdown>
+                        )
+                      )}
                     </div>
                   </div>
                 ))}
-
-                {isLoading && streamingText && (
-                  <div className="flex justify-start">
-                    <div className="max-w-[85%] px-3.5 py-2.5 rounded-2xl rounded-bl-md text-sm leading-relaxed overflow-hidden break-words bg-gray-800 text-gray-200 border border-gray-700 prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:p-2 prose-pre:bg-black/50 prose-pre:border prose-pre:border-gray-700 prose-pre:whitespace-pre-wrap prose-pre:break-words">
-                      <ReactMarkdown>{streamingText + ' ▊'}</ReactMarkdown>
-                    </div>
-                  </div>
-                )}
-
-                {isLoading && !streamingText && (
-                  <div className="flex justify-start">
-                    <div className="px-4 py-3 rounded-2xl rounded-bl-md bg-gray-800 border border-gray-700">
-                      <div className="flex gap-1">
-                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-                        <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 <div ref={messagesEndRef} />
               </div>
