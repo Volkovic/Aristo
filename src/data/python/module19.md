@@ -1,475 +1,144 @@
 # Día 19 - Manejo de archivos
 
-## Manejo de archivos
+El manejo de archivos es una parte esencial de la programación. Nos permite persistir datos, es decir, guardarlos en el disco duro para que no se pierdan al cerrar el programa, y leerlos más tarde.
 
-Hasta ahora hemos visto distintos tipos de datos en Python. Normalmente almacenamos datos en distintos formatos de archivo. Además de manejar archivos, en esta sección veremos diferentes formatos (.txt, .json, .xml, .csv, .tsv, .excel). Primero, familiaricémonos con el manejo de archivos usando un formato común (.txt).
-
-El manejo de archivos es una parte importante de la programación; nos permite crear, leer, actualizar y eliminar archivos. En Python usamos la función incorporada _open()_ para manipular archivos.
+En Python usamos la función incorporada `open()` para abrir un archivo del disco duro y trabajar con él.
 
 ```py
-# sintaxis
-open('filename', mode) # mode(r, a, w, x, t, b) puede ser lectura, escritura o actualización
+archivo = open('nombre_archivo.txt', 'modo')
 ```
-
-- "r" - lectura - valor por defecto. Abre el archivo solo para lectura; si no existe genera un error.
-- "a" - append (añadir) - abre el archivo para agregar contenido al final; crea el archivo si no existe.
-- "w" - escritura - abre el archivo para escribir, sobrescribe si existe; crea el archivo si no existe.
-- "x" - crear - crea el archivo; si existe genera un error.
-- "t" - texto - valor por defecto. Modo texto.
-- "b" - binario - modo binario (por ejemplo para imágenes).
-
-Al trabajar con archivos de texto, también es fundamental entender la **codificación (Encoding)**. La codificación es el mapa que le indica al sistema cómo traducir los ceros y unos binarios del disco en caracteres legibles por humanos (como letras con tildes o la 'ñ'). Para evitar que estos caracteres se vean como "basura", es una buena práctica especificar siempre la codificación al abrir un archivo, por ejemplo: `open('archivo.txt', 'r', encoding='utf-8')`.
 
 ---
 
-### Abrir un archivo para lectura
+## Modos de Apertura (`mode`)
 
-El modo por defecto de _open_ es lectura, así que no es necesario especificar 'r' o 'rt'. He creado un archivo llamado reading_file_example.txt en el directorio files. Veamos:
+Al abrir un archivo, debes decirle a Python qué planeas hacer con él. Estos son los modos principales:
 
+- `'r'` (Lectura / Read): Valor **por defecto**. Abre el archivo solo para leer. Falla si no existe. (Si omites el modo en `open('datos.txt')`, asume `'r'`).
+- `'w'` (Escritura / Write): Abre para escribir. **Sobrescribe** todo el contenido si ya existe, o lo crea si no existe.
+- `'a'` (Añadir / Append): Abre para agregar contenido **al final** sin borrar lo existente. Lo crea si no existe.
+- `'b'` (Binario): Se añade para leer archivos no textuales como imágenes (PNG), audios (MP3) o ejecutables (ej. `'rb'`).
+
+### Codificación (Encoding)
+La codificación es el mapa que le indica al sistema cómo traducir los ceros y unos (binarios) del disco en caracteres legibles por humanos (letras, tildes, 'ñ'). Siempre es buena práctica especificar la codificación universal al abrir texto:
 ```py
-f = open('./files/reading_file_example.txt')
-print(f) # <_io.TextIOWrapper name='./files/reading_file_example.txt' mode='r' encoding='UTF-8'>
+f = open('datos.txt', 'r', encoding='utf-8')
 ```
-
-Como en el ejemplo, al imprimir el objeto archivo obtenemos información sobre él. Un archivo abierto permite distintos métodos de lectura: _read()_, _readline_, _readlines_. Debemos cerrar el archivo con _close()_ cuando terminemos.
-
-- _read()_: lee todo el texto como una cadena. Podemos limitar el número de caracteres pasando un entero a *read(number)*.
-
-```py
-f = open('./files/reading_file_example.txt')
-txt = f.read()
-print(type(txt))
-print(txt)
-f.close()
-```
-
-```sh
-# salida
-<class 'str'>
-This is an example to show how to open a file and read.
-This is the second line of the text.
-```
-
-En lugar de imprimir todo el texto, podemos leer solamente los primeros 10 caracteres:
-
-```py
-f = open('./files/reading_file_example.txt')
-txt = f.read(10)
-print(type(txt))
-print(txt)
-f.close()
-```
-
-```sh
-# salida
-<class 'str'>
-This is an
-```
-
-- _readline()_: lee solo la primera línea
-
-```py
-f = open('./files/reading_file_example.txt')
-line = f.readline()
-print(type(line))
-print(line)
-f.close()
-```
-
-```sh
-# salida
-<class 'str'>
-This is an example to show how to open a file and read.
-```
-
-- _readlines()_: lee todo el texto línea por línea y devuelve una lista de líneas
-
-```py
-f = open('./files/reading_file_example.txt')
-lines = f.readlines()
-print(type(lines))
-print(lines)
-f.close()
-```
-
-```sh
-# salida
-<class 'list'>
-['This is an example to show how to open a file and read.\n', 'This is the second line of the text.']
-```
-
-Otra forma de obtener todas las líneas como lista es usar _splitlines()_:
-
-```py
-f = open('./files/reading_file_example.txt')
-lines = f.read().splitlines()
-print(type(lines))
-print(lines)
-f.close()
-```
-
-```sh
-# salida
-<class 'list'>
-['This is an example to show how to open a file and read.', 'This is the second line of the text.']
-```
-
-Además de estos métodos, la forma más "pytónica" y eficiente en consumo de memoria (RAM) para leer un archivo inmenso es iterar directamente sobre el objeto archivo con un bucle `for`. Al hacer `for linea in f:`, Python lee y descarta de la memoria una sola línea a la vez (es un iterable perezoso o *lazy*).
-
-Los archivos funcionan internamente como cintas magnéticas con un cursor de lectura/escritura. Podemos saber la posición exacta (en bytes) de este cursor usando el método `f.tell()`. Si hemos leído todo el archivo y queremos volver a leerlo sin cerrarlo, el cursor estará al final. Para "rebobinar" o mover el cursor a un byte específico, utilizamos el método `f.seek(posicion)` (por ejemplo, `f.seek(0)` vuelve al inicio del archivo).
-
-Debemos cerrar los archivos después de abrirlos. Es fácil olvidarse; por eso existe la construcción _with_ que cierra automáticamente:
-
-```py
-with open('./files/reading_file_example.txt') as f:
-    lines = f.read().splitlines()
-    print(type(lines))
-    print(lines)
-```
-
-```sh
-# salida
-<class 'list'>
-['This is an example to show how to open a file and read.', 'This is the second line of the text.']
-```
-
 
 ---
 
-### Abrir un archivo para escritura y actualización
+## Leer y Escribir (Métodos principales)
 
-Para escribir en un archivo hay que pasar el modo a _open()_:
+Una vez abierto el archivo, utilizamos los métodos del Objeto Archivo:
 
-- "a" - append - añade al final; crea el archivo si no existe.
-- "w" - write - sobrescribe el contenido; crea el archivo si no existe.
-
-Añadamos texto al archivo que hemos estado leyendo:
-
-```py
-with open('./files/reading_file_example.txt','a') as f:
-    f.write('Este texto debe añadirse al final')
-```
-
-Es importante destacar que, a diferencia de la función `print()`, el método `write()` es literal y **no añade un salto de línea automático** al final del texto introducido. Si deseas que el siguiente texto aparezca en una nueva línea, debes incluir explícitamente el carácter de salto de línea (`\n`) en tu cadena.
-
-Si el archivo no existe, el siguiente ejemplo creará uno nuevo:
+- `.read()`: Extrae **todo** el contenido del archivo en un solo y gigantesco String.
+- `.readlines()`: Lee el archivo y devuelve una **Lista de Strings**, donde cada elemento es una línea independiente.
+- `.write("texto")`: Inserta texto en el archivo. **Ojo:** Este método es literal y NO añade un salto de línea automático al final del texto introducido; debes poner `\n` manualmente si quieres bajar de línea.
 
 ```py
-with open('./files/writing_file_example.txt','w') as f:
-    f.write('Este texto será escrito en el nuevo archivo creado')
-```
+# Escribir en un archivo (sobrescribiendo)
+f = open('saludo.txt', 'w', encoding='utf-8')
+f.write("Hola Mundo\n")
+f.write("Segunda línea")
 
+# CERRAR SIEMPRE EL ARCHIVO
+f.close() 
+```
+**Acción CRÍTICA:** Siempre debes realizar manualmente el método `.close()` sobre el objeto archivo cuando terminas de usarlo para liberar la memoria y asegurar que los datos se guarden.
 
 ---
 
-### Eliminar archivos
+## La forma "Pytónica" y Eficiente
 
-Como vimos anteriormente, podemos crear y eliminar directorios con el módulo _os_. Para eliminar archivos también usamos _os_.
+### Declaración de Contexto `with` (Cierre automático)
+Cerrar archivos manualmente con `.close()` es fácil de olvidar. La sintaxis recomendada en Python moderno es usar un administrador de contexto (`with`). De esta forma el archivo se CIERRE AUTOMÁTICAMENTE sin depender del programador.
+
+```py
+with open('saludo.txt', 'r', encoding='utf-8') as f:
+    contenido = f.read()
+    print(contenido)
+# Aquí el archivo ya está cerrado automáticamente
+```
+
+### Leer archivos inmensos
+Si un archivo pesa 10 GB, usar `.read()` o `.readlines()` colapsaría tu memoria RAM. La forma más "Pytónica" y eficiente en consumo de memoria para leer un archivo inmenso es **iterar directamente sobre el objeto archivo** con un bucle `for`:
+
+```py
+with open('log_gigante.txt', 'r') as f:
+    for linea in f:
+        print(linea) # Lee y descarta de la RAM una línea a la vez
+```
+
+---
+
+## El Cursor: `.tell()` y `.seek()`
+
+Los archivos funcionan internamente como cintas magnéticas con un "cursor" o "cabezal" de lectura/escritura.
+
+- `f.tell()`: Devuelve la posición exacta (en bytes) donde se encuentra el cursor actualmente.
+- `f.seek(posicion)`: Mueve el cursor a un byte específico. (Ej: `f.seek(0)` rebobina el cursor al principio del archivo).
+
+```py
+with open('texto.txt', 'r') as f:
+    print("Cursor inicial:", f.tell()) # 0
+    f.read()
+    print("Cursor final:", f.tell()) # Final del archivo
+    f.seek(0) # Rebobinar
+    print("De nuevo al inicio:", f.tell()) # 0
+```
+
+---
+
+## Eliminar Archivos y Comprobar Existencia
+
+Para eliminar físicamente un archivo del disco duro usando código, utilizamos el módulo del sistema operativo llamado `os`.
+
+Para evitar un error, debes revisar si un archivo realmente existe en el disco duro antes de intentar abrirlo o eliminarlo, usando `os.path.exists()`.
 
 ```py
 import os
-os.remove('./files/example.txt')
-```
 
-Si el archivo no existe, remove lanzará un error, por lo que es mejor comprobar:
+ruta = './mi_archivo.txt'
 
-```py
-import os
-if os.path.exists('./files/example.txt'):
-    os.remove('./files/example.txt')
+if os.path.exists(ruta):
+    os.remove(ruta)
+    print("Archivo eliminado.")
 else:
-    print('El archivo no existe')
+    print("El archivo no existe en el disco duro.")
 ```
-
 
 ---
 
-## Tipos de archivos
+## Manejo de Archivos JSON
 
-### Archivos con extensión txt
+JSON (*JavaScript Object Notation*) es el formato más popular para intercambiar datos. En Python, un JSON se comporta estructuralmente igual que un **Diccionario**. 
 
-Los archivos _txt_ son un formato muy común; ya vimos su uso más arriba. Ahora pasemos a JSON.
-
-### Archivos con extensión json
-
-JSON significa JavaScript Object Notation. Es básicamente una representación en cadena de un objeto JavaScript o de un diccionario Python.
-
-_Ejemplo:_
-
-```py
-# diccionario
-person_dct= {
-    "name":"Asabeneh",
-    "country":"Finland",
-    "city":"Helsinki",
-    "skills":["JavaScript", "React","Python"]
-}
-# JSON: la forma en cadena del diccionario
-person_json = "{'name': 'Asabeneh', 'country': 'Finland', 'city': 'Helsinki', 'skills': ['JavaScrip', 'React', 'Python']}"
-# Usamos triple comillas para que sea multilínea y más legible
-person_json = '''{
-    "name":"Asabeneh",
-    "country":"Finland",
-    "city":"Helsinki",
-    "skills":["JavaScript", "React","Python"]
-}'''
-```
-
-
----
-
-### Convertir JSON a diccionario
-
-Para convertir JSON a diccionario importamos el módulo json y usamos _loads_.
+Para volcarlo (guardarlo) en disco como un archivo de formato `.json`, utilizamos el módulo de la Librería Estándar llamado `json`.
 
 ```py
 import json
-# JSON
-person_json = '''{
-    "name": "Asabeneh",
-    "country": "Finland",
-    "city": "Helsinki",
-    "skills": ["JavaScript", "React", "Python"]
-}'''
-# Convertir la cadena JSON a diccionario
-person_dct = json.loads(person_json)
-print(type(person_dct))
-print(person_dct)
-print(person_dct['name'])
-```
 
-```sh
-# salida
-<class 'dict'>
-{'name': 'Asabeneh', 'country': 'Finland', 'city': 'Helsinki', 'skills': ['JavaScrip', 'React', 'Python']}
-Asabeneh
-```
-
-
----
-
-### Convertir diccionario a JSON
-
-Para convertir un diccionario a JSON usamos _dumps_.
-
-```py
-import json
-# diccionario en Python
-person = {
-    "name": "Asabeneh",
-    "country": "Finland",
-    "city": "Helsinki",
-    "skills": ["JavaScript", "React", "Python"]
+persona = {
+    "nombre": "Ana",
+    "habilidades": ["Python", "SQL"]
 }
-# convertir diccionario a cadena JSON
-person_json = json.dumps(person, indent=4) # indent puede ser 2, 4, 8; formatea la salida
-print(type(person_json))
-print(person_json)
+
+# json.dump(): Guarda en un ARCHIVO en el disco
+with open('datos.json', 'w', encoding='utf-8') as f:
+    json.dump(persona, f, indent=4)
 ```
 
-```sh
-# salida
-<class 'str'>
-{
-    "name": "Asabeneh",
-    "country": "Finland",
-    "city": "Helsinki",
-    "skills": [
-        "JavaScript",
-        "React",
-        "Python"
-    ]
-}
-```
-
+**Diferencia técnica clave:**
+- `json.dump(objeto, archivo)`: Vuelca los datos directamente a un **Objeto Archivo** (guardando en el disco).
+- `json.dumps(objeto)`: (Con 's' de String). Convierte los datos a un **String** de texto plano en la memoria RAM, sin guardar nada en disco. 
+- Lo mismo aplica para leer: `load()` (lee archivo) vs `loads()` (lee string).
 
 ---
 
-### Guardar como archivo JSON
+## Otros formatos (CSV, Excel y XML)
 
-También podemos guardar los datos en un archivo JSON:
+Brevemente, Python puede manejar cualquier tipo de archivo de datos usando librerías:
 
-```py
-import json
-# diccionario en Python
-person = {
-    "name": "Asabeneh",
-    "country": "Finland",
-    "city": "Helsinki",
-    "skills": ["JavaScript", "React", "Python"]
-}
-with open('./files/json_example.json', 'w', encoding='utf-8') as f:
-    json.dump(person, f, ensure_ascii=False, indent=4)
-```
-
-En el ejemplo usamos encoding y ensure_ascii para manejar caracteres no ASCII. Ejemplo con caracteres no ASCII:
-
-```py
-import json
-person = {
-    "name": "Mark Firenze",
-    "country": "Spain",
-    "city": "Madrid",
-    "skills": ["JavaScript", "React", "Python"]
-}
-with open('./files/json_example.json', 'w', encoding='utf-8') as f:
-    json.dump(person, f, ensure_ascii=False, indent=4)
-```
-
-Leamos el archivo JSON que acabamos de crear:
-
-```py
-import json
-with open('./files/json_example.json', 'r', encoding='utf-8') as f:
-    person = json.load(f)
-    print(person)
-```
-
-```sh
-# salida
-{'name': 'Mark Firenze', 'country': 'Spain', 'city': 'Madrid', 'skills': ['JavaScript', 'React', 'Python']}
-```
-
-*Nota técnica:* La diferencia principal entre `json.dump()` y `json.dumps()` radica en su destino. `json.dump()` escribe los datos directamente en un **Objeto Archivo** (guardando en disco), mientras que `json.dumps()` (con 's' al final, de *String*) convierte los datos a un **String** en la memoria RAM. La misma lógica aplica para la lectura: `json.load(archivo)` lee de un archivo, y `json.loads(string_json)` lee de una cadena de texto.
-
-
----
-
-### Archivos con extensión csv
-
-CSV significa Comma Separated Values (valores separados por comas). Es un formato sencillo para datos tabulares (como hojas de cálculo o bases de datos) muy común en ciencia de datos.
-
-_Ejemplo CSV:_
-
-```csv
-"name","country","city","skills"
-"Asabeneh","Finland","Helsinki","JavaScript"
-```
-
-Ejemplo de lectura:
-
-```py
-import csv
-with open('./files/csv_example.csv') as f:
-    csv_reader = csv.reader(f, delimiter=',') # w+ crea el archivo si no existe
-    line_count = 0
-    for row in csv_reader:
-        if line_count == 0:
-            print(f'Encabezados: {", ".join(row)}')
-            line_count += 1
-        else:
-            print(f'{row[0]} viene de {row[1]}, {row[2]}. Conoce {row[3]}')
-            line_count += 1
-    print(f'Procesadas {line_count} líneas.')
-```
-
-```sh
-# salida:
-Encabezados: name, country, city, skills
-Asabeneh viene de Finland, Helsinki. Conoce JavaScript
-Procesadas 2 líneas.
-```
-
-También podemos escribir CSV:
-
-```py
-import csv
-with open('./files/csv_example.csv', 'w', encoding='UTF8', newline='') as f:
-    writer = csv.writer(f)
-    # escribir encabezados
-    writer.writerow(['name', 'country', 'city', 'skills'])
-    # escribir datos
-    writer.writerow(['Asabeneh', 'Finland', 'Helsinki', 'JavaScript'])
-```
-
-
----
-
-### Archivos con extensión xlsx
-
-Para leer archivos Excel necesitamos instalar la librería xlrd (u otras alternativas). Ejemplo:
-
-```py
-import xlrd
-excel_book = xlrd.open_workbook('sample.xls')
-print(excel_book.nsheets)
-print(excel_book.sheet_names)
-```
-
-
----
-
-### Archivos con extensión xml
-
-XML es un lenguaje de marcado similar a HTML. Permite etiquetas personalizadas y se usa para datos estructurados. En Python hay varias librerías; aquí usamos xml.etree.ElementTree.
-
-_Ejemplo XML:_
-
-```xml
-<?xml version="1.0"?>
-<person gender="female">
-  <name>Asabeneh</name>
-  <country>Finland</country>
-  <city>Helsinki</city>
-  <skills>
-    <skill>JavaScript</skill>
-    <skill>React</skill>
-    <skill>Python</skill>
-  </skills>
-</person>
-```
-
-Usamos xml.etree.ElementTree para parsear:
-
-```py
-import xml.etree.ElementTree as ET
-tree = ET.parse('./files/xml_example.xml')
-root = tree.getroot()
-print('Etiqueta raíz:', root.tag)
-print('Atributos:', root.attrib)
-for child in root:
-    print('Campo: ', child.tag)
-```
-
-```sh
-# salida
-Etiqueta raíz: person
-Atributos: {'gender': 'female'}
-Campo:  name
-Campo:  country
-Campo:  city
-Campo:  skills
-```
-
-Obtener más detalles:
-
-```py
-import xml.etree.ElementTree as ET
-tree = ET.parse('./files/xml_example.xml')
-root = tree.getroot()
-print('Etiqueta raíz:', root.tag)
-print('Atributos:', root.attrib)
-for child in root:
-    print('Campo: ', child.tag)
-    if child.tag != 'skills':
-        print(child.text)
-    else:
-        for skill in child:
-            print(skill.text)
-```
-
-```sh
-# salida
-Etiqueta raíz: person
-Atributos: {'gender': 'female'}
-field:  name
-Asabeneh
-field:  country
-Finland
-field:  city
-Helsinki
-field:  skills
-JavaScript
-React
-Python
-```
+- **CSV (Valores Separados por Comas):** Ideal para tablas de datos. Se utiliza el módulo estándar `csv`. Para iterar se usa `csv.reader(archivo)`.
+- **Excel (.xlsx, .xls):** Archivos complejos de hojas de cálculo. Se requieren librerías externas (no integradas en Python por defecto) como `xlrd` o `openpyxl`.
+- **XML:** Formato de etiquetas parecido al HTML `<etiqueta>dato</etiqueta>`. Se lee usando el módulo estándar `xml.etree.ElementTree`.
