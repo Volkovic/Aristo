@@ -1,10 +1,12 @@
-import { Outlet, Link, Navigate } from 'react-router-dom';
+import { Outlet, Link, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, LogOut } from 'lucide-react';
 import logo from '../assets/logo.svg';
 
 export default function MainLayout() {
   const { user, loading, signOut } = useAuth();
+  const location = useLocation();
+  const isModuleView = location.pathname.includes('/module/');
 
   if (loading) {
     return (
@@ -28,14 +30,14 @@ export default function MainLayout() {
           <button 
             onClick={signOut}
             className="text-gray-400 hover:text-red-400 transition-colors flex items-center gap-2 text-sm font-semibold"
-            title="Cerrar Sesin"
+            title="Cerrar Sesión"
           >
             <LogOut size={18} />
             <span className="hidden sm:inline">Salir</span>
           </button>
         </div>
       </header>
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+      <main className={`flex-1 w-full ${isModuleView ? '' : 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8'}`}>
         <Outlet />
       </main>
     </div>

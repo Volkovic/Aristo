@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
-import { MessageSquare, X, Send, Settings, Sparkles, Trash2, ChevronDown } from 'lucide-react';
+import { MessageSquare, X, Send, Settings, Sparkles, Trash2, ChevronDown, ChevronRight, ChevronLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 
@@ -275,17 +275,21 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
     '❓ No entendí esto',
   ];
 
-  // --- FAB Button (always rendered when chat is not open) ---
   if (!isOpen) {
-    return createPortal(
-      <button
-        onClick={onToggle}
-        className="ai-chat-fab"
-        title="Asistente IA"
-      >
-        <Sparkles size={22} />
-      </button>,
-      document.body
+    return (
+      <>
+        {/* Mobile FAB */}
+        {createPortal(
+          <button
+            onClick={onToggle}
+            className="ai-chat-fab lg:hidden"
+            title="Asistente IA"
+          >
+            <Sparkles size={22} />
+          </button>,
+          document.body
+        )}
+      </>
     );
   }
 
@@ -340,16 +344,15 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
     </div>
   );
 
-  // --- Chat Panel ---
-  return createPortal(
+  return (
     <>
-      {/* Desktop Panel */}
-      <div className="ai-chat-panel hidden lg:flex flex-col">
+      {/* Desktop Panel (Rendered Inline) */}
+      <div className="hidden lg:flex flex-col h-full w-full">
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-gray-800 flex-shrink-0 bg-gray-800/50">
           <div className="flex items-center gap-2">
             <Sparkles size={16} className="text-primary" />
-            <span className="font-bold text-sm text-white">Asistente IA (Diap. {slideIndex + 1})</span>
+            <span className="font-bold text-sm text-white">Asistente IA</span>
           </div>
           <div className="flex items-center gap-1">
             {hasConfig && (
@@ -362,9 +365,6 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
                 </button>
               </>
             )}
-            <button onClick={onToggle} className="p-1.5 text-gray-500 hover:text-white transition-colors rounded-lg">
-              <X size={16} />
-            </button>
           </div>
         </div>
 
@@ -478,121 +478,123 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
         </div>
       )}
 
-      {/* Mobile Bottom Sheet */}
-      <div className="ai-chat-bottomsheet lg:hidden">
-        <div className="ai-chat-bottomsheet-overlay" onClick={onToggle}></div>
-        <div className="ai-chat-bottomsheet-content">
-          {/* Drag Handle */}
-          <div className="flex justify-center py-2 flex-shrink-0">
-            <div className="w-10 h-1 bg-gray-600 rounded-full"></div>
-          </div>
-
-          {/* Header */}
-          <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800 flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <Sparkles size={16} className="text-primary" />
-              <span className="font-bold text-sm text-white">Asistente IA</span>
+      {/* Mobile Bottom Sheet (Rendered in Portal) */}
+      {createPortal(
+        <div className="ai-chat-bottomsheet lg:hidden">
+          <div className="ai-chat-bottomsheet-overlay" onClick={onToggle}></div>
+          <div className="ai-chat-bottomsheet-content">
+            {/* Drag Handle */}
+            <div className="flex justify-center py-2 flex-shrink-0">
+              <div className="w-10 h-1 bg-gray-600 rounded-full"></div>
             </div>
-            <div className="flex items-center gap-1">
-              {hasConfig && (
-                <>
-                  <button onClick={() => setShowDeleteModal(true)} className="p-1.5 text-gray-500 hover:text-red-400 transition-colors rounded-lg" title="Limpiar chat">
-                    <Trash2 size={16} />
-                  </button>
-                  <button onClick={() => setIsConfigOpen(!isConfigOpen)} className="p-1.5 text-gray-500 hover:text-primary transition-colors rounded-lg" title="Configuración">
-                    <Settings size={14} />
-                  </button>
-                </>
-              )}
-              <button onClick={onToggle} className="p-1.5 text-gray-500 hover:text-white transition-colors rounded-lg">
-                <ChevronDown size={18} />
-              </button>
-            </div>
-          </div>
 
-          {/* Body */}
-          {(!hasConfig || isConfigOpen) ? (
-            <div className="flex-1 flex items-center justify-center p-4 overflow-y-auto">
-              {renderConfig()}
-            </div>
-          ) : (
-            <>
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                {messages.length === 0 && !isLoading && (
-                  <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-6">
-                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Sparkles size={20} className="text-primary" />
-                    </div>
-                    <p className="text-gray-400 text-sm">¿Tenés alguna duda?</p>
-                    <div className="flex flex-wrap gap-2 justify-center">
-                      {suggestedQuestions.map((q, i) => (
-                        <button
-                          key={i}
-                          onClick={() => handleSuggestion(q.replace(/^[^\s]+\s/, ''))}
-                          className="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-full text-xs text-gray-300 hover:border-primary hover:text-primary transition-colors"
-                        >
-                          {q}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {messages.map((msg, i) => (
-                  <div key={msg.id || i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed overflow-hidden break-words ${
-                      msg.role === 'user'
-                        ? 'bg-primary/20 text-white rounded-br-md whitespace-pre-wrap'
-                        : 'bg-gray-800 text-gray-200 rounded-bl-md border border-gray-700 prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:p-2 prose-pre:bg-black/50 prose-pre:border prose-pre:border-gray-700 prose-pre:whitespace-pre-wrap prose-pre:break-words'
-                    }`}>
-                      {msg.role === 'user' ? (
-                        msg.content
-                      ) : (
-                        msg.content === '' ? (
-                          <div className="flex gap-1 py-1 px-2">
-                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
-                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
-                            <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
-                          </div>
-                        ) : (
-                          <ReactMarkdown>{msg.content}</ReactMarkdown>
-                        )
-                      )}
-                    </div>
-                  </div>
-                ))}
-
-                <div ref={messagesEndRef} />
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-2 border-b border-gray-800 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <Sparkles size={16} className="text-primary" />
+                <span className="font-bold text-sm text-white">Asistente IA</span>
               </div>
+              <div className="flex items-center gap-1">
+                {hasConfig && (
+                  <>
+                    <button onClick={() => setShowDeleteModal(true)} className="p-1.5 text-gray-500 hover:text-red-400 transition-colors rounded-lg" title="Limpiar chat">
+                      <Trash2 size={16} />
+                    </button>
+                    <button onClick={() => setIsConfigOpen(!isConfigOpen)} className="p-1.5 text-gray-500 hover:text-primary transition-colors rounded-lg" title="Configuración">
+                      <Settings size={14} />
+                    </button>
+                  </>
+                )}
+                <button onClick={onToggle} className="p-1.5 text-gray-500 hover:text-white transition-colors rounded-lg">
+                  <ChevronDown size={18} />
+                </button>
+              </div>
+            </div>
 
-              {/* Input */}
-              <form onSubmit={handleSubmit} className="flex-shrink-0 p-3 border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm">
-                <div className="flex items-center gap-2">
-                  <textarea
-                    ref={mobileInputRef}
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Preguntá algo..."
-                    disabled={isLoading}
-                    rows={1}
-                    className="flex-1 px-3.5 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition-colors disabled:opacity-50 resize-none overflow-hidden"
-                  />
-                  <button
-                    type="submit"
-                    disabled={!input.trim() || isLoading}
-                    className="p-2.5 bg-primary text-background-dark rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
-                  >
-                    <Send size={16} />
-                  </button>
+            {/* Body */}
+            {(!hasConfig || isConfigOpen) ? (
+              <div className="flex-1 flex items-center justify-center p-4 overflow-y-auto">
+                {renderConfig()}
+              </div>
+            ) : (
+              <>
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {messages.length === 0 && !isLoading && (
+                    <div className="flex flex-col items-center justify-center h-full text-center gap-3 py-6">
+                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Sparkles size={20} className="text-primary" />
+                      </div>
+                      <p className="text-gray-400 text-sm">¿Tenés alguna duda?</p>
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        {suggestedQuestions.map((q, i) => (
+                          <button
+                            key={i}
+                            onClick={() => handleSuggestion(q.replace(/^[^\s]+\s/, ''))}
+                            className="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-full text-xs text-gray-300 hover:border-primary hover:text-primary transition-colors"
+                          >
+                            {q}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {messages.map((msg, i) => (
+                    <div key={msg.id || i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      <div className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed overflow-hidden break-words ${
+                        msg.role === 'user'
+                          ? 'bg-primary/20 text-white rounded-br-md whitespace-pre-wrap'
+                          : 'bg-gray-800 text-gray-200 rounded-bl-md border border-gray-700 prose prose-invert prose-sm max-w-none prose-p:leading-relaxed prose-pre:p-2 prose-pre:bg-black/50 prose-pre:border prose-pre:border-gray-700 prose-pre:whitespace-pre-wrap prose-pre:break-words'
+                      }`}>
+                        {msg.role === 'user' ? (
+                          msg.content
+                        ) : (
+                          msg.content === '' ? (
+                            <div className="flex gap-1 py-1 px-2">
+                              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                              <div className="w-2 h-2 bg-gray-500 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+                            </div>
+                          ) : (
+                            <ReactMarkdown>{msg.content}</ReactMarkdown>
+                          )
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  <div ref={messagesEndRef} />
                 </div>
-              </form>
-            </>
-          )}
-        </div>
-      </div>
-    </>,
-    document.body
+
+                {/* Input */}
+                <form onSubmit={handleSubmit} className="flex-shrink-0 p-3 border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm">
+                  <div className="flex items-center gap-2">
+                    <textarea
+                      ref={mobileInputRef}
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder="Preguntá algo..."
+                      disabled={isLoading}
+                      rows={1}
+                      className="flex-1 px-3.5 py-2.5 bg-gray-800 border border-gray-700 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:border-primary transition-colors disabled:opacity-50 resize-none overflow-hidden"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!input.trim() || isLoading}
+                      className="p-2.5 bg-primary text-background-dark rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex-shrink-0"
+                    >
+                      <Send size={16} />
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 }

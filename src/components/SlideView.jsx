@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
-import { ArrowLeft, ArrowRight, ChevronRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Home } from 'lucide-react';
 import Quiz from './Quiz';
 
 function preprocessSolutions(markdown) {
@@ -87,19 +87,59 @@ export default function SlideView({ content, moduleQuiz, moduleId, courseId, onS
   }, [currentSlide, totalSlides]);
 
   return (
-    <div className="w-full max-w-5xl mx-auto flex flex-col bg-gray-900 border border-gray-800 shadow-2xl rounded-2xl overflow-hidden" style={{ minHeight: '65vh' }}>
+    <div className="w-full flex flex-col bg-background-dark overflow-hidden h-full">
       
-      {/* Header with Progress Bar */}
-      <div className="flex flex-col bg-gray-800/50 px-6 py-4 border-b border-gray-800 flex-shrink-0">
-        <div className="flex justify-between items-center mb-2">
-          <Link to={`/${courseId || 'python'}`} className="text-gray-400 hover:text-primary transition-colors flex items-center gap-2">
-            <ArrowLeft size={16} /> <span className="hidden sm:inline">Volver</span>
-          </Link>
-          <span className="text-sm font-bold text-gray-300">
+      {/* Header with Progress Bar and Controls */}
+      <div className="flex flex-col bg-gray-800/50 px-4 sm:px-6 py-3 border-b border-gray-800 flex-shrink-0">
+        <div className="flex justify-between items-center mb-3">
+          
+          {/* Left Navigation */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Link to="/" className="text-gray-400 hover:text-primary transition-colors flex items-center gap-1.5" title="Inicio">
+              <Home size={18} /> <span className="hidden sm:inline text-sm font-medium">Inicio</span>
+            </Link>
+            <div className="w-px h-4 bg-gray-700 hidden sm:block"></div>
+            <Link to={`/${courseId || 'python'}`} className="text-gray-400 hover:text-primary transition-colors flex items-center gap-1.5" title="Volver al curso">
+              <ArrowLeft size={18} /> <span className="hidden sm:inline text-sm font-medium">Curso</span>
+            </Link>
+          </div>
+
+          {/* Center Title (Hidden on very small screens to avoid overflow) */}
+          <span className="text-sm font-bold text-gray-300 hidden md:block">
             {isQuizSlide ? 'Evaluación' : `Diapositiva ${currentSlide + 1} de ${slides.length}`}
           </span>
-          <div className="w-16"></div>
+
+          {/* Right Navigation (Next/Prev) */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handlePrev}
+              disabled={currentSlide === 0}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors ${
+                currentSlide === 0 
+                  ? 'opacity-50 cursor-not-allowed text-gray-500 bg-gray-800' 
+                  : 'text-white bg-gray-800 hover:bg-gray-700'
+              }`}
+              title="Anterior"
+            >
+              <ArrowLeft size={16} /> <span className="hidden sm:inline">Anterior</span>
+            </button>
+            
+            <button
+              onClick={handleNext}
+              disabled={currentSlide === totalSlides - 1}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors ${
+                currentSlide === totalSlides - 1
+                  ? 'opacity-50 cursor-not-allowed text-gray-500 bg-gray-800'
+                  : 'text-background-dark bg-primary hover:bg-primary/90'
+              }`}
+              title={isQuizSlide ? 'Finalizar' : 'Siguiente'}
+            >
+              <span className="hidden sm:inline">{isQuizSlide ? 'Finalizar' : 'Siguiente'}</span> <ArrowRight size={16} />
+            </button>
+          </div>
         </div>
+
+        {/* Progress Bar */}
         <div className="w-full bg-gray-700 rounded-full h-1.5">
           <div 
             className="bg-primary h-1.5 rounded-full transition-all duration-300" 
@@ -121,33 +161,6 @@ export default function SlideView({ content, moduleQuiz, moduleId, courseId, onS
             </ReactMarkdown>
           </article>
         )}
-      </div>
-
-      {/* Footer Controls */}
-      <div className="flex justify-between items-center bg-gray-800/50 px-6 py-4 border-t border-gray-800 flex-shrink-0">
-        <button
-          onClick={handlePrev}
-          disabled={currentSlide === 0}
-          className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-semibold transition-colors ${
-            currentSlide === 0 
-              ? 'opacity-50 cursor-not-allowed text-gray-500 bg-gray-800' 
-              : 'text-white bg-gray-800 hover:bg-gray-700'
-          }`}
-        >
-          <ArrowLeft size={18} /> Anterior
-        </button>
-        
-        <button
-          onClick={handleNext}
-          disabled={currentSlide === totalSlides - 1}
-          className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold transition-colors ${
-            currentSlide === totalSlides - 1
-              ? 'opacity-50 cursor-not-allowed text-gray-500 bg-gray-800'
-              : 'text-background-dark bg-primary hover:bg-primary/90'
-          }`}
-        >
-          {isQuizSlide ? 'Finalizar' : 'Siguiente'} <ArrowRight size={18} />
-        </button>
       </div>
     </div>
   );
