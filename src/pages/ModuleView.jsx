@@ -109,25 +109,13 @@ export default function ModuleView() {
         </div>
       )}
 
-      {/* AI Chat Section (Desktop only, side-by-side) */}
+      {/* Unified Chat Component (Handles both Desktop and Mobile views internally) */}
       <div 
-        className={`transition-all duration-300 ease-in-out hidden lg:flex flex-col h-full bg-[#0d0d0d]
+        className={`
+          hidden lg:flex flex-col h-screen border-l border-gray-800 bg-background-dark transition-all duration-300 ease-in-out z-20
           ${isChatOpen && !isQuizActive ? 'w-[40%] opacity-100' : 'w-0 opacity-0 overflow-hidden'}
         `}
       >
-        <AiChat
-          isOpen={isChatOpen}
-          onToggle={() => setIsChatOpen(!isChatOpen)}
-          slideContent={currentSlideContent}
-          courseId={courseId}
-          moduleId={moduleId}
-          slideIndex={currentSlideIndex}
-          disabled={isQuizActive}
-        />
-      </div>
-
-      {/* Mobile Chat (controlled inside AiChat via portal) */}
-      <div className="lg:hidden">
         <AiChat
           isOpen={isChatOpen}
           onToggle={() => setIsChatOpen(!isChatOpen)}

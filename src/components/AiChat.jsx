@@ -53,10 +53,20 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
     adjustHeight(mobileInputRef.current);
   }, [input]);
 
-  // Load config from localStorage
+  // Load config from localStorage or .env
   useEffect(() => {
     const config = getStoredConfig();
-    if (config?.apiKey && config?.provider) {
+    const envApiKey = import.meta.env.VITE_GEMINI_API_KEY;
+    
+    if (envApiKey) {
+      setProvider('google');
+      setApiKey(envApiKey);
+      setHasConfig(true);
+      // Update localStorage if it's different
+      if (config?.apiKey !== envApiKey) {
+        setStoredConfig({ provider: 'google', apiKey: envApiKey });
+      }
+    } else if (config?.apiKey && config?.provider) {
       setProvider(config.provider);
       setApiKey(config.apiKey);
       setHasConfig(true);
@@ -73,7 +83,7 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
         .select('id, role, content, created_at')
         .eq('user_id', user.id)
         .eq('course_id', courseId)
-        .eq('day_id', parseInt(moduleId))
+        .eq('module_id', moduleId)
         .order('created_at', { ascending: true });
 
       if (!error && data) {
@@ -133,7 +143,7 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
     const { data } = await supabase.from('ai_chat_messages').insert({
       user_id: user.id,
       course_id: courseId,
-      day_id: parseInt(moduleId),
+      module_id: moduleId,
       role,
       content: `:::SLIDE:::${index}::: ${content}`,
     }).select('id');
@@ -199,30 +209,53 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
     }));
 
     try {
-      const session = await supabase.auth.getSession();
-      const accessToken = session?.data?.session?.access_token;
-
       const controller = new AbortController();
       abortRef.current = controller;
 
-      const response = await fetch(`${SUPABASE_URL}/functions/v1/ai-chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-          'apikey': SUPABASE_ANON_KEY,
-        },
-        body: JSON.stringify({
-          provider,
-          apiKey,
-          messages: apiMessages,
-        }),
-        signal: controller.signal,
-      });
+      let response;
+
+      if (provider === 'google') {
+        // Direct call to native Gemini API to avoid Edge Function AQ. key parsing bug
+        const systemInstruction = apiMessages[0].role === 'system' ? apiMessages[0].content : '';
+        const geminiMessages = apiMessages.filter(m => m.role !== 'system').map(m => ({
+          role: m.role === 'assistant' ? 'model' : m.role,
+          parts: [{ text: m.content }]
+        }));
+
+        response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:streamGenerateContent?alt=sse&key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: systemInstruction }] },
+            contents: geminiMessages
+          }),
+          signal: controller.signal,
+        });
+
+      } else {
+        // Original Edge Function flow for other providers
+        const session = await supabase.auth.getSession();
+        const accessToken = session?.data?.session?.access_token;
+        
+        response = await fetch(`${SUPABASE_URL}/functions/v1/ai-chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${accessToken}`,
+            'apikey': SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({
+            provider,
+            apiKey,
+            messages: apiMessages,
+          }),
+          signal: controller.signal,
+        });
+      }
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Error ${response.status}`);
+        throw new Error(errorData.error?.message || errorData.error || `Error ${response.status}`);
       }
 
       const reader = response.body?.getReader();
@@ -245,7 +278,6 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
           ({ done, value } = await Promise.race([reader.read(), timeoutPromise]));
         } catch (e) {
           if (e.message === 'stream_timeout') {
-            // No data for 5s — stream is stalled, treat as complete
             break;
           }
           throw e;
@@ -260,7 +292,7 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
         buffer = lines.pop() || '';
 
         for (const line of lines) {
-          if (line === 'data: [DONE]') {
+          if (line === 'data: [DONE]' || line === 'data: {"candidates":[]}') {
             isDone = true;
             break;
           }
@@ -268,8 +300,16 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
 
           try {
             const parsed = JSON.parse(line.slice(6));
-            if (parsed.text) {
-              fullText += parsed.text;
+            let chunkText = '';
+            
+            if (provider === 'google' && parsed.candidates?.[0]?.content?.parts?.[0]?.text) {
+              chunkText = parsed.candidates[0].content.parts[0].text;
+            } else if (parsed.text) {
+              chunkText = parsed.text;
+            }
+
+            if (chunkText) {
+              fullText += chunkText;
               setAllMessages(prev => prev.map(m => m.id === tempId ? { ...m, content: fullText + ' ▊' } : m));
             }
           } catch {}
@@ -286,6 +326,9 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
           setAllMessages(prev => prev.map(m => m.id === tempId ? { ...m, id: asstId } : m));
         }
       }
+
+
+
     } catch (err) {
       if (err.name !== 'AbortError') {
         setAllMessages(prev => prev.map(m => m.id === tempId ? { ...m, content: `⚠️ Error: ${err.message}. Verifica tu API key e intenta de nuevo.` } : m));
