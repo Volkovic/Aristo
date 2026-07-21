@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import ReactMarkdown from 'react-markdown';
-import { MessageSquare, X, Send, Settings, Sparkles, Trash2, ChevronDown, ChevronRight, ChevronLeft } from 'lucide-react';
+import { MessageSquare, X, Send, Settings, Sparkles, Trash2, ChevronDown, ChevronRight, ChevronLeft, MoreVertical } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { supabase } from '../lib/supabase';
 
@@ -154,6 +154,19 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
     }
     setAllMessages(prev => prev.filter(m => m.slideIndex !== slideIndex));
     setShowDeleteModal(false);
+  };
+
+  const deleteMessage = async (msgId) => {
+    if (!user || !msgId) return;
+    
+    // Optimistic update
+    setAllMessages(prev => prev.filter(m => m.id !== msgId));
+    
+    // Delete from DB
+    await supabase
+      .from('ai_chat_messages')
+      .delete()
+      .eq('id', msgId);
   };
 
   const sendMessage = useCallback(async (text) => {
@@ -432,7 +445,16 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
               )}
               
               {messages.map((msg, i) => (
-                <div key={msg.id || i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div key={msg.id || i} className={`group flex items-center gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  {msg.role === 'user' && msg.id && (
+                    <button 
+                      onClick={() => deleteMessage(msg.id)}
+                      className="p-1.5 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+                      title="Eliminar mensaje"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
                   <div className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed overflow-hidden break-words ${
                     msg.role === 'user'
                       ? 'bg-primary/20 text-white rounded-br-md whitespace-pre-wrap'
@@ -452,6 +474,15 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
                       )
                     )}
                   </div>
+                  {msg.role === 'assistant' && msg.id && (
+                    <button 
+                      onClick={() => deleteMessage(msg.id)}
+                      className="p-1.5 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+                      title="Eliminar mensaje"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  )}
                 </div>
               ))}
 
@@ -575,7 +606,16 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
                   )}
 
                   {messages.map((msg, i) => (
-                    <div key={msg.id || i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div key={msg.id || i} className={`group flex items-center gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                      {msg.role === 'user' && msg.id && (
+                        <button 
+                          onClick={() => deleteMessage(msg.id)}
+                          className="p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+                          title="Eliminar mensaje"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
                       <div className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed overflow-hidden break-words ${
                         msg.role === 'user'
                           ? 'bg-primary/20 text-white rounded-br-md whitespace-pre-wrap'
@@ -595,6 +635,15 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
                           )
                         )}
                       </div>
+                      {msg.role === 'assistant' && msg.id && (
+                        <button 
+                          onClick={() => deleteMessage(msg.id)}
+                          className="p-1 text-gray-500 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg"
+                          title="Eliminar mensaje"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
                     </div>
                   ))}
 
