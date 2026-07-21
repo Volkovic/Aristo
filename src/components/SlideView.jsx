@@ -30,7 +30,7 @@ function preprocessSolutions(markdown) {
   );
 }
 
-export default function SlideView({ content, moduleQuiz, moduleId, courseId, onSlideChange }) {
+export default function SlideView({ content, moduleQuiz, moduleId, courseId, moduleTitle, onSlideChange }) {
   // Split markdown by horizontal rule (---)
   // We use regex to match lines that are exactly '---'
   const slides = content.split(/^---\s*$/m).filter(s => s.trim().length > 0);
@@ -106,7 +106,13 @@ export default function SlideView({ content, moduleQuiz, moduleId, courseId, onS
 
           {/* Center Title (Hidden on very small screens to avoid overflow) */}
           <span className="text-sm font-bold text-gray-300 hidden md:block">
-            {isQuizSlide ? 'Evaluación' : `Diapositiva ${currentSlide + 1} de ${slides.length}`}
+            {moduleTitle ? (
+              <span className="text-primary mr-2">{moduleTitle}</span>
+            ) : null}
+            <span className="text-gray-500">|</span>
+            <span className="ml-2">
+              {isQuizSlide ? 'Evaluación' : `Diapositiva ${currentSlide + 1} de ${slides.length}`}
+            </span>
           </span>
 
           {/* Right Navigation (Next/Prev) */}

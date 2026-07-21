@@ -6,6 +6,7 @@ import rehypeSlug from 'rehype-slug';
 import Quiz from '../components/Quiz';
 import SlideView from '../components/SlideView';
 import AiChat from '../components/AiChat';
+import { getModuleTitle } from '../data/courseTitles';
 
 export default function ModuleView() {
   const { courseId, moduleId } = useParams();
@@ -86,7 +87,8 @@ export default function ModuleView() {
           content={content} 
           moduleQuiz={moduleQuiz} 
           moduleId={moduleId} 
-          courseId={courseId} 
+          courseId={courseId}
+          moduleTitle={getModuleTitle(courseId, moduleId)}
           onSlideChange={handleSlideChange}
         />
       </div>
