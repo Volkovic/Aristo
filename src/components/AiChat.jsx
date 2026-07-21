@@ -541,6 +541,8 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
             <form onSubmit={handleSubmit} className="flex-shrink-0 p-3 border-t border-gray-800 bg-gray-900/50">
               <div className="flex items-center gap-2">
                 <textarea
+                  id="chat-input-desktop"
+                  name="chat-input-desktop"
                   ref={desktopInputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
@@ -702,6 +704,8 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
                 <form onSubmit={handleSubmit} className="flex-shrink-0 p-3 border-t border-gray-800 bg-gray-900/80 backdrop-blur-sm">
                   <div className="flex items-center gap-2">
                     <textarea
+                      id="chat-input-mobile"
+                      name="chat-input-mobile"
                       ref={mobileInputRef}
                       value={input}
                       onChange={(e) => setInput(e.target.value)}

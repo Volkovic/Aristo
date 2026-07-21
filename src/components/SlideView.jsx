@@ -38,7 +38,18 @@ export default function SlideView({ content, moduleQuiz, moduleId, courseId, mod
   // Add a final slide for the Quiz
   const totalSlides = moduleQuiz ? slides.length + 1 : slides.length;
 
-  const [currentSlide, setCurrentSlide] = useState(0);
+  // Retrieve saved progress from localStorage or default to 0
+  const storageKey = `vitka-slide-${courseId}-${moduleId}`;
+  const savedSlide = localStorage.getItem(storageKey);
+  const initialSlide = savedSlide ? parseInt(savedSlide, 10) : 0;
+  const validInitialSlide = Math.max(0, Math.min(initialSlide, totalSlides - 1));
+
+  const [currentSlide, setCurrentSlide] = useState(validInitialSlide);
+
+  // Save progress to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem(storageKey, currentSlide.toString());
+  }, [currentSlide, storageKey]);
   const scrollRef = useRef(null);
 
   useEffect(() => {
