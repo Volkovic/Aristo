@@ -77,13 +77,22 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
         .order('created_at', { ascending: true });
 
       if (!error && data) {
-        const parsed = data.map(m => {
-          const match = m.content.match(/^:::SLIDE:::(\d+)::: ([\s\S]*)$/);
-          if (match) {
-            return { role: m.role, content: match[2], slideIndex: parseInt(match[1]), id: m.id };
-          }
-          return { role: m.role, content: m.content, slideIndex: 0, id: m.id };
-        });
+        const parsed = data
+          .filter(m => {
+            // Filter out empty assistant messages (stuck "..." bubbles)
+            if (m.role === 'assistant') {
+              const trimmed = m.content.replace(/^:::SLIDE:::\d+::: ?/, '').trim();
+              return trimmed.length > 0;
+            }
+            return true;
+          })
+          .map(m => {
+            const match = m.content.match(/^:::SLIDE:::(\d+)::: ([\s\S]*)$/);
+            if (match) {
+              return { role: m.role, content: match[2], slideIndex: parseInt(match[1]), id: m.id };
+            }
+            return { role: m.role, content: m.content, slideIndex: 0, id: m.id };
+          });
         
         setAllMessages(prev => {
           // Preserve any actively streaming messages (which have a temp- ID)
@@ -130,6 +139,8 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
     }).select('id');
     return data && data.length > 0 ? data[0].id : null;
   };
+
+
 
   const clearHistory = async () => {
     if (!user) return;
@@ -205,11 +216,30 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
       const decoder = new TextDecoder();
       let fullText = '';
       let buffer = '';
-
       let isDone = false;
 
+      // Read stream with inactivity timeout — if no new chunk arrives in 5s, assume stream is finished
+      const INACTIVITY_TIMEOUT_MS = 5000;
+
       while (reader && !isDone) {
-        const { done, value } = await reader.read();
+        let timeoutId;
+        const timeoutPromise = new Promise((_, reject) => {
+          timeoutId = setTimeout(() => reject(new Error('stream_timeout')), INACTIVITY_TIMEOUT_MS);
+        });
+
+        let done, value;
+        try {
+          ({ done, value } = await Promise.race([reader.read(), timeoutPromise]));
+        } catch (e) {
+          if (e.message === 'stream_timeout') {
+            // No data for 5s — stream is stalled, treat as complete
+            break;
+          }
+          throw e;
+        } finally {
+          clearTimeout(timeoutId);
+        }
+
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
@@ -233,9 +263,10 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
         }
       }
 
-      // Remove cursor and save final message
+      // Remove cursor and update state
       setAllMessages(prev => prev.map(m => m.id === tempId ? { ...m, content: fullText } : m));
       
+      // Save complete response to DB only once, at the end
       if (fullText) {
         const asstId = await saveMessage('assistant', fullText, slideIndex);
         if (asstId) {
