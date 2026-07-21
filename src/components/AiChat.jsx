@@ -83,7 +83,7 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
         .select('id, role, content, created_at')
         .eq('user_id', user.id)
         .eq('course_id', courseId)
-        .eq('module_id', moduleId)
+        .eq('module_id', parseInt(moduleId))
         .order('created_at', { ascending: true });
 
       if (!error && data) {
@@ -140,13 +140,18 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
 
   const saveMessage = async (role, content, index) => {
     if (!user) return null;
-    const { data } = await supabase.from('ai_chat_messages').insert({
+    const { data, error } = await supabase.from('ai_chat_messages').insert({
       user_id: user.id,
       course_id: courseId,
-      module_id: moduleId,
+      module_id: parseInt(moduleId),
       role,
       content: `:::SLIDE:::${index}::: ${content}`,
     }).select('id');
+    
+    if (error) {
+      console.error("Error saving message to Supabase:", error);
+    }
+    
     return data && data.length > 0 ? data[0].id : null;
   };
 

@@ -50,9 +50,9 @@ export default function Quiz({ questions, moduleId, courseId }) {
           .upsert({
             user_id: user.id,
             course_id: courseId,
-            day_id: parseInt(moduleId),
+            module_id: parseInt(moduleId),
             score: score
-          }, { onConflict: 'user_id, course_id, day_id' });
+          }, { onConflict: 'user_id, course_id, module_id' });
           
         if (error) {
           console.error("Error saving progress to Supabase:", error.message);

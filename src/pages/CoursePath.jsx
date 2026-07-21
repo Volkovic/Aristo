@@ -34,7 +34,7 @@ export default function CoursePath() {
   ];
 
   const { user, loading: authLoading } = useAuth();
-  const [currentCompletedDays, setCurrentCompletedDays] = useState(0);
+  const [currentCompletedModules, setCurrentCompletedModules] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -46,15 +46,15 @@ export default function CoursePath() {
     async function loadProgress() {
       const { data, error } = await supabase
         .from('user_progress')
-        .select('day_id')
+        .select('module_id')
         .eq('user_id', user.id)
         .eq('course_id', courseId);
       
       if (!error && data) {
         // Encontramos cuntos das complet. Asumimos que los das se completan secuencialmente.
         // O podemos simplemente habilitar el da = mximo da completado + 1
-        const maxDay = data.reduce((max, curr) => Math.max(max, curr.day_id), 0);
-        setCurrentCompletedDays(maxDay);
+        const maxModule = data.reduce((max, curr) => Math.max(max, curr.module_id), 0);
+        setCurrentCompletedModules(maxModule);
       }
       setLoading(false);
     }
@@ -68,7 +68,7 @@ export default function CoursePath() {
   const isPython = courseId === 'python';
   const isSql = courseId === 'sql';
   
-  const dayTitles = isPython ? pythonTitles : (isSql ? sqlTitles : javascriptTitles);
+  const moduleTitles = isPython ? pythonTitles : (isSql ? sqlTitles : javascriptTitles);
   const courseName = isPython ? 'Python' : (isSql ? 'SQL' : 'JavaScript');
   const Icon = isPython ? Terminal : (isSql ? Database : Code2);
 
@@ -81,24 +81,24 @@ export default function CoursePath() {
     return <Navigate to="/login" />;
   }
 
-  const days = Array.from({ length: dayTitles.length }, (_, i) => {
-    const dayId = i + 1;
+  const modules = Array.from({ length: moduleTitles.length }, (_, i) => {
+    const moduleId = i + 1;
     
     let status = 'locked';
-    if (dayId <= currentCompletedDays) {
+    if (moduleId <= currentCompletedModules) {
       status = 'completed';
-    } else if (dayId === currentCompletedDays + 1) {
+    } else if (moduleId === currentCompletedModules + 1) {
       status = 'available';
     }
     
     return {
-      id: dayId,
-      title: dayTitles[i] || `Tema ${dayId}`,
+      id: moduleId,
+      title: moduleTitles[i] || `Tema ${moduleId}`,
       status: status
     };
   });
 
-  const progressPercentage = Math.round((currentCompletedDays / dayTitles.length) * 100);
+  const progressPercentage = Math.round((currentCompletedModules / moduleTitles.length) * 100);
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 animate-in fade-in duration-500 pb-20">
@@ -106,7 +106,7 @@ export default function CoursePath() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <h1 className="text-4xl sm:text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-primary to-green-400">Ruta de {courseName}</h1>
-            <span className="px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-bold border border-primary/20 shadow-[0_0_15px_rgba(209,254,23,0.2)]">{dayTitles.length} Módulos</span>
+            <span className="px-4 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-bold border border-primary/20 shadow-[0_0_15px_rgba(209,254,23,0.2)]">{moduleTitles.length} Módulos</span>
           </div>
           <Icon size={48} className="text-gray-800 hidden sm:block" />
         </div>
@@ -114,7 +114,7 @@ export default function CoursePath() {
         <div className="space-y-3 w-full max-w-2xl">
           <div className="flex justify-between text-sm font-medium">
             <span className="text-text-muted">Progreso del curso</span>
-            <span className="text-primary font-bold">{progressPercentage}% ({currentCompletedDays}/{dayTitles.length})</span>
+            <span className="text-primary font-bold">{progressPercentage}% ({currentCompletedModules}/{moduleTitles.length})</span>
           </div>
           <div className="w-full bg-gray-800/50 rounded-full h-3 overflow-hidden border border-gray-800 shadow-inner">
             <div className="bg-gradient-to-r from-green-500 to-primary h-full rounded-full transition-all duration-1000 ease-out" style={{ width: `${progressPercentage}%` }}></div>
@@ -123,10 +123,10 @@ export default function CoursePath() {
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-        {days.map((day) => {
-          const isLocked = day.status === 'locked';
-          const isCompleted = day.status === 'completed';
-          const isAvailable = day.status === 'available';
+        {modules.map((module) => {
+          const isLocked = module.status === 'locked';
+          const isCompleted = module.status === 'completed';
+          const isAvailable = module.status === 'available';
           
           let cardClasses = "group relative flex flex-col h-full min-h-[9rem] p-4 rounded-2xl border transition-all duration-300 overflow-hidden ";
           
@@ -141,8 +141,8 @@ export default function CoursePath() {
 
           return (
             <Link 
-              key={day.id} 
-              to={`/${courseId}/module/${day.id}`}
+              key={module.id} 
+              to={`/${courseId}/module/${module.id}`}
               className={cardClasses}
             >
               {/* Resplandor de fondo al hacer hover en cards interactivos */}
@@ -152,7 +152,7 @@ export default function CoursePath() {
 
               <div className="flex justify-between items-start z-10">
                 <span className={`text-4xl font-black tracking-tighter ${isCompleted ? 'text-primary' : isLocked ? 'text-gray-800' : 'text-gray-400 group-hover:text-primary transition-colors'}`}>
-                  {day.id.toString().padStart(2, '0')}
+                  {module.id.toString().padStart(2, '0')}
                 </span>
                 
                 {/* Icon Container */}
@@ -169,7 +169,7 @@ export default function CoursePath() {
               
               <div className="mt-auto z-10">
                 <h3 className={`font-bold text-base ${isLocked ? 'text-gray-600' : 'text-white'}`}>
-                  {day.title}
+                  {module.title}
                 </h3>
                 <p className={`text-[10px] font-bold uppercase tracking-widest mt-1 flex items-center gap-1
                   ${isCompleted ? 'text-primary drop-shadow-[0_0_5px_rgba(209,254,23,0.5)]' : ''}

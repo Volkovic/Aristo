@@ -24,26 +24,26 @@ export default function Dashboard() {
     async function loadProgress() {
       const { data, error } = await supabase
         .from('user_progress')
-        .select('course_id, day_id')
+        .select('course_id, module_id')
         .eq('user_id', user.id);
 
       if (!error && data) {
-        const maxDays = {
+        const maxModules = {
           python: 0,
           javascript: 0,
           sql: 0
         };
         
         data.forEach(row => {
-          if (row.course_id && row.day_id > maxDays[row.course_id]) {
-            maxDays[row.course_id] = row.day_id;
+          if (row.course_id && row.module_id > maxModules[row.course_id]) {
+            maxModules[row.course_id] = row.module_id;
           }
         });
 
         setProgress({
-          python: Math.round((maxDays.python / TOTAL_MODULES.python) * 100),
-          javascript: Math.round((maxDays.javascript / TOTAL_MODULES.javascript) * 100),
-          sql: Math.round((maxDays.sql / TOTAL_MODULES.sql) * 100)
+          python: Math.round((maxModules.python / TOTAL_MODULES.python) * 100),
+          javascript: Math.round((maxModules.javascript / TOTAL_MODULES.javascript) * 100),
+          sql: Math.round((maxModules.sql / TOTAL_MODULES.sql) * 100)
         });
       }
     }
