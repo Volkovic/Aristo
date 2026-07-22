@@ -184,6 +184,8 @@ export default function AiChat({ isOpen, onToggle, slideContent, courseId, modul
   const sendMessage = useCallback(async (text) => {
     if (!text.trim() || isLoading || !hasConfig) return;
 
+
+
     const userMessage = { role: 'user', content: text.trim(), slideIndex };
     const tempId = 'temp-' + Date.now();
     const tempAssistantMessage = { id: tempId, role: 'assistant', content: '', slideIndex };
